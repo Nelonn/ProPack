@@ -1,0 +1,4 @@
+{
+  "item.example.tomato": "Tomato",
+  "item.<namespace>.sandwich": "Sandwich"
+}

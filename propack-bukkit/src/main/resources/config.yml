@@ -1,0 +1,7 @@
+dispatch:
+  enabled: true
+  delay: -1
+  # options below requires ProtocolLib or Paper (or fork) core
+  required: true
+  pack: example
+  prompt: "&#fa4943Accept the pack to enjoy a full experience"

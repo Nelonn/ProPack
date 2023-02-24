@@ -1,0 +1,16 @@
+{
+  // must implement me.nelonn.propack.builder.ZipPackager
+  // default: propack.StandardZipPackager
+  Class: 'propack.StandardZipPackager',
+
+  Options: {
+    compression: 'BEST_COMPRESSION', // see Deflater.class
+    // protection will use several methods to make your pack impossible to extract
+    // with usual tools (native windows unzip, 7zip, winrar, etc) without altering
+    // its integrity. Be careful if you activate this option to not try to extract
+    // the pack or you might fill your disk.
+    protection: true,
+    // TODO: FUCKING GSON LENIENT MODE
+    comment: "The content of this resource pack\nbelongs to the owner of the ProPack\nplugin and any complete or partial\nuse must comply with the terms and\nconditions of ProPack."
+  }
+}

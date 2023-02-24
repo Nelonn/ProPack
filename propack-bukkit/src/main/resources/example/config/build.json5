@@ -1,0 +1,13 @@
+{
+  ItemDefinition: {
+    Type: "Bukkit"
+  },
+  // Available options: false, 'warn', true
+  Strict: true,
+  IgnoredExtensions: [
+    "old.png",
+    "psd",
+    "txt",
+    "md"
+  ]
+}

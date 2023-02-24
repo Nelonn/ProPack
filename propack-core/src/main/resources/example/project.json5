@@ -1,0 +1,21 @@
+{
+  "FileVersion": 1,
+  "Name": "example",
+  "PackFormat": 7,
+  "Icon": "Icon128x",
+  "Description": {
+    "Type": "MiniMessage",
+    "Text": "<white>Resource Pack"
+  }
+  /*"Description": {
+    "Type": "Component",
+    "Text": {
+      "color": "white",
+      "text": "Resource Pack"
+    }
+  },*/
+  /*"Description": {
+    "Type": "Legacy",
+    "Text": "&fResource Pack"
+  }*/
+}

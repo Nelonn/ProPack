@@ -1,0 +1,5 @@
+{
+  "Type": "DefaultItemModel",
+  "Mesh": "./emerald_helmet",
+  "Target": "minecraft:leather_helmet"
+}

@@ -1,0 +1,5 @@
+{
+  "Type": "DefaultItemModel",
+  "Mesh": "./emerald_chestplate",
+  "Target": "minecraft:leather_chestplate"
+}

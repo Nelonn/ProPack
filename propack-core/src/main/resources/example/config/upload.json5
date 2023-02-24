@@ -1,0 +1,18 @@
+{
+  Enabled: false,
+
+  // must implement me.nelonn.propack.builder.Hosting
+  // default: propack.DevServer
+  // DevServer will serve pack on 0.0.0.0
+  Class: 'propack.DevServer',
+
+  // allows you to upload 2 or more resource packs
+  // to one place without creating a new connection
+  SharedOptions: {
+    return_ip: '127.0.0.1',
+    port: 3000
+  },
+
+  // upload settings specially for this resource pack
+  Options: {}
+}

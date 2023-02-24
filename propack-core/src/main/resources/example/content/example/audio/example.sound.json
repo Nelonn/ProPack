@@ -1,0 +1,17 @@
+{
+  "category": "records",
+  "subtitle": "subtitles.block.generic.hit",
+  "sounds": [
+    {
+      "name": "./never_gonna",
+      "volume": 0.1,
+      "pitch": 1.0,
+      "weight": 1,
+      "stream": true,
+      "attenuation_distance": 16,
+      "preload": false,
+      "type": "event"
+    },
+    "./industry"
+  ]
+}

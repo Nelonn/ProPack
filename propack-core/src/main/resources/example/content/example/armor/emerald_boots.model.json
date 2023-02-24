@@ -1,0 +1,5 @@
+{
+  "Type": "DefaultItemModel",
+  "Mesh": "./emerald_boots",
+  "Target": "minecraft:leather_boots"
+}
