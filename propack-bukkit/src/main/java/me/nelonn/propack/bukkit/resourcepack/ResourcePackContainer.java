@@ -73,6 +73,8 @@ public class ResourcePackContainer {
                     internalProject.build();
                     ResourcePackDefinition resourcePackDefinition = new ResourcePackDefinition(name, internalProject);
                     definitions.put(name, resourcePackDefinition);
+                } else if (type.equalsIgnoreCase("File")) {
+                    throw new UnsupportedOperationException("Resource pack definition type 'File' currently not supported");
                 }
             } catch (Exception e) {
                 LOGGER.error("Unable to load '" + name + "': " + e.getMessage());
