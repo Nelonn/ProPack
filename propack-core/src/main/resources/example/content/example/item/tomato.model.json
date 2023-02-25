@@ -1,7 +1,5 @@
 {
-  "Type": "Default",
-  "Mesh": "./tomato",
-  "Target": [
-    "cookie"
-  ]
+    "Type": "Default",
+    "Mesh": "./tomato",
+    "Target": "cookie"
 }
