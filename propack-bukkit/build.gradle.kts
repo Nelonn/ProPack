@@ -94,31 +94,15 @@ tasks.named<ShadowJar>("shadowJar") {
                 }
             }
     })
-    dependencies {
-        /*include(project(":propack-api"))
-        include(project(":propack-core"))
-        include(dependency("net.kyori:adventure-api:4.12.0"))
-        include(dependency("net.kyori:adventure-key:4.12.0"))
-        include(dependency("net.kyori:adventure-nbt:4.12.0"))
-        include(dependency("net.kyori:adventure-platform-api:4.2.0"))
-        include(dependency("net.kyori:adventure-platform-bukkit:4.2.0"))
-        include(dependency("net.kyori:adventure-platform-facet:4.2.0"))
-        include(dependency("net.kyori:adventure-platform-viaversion:4.2.0"))
-        include(dependency("net.kyori:adventure-text-minimessage:4.12.0"))
-        include(dependency("net.kyori:adventure-text-serializer-plain:4.12.0"))
-        include(dependency("net.kyori:adventure-text-serializer-legacy:4.12.0"))
-        include(dependency("net.kyori:adventure-text-serializer-gson:4.12.0"))
-        include(dependency("net.kyori:examination-api:1.3.0"))
-        include(dependency("net.kyori:examination-string:1.3.0"))
-        include(dependency("commons-io:commons-io:2.11.0"))
-        include(dependency("org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r"))*/
-    }
     exclude("GradleStart**")
     exclude(".cache")
     exclude("LICENSE*")
     exclude("META-INF/maven/**")
     exclude("about.html")
-    relocate("net.kyori", "me.nelonn.propack.shaded.kyori")
+    relocate("net.kyori", "me.nelonn.propack.shaded.kyori") {
+        exclude("net.kyori.adventure.key.*")
+    }
+    exclude("net/kyori/adventure/key/**") // problems with different classes
     relocate("org.xiph", "me.nelonn.propack.core.ogg")
     archiveClassifier.set("")
 }

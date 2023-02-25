@@ -44,6 +44,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -94,8 +95,8 @@ public class PacketListener extends PacketAdapter {
     public void onPacketSending(PacketEvent event) {
         PacketType type = event.getPacketType();
         Object packet = event.getPacket().getHandle();
-        final ResourcePack resourcePack = ProPack.getDispatcher().getResourcePack(event.getPlayer());
-        if (resourcePack == null) return;
+        Optional<ResourcePack> resourcePack = ProPack.getDispatcher().getResourcePack(event.getPlayer());
+        if (resourcePack.isEmpty()) return;
         BiConsumer<Object, Consumer<WrappedItemStack>> method;
         if (type == PacketType.Play.Server.SET_SLOT) {
             method = adapter::patchSetSlot;
@@ -106,7 +107,7 @@ public class PacketListener extends PacketAdapter {
         } else {
             return;
         }
-        method.accept(packet, stack -> patchOut(stack, resourcePack));
+        method.accept(packet, stack -> patchOut(stack, resourcePack.get()));
     }
 
     private void patchIn(WrappedItemStack itemStack) {

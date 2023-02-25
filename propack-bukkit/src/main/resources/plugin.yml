@@ -5,5 +5,4 @@ api-version: 1.17
 author: Nelonn
 load: STARTUP
 description: Resources manager, auto build resource pack
-depend: [ Flint ]
-softdepend: [ ProtocolLib, PlaceholderAPI ]
+softdepend: [ProtocolLib, PlaceholderAPI]

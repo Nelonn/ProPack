@@ -31,10 +31,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class Dispatcher implements Listener {
     private final Plugin plugin;
@@ -73,7 +73,7 @@ public class Dispatcher implements Listener {
         sent.remove(event.getPlayer());
     }
 
-    public @Nullable ResourcePack getResourcePack(@NotNull Player player) {
-        return sent.get(player);
+    public @NotNull Optional<ResourcePack> getResourcePack(@NotNull Player player) {
+        return Optional.of(sent.get(player));
     }
 }
