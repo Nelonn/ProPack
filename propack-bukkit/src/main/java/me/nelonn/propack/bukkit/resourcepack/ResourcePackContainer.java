@@ -26,6 +26,7 @@ import me.nelonn.propack.core.loader.itemdefinition.JsonFileItemDefinitionLoader
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.bukkit.BukkitItemDefinitionLoader;
+import me.nelonn.propack.core.util.Util;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -62,7 +63,7 @@ public class ResourcePackContainer {
             if (file.isDirectory()) continue;
             String name = file.getName();
             if (!name.endsWith(".json")) continue;
-            name = name.substring(0, name.length() - ".json".length());
+            name = Util.substringLast(name, ".json");
             try {
                 String content = Files.readString(file.toPath(), StandardCharsets.UTF_8);
                 JsonObject jsonObject = GsonHelper.deserialize(content);

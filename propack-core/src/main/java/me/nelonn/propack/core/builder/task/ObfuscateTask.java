@@ -32,6 +32,7 @@ import me.nelonn.propack.core.builder.asset.FontBuilder;
 import me.nelonn.propack.core.builder.asset.SoundAssetBuilder;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.PathUtil;
+import me.nelonn.propack.core.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -57,7 +58,7 @@ public class ObfuscateTask extends AbstractTask {
                     String[] pathSplit = filePath.split("/", 4); // assets/example/models/file.json
                     if (pathSplit.length < 4 || pathSplit[1].equalsIgnoreCase("minecraft") ||
                             !pathSplit[2].equalsIgnoreCase("models")) continue;
-                    Path contentPath = Path.of(pathSplit[1], pathSplit[3].substring(0, pathSplit[3].length() - ".json".length()));
+                    Path contentPath = Path.of(pathSplit[1], Util.substringLast(pathSplit[3], ".json"));
                     Path obfuscatedPath = Path.of(conf.getNamespace(), nextHex(integer));
                     io.getFiles().addFile(file.copyAs(PathUtil.assetsPath(obfuscatedPath, "models") + ".json"));
                     meshMapping.put(contentPath, obfuscatedPath);
@@ -209,7 +210,7 @@ public class ObfuscateTask extends AbstractTask {
                                 String providerType = GsonHelper.getString(providerObject, "type");
                                 if (providerType.equalsIgnoreCase("bitmap")) {
                                     String path = GsonHelper.getString(providerObject, "file");
-                                    path = path.substring(0, path.length() - ".png".length());
+                                    path = Util.substringLast(path, ".png");
                                     Path obfuscatedPath = pngMapping.get(Path.of(path));
                                     if (obfuscatedPath != null) {
                                         providerObject.addProperty("file", obfuscatedPath + ".png");

@@ -60,7 +60,7 @@ public class ProcessLanguagesTask extends AbstractTask {
                 Path resourcePath = PathUtil.resourcePath(filePath);
                 String langCode = resourcePath.getValue();
                 langCode = langCode.substring(langCode.indexOf('/') + 1, langCode.length() - ".font.json".length());
-                final String langPath = PathUtil.assetsPath(resourcePath, "lang") + ".json";
+                String langPath = "assets/" + resourcePath.getNamespace() + "/lang/" + langCode + ".json";
                 JsonFile langJsonFile = Util.getOrPut(languageFiles, langPath, () -> new JsonFile(langPath, new JsonObject()));
                 for (String key : jsonObject.keySet()) {
                     String translation = GsonHelper.getString(jsonObject, key);

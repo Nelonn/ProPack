@@ -19,6 +19,7 @@
 package me.nelonn.propack.builder.file;
 
 import com.google.gson.JsonObject;
+import me.nelonn.propack.core.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.Charset;
@@ -29,7 +30,7 @@ public class JsonFile extends AbstractFile implements MutableFile<JsonObject> {
     private final Charset charset;
 
     public JsonFile(@NotNull String path, @NotNull JsonObject content, @NotNull Charset charset) {
-        super(path.endsWith(".json5") || path.endsWith(".jsonc") ? path.substring(0, path.length() - 1) : path);
+        super(path.endsWith(".json5") || path.endsWith(".jsonc") ? Util.substringLast(path, 1) : path);
         this.content = content;
         this.charset = charset;
     }

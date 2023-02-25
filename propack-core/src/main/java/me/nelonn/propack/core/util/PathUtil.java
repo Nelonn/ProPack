@@ -65,7 +65,7 @@ public final class PathUtil {
     }
 
     public static @NotNull Path resourcePath(@NotNull String input, @NotNull String extension) {
-        return resourcePath(input.substring(0, input.length() - extension.length()));
+        return resourcePath(Util.substringLast(input, extension));
     }
 
     public static @NotNull String contentPath(@NotNull Path path) {
@@ -83,7 +83,7 @@ public final class PathUtil {
             path = path.substring(1);
         }
         if (path.endsWith("/")) {
-            path = path.substring(0, path.length() - 1);
+            path = Util.substringLast(path, 1);
         }
         return path;
     }

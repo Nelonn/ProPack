@@ -91,6 +91,14 @@ public final class Util {
         return jsonArray;
     }
 
+    public static @NotNull String substringLast(@NotNull String string, int size) {
+        return string.substring(0, string.length() - size);
+    }
+
+    public static @NotNull String substringLast(@NotNull String string, @NotNull String cut) {
+        return substringLast(string, cut.length());
+    }
+
     /*public static @NotNull Path parsePath(@NotNull String input) {
         String[] args = input.split("\\+", 2);
         return Path.of(args[0]);

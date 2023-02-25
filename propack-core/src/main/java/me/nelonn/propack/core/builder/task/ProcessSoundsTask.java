@@ -56,7 +56,7 @@ public class ProcessSoundsTask extends AbstractTask {
                 String filePath = file.getPath();
                 if (!filePath.startsWith("content/") || !filePath.endsWith(".wav")) continue;
                 io.getFiles().removeFile(filePath);
-                String oggFilePath = filePath.substring(0, filePath.length() - "wav".length()) + "ogg";
+                String oggFilePath = Util.substringLast(filePath, "wav") + "ogg";
                 java.io.File tempFile = new java.io.File(io.getTempDirectory(), oggFilePath);
                 tempFile.getParentFile().mkdirs();
                 try (InputStream inputStream = file.openInputStream();
@@ -82,9 +82,9 @@ public class ProcessSoundsTask extends AbstractTask {
                 for (Sound soundIn : soundEntryIn.getSounds()) {
                     String oggPathStr = soundIn.getName();
                     if (oggPathStr.endsWith(".ogg")) {
-                        oggPathStr = oggPathStr.substring(0, oggPathStr.length() - ".ogg".length());
+                        oggPathStr = Util.substringLast(oggPathStr, ".ogg");
                     }
-                    Path oggPath = PathUtil.resolve(soundIn.getName(), resourcePath);
+                    Path oggPath = PathUtil.resolve(oggPathStr, resourcePath);
                     soundsOut.add(new Sound(oggPath.toString(), soundIn.getVolume(), soundIn.getPitch(),
                             soundIn.getWeight(), soundIn.getRegistrationType(), soundIn.isStreamed(), soundIn.isPreloaded(),
                             soundIn.getAttenuation()));
