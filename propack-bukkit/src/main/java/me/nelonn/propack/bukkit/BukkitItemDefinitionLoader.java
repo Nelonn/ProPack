@@ -25,24 +25,18 @@ import me.nelonn.propack.builder.util.Extras;
 import me.nelonn.propack.definition.Item;
 import me.nelonn.propack.definition.ItemDefinition;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class BukkitItemDefinitionLoader implements ItemDefinitionLoader {
     public static final BukkitItemDefinitionLoader INSTANCE = new BukkitItemDefinitionLoader();
     private final ItemDefinition itemDefinition;
 
-    @SuppressWarnings("deprecation")
     private BukkitItemDefinitionLoader() {
-        Map<Identifier, Item> itemMap = new HashMap<>();
-        for (Material material : Material.values()) {
-            if (material.isLegacy()) continue;
-            Identifier id = Identifier.of(material.getKey().getKey(), material.getKey().getNamespace());
-            itemMap.put(id, new Item(id, material.isBlock()));
-        }
-        itemDefinition = new ItemDefinition(itemMap);
+        itemDefinition = BukkitItemDefinition.INSTANCE;
     }
 
     @Override
@@ -53,5 +47,36 @@ public class BukkitItemDefinitionLoader implements ItemDefinitionLoader {
     @Override
     public @NotNull ItemDefinition load(@NotNull JsonObject input, @NotNull Extras extras) {
         return itemDefinition;
+    }
+
+    @SuppressWarnings("deprecation")
+    public static class BukkitItemDefinition implements ItemDefinition {
+        public static final BukkitItemDefinition INSTANCE = new BukkitItemDefinition();
+
+        private BukkitItemDefinition() {
+        }
+
+        @Override
+        public @Nullable Item getItem(@NotNull Identifier identifier) {
+            Material material = Material.matchMaterial(identifier.asString());
+            return material == null ? null : transform(material);
+        }
+
+        @Override
+        public @NotNull Collection<Item> getItems() {
+            return Arrays.stream(Material.values()).collect(HashSet::new, (items, material) -> {
+                if (!material.isLegacy()) {
+                    items.add(transform(material));
+                }
+            }, HashSet::addAll);
+        }
+
+        public @NotNull Item transform(@NotNull Material material) {
+            if (material.isLegacy()) {
+                throw new IllegalArgumentException("Legacy material is not allowed");
+            }
+            NamespacedKey key = material.getKey();
+            return new Item(Identifier.of(key.getKey(), key.getNamespace()), material.isBlock());
+        }
     }
 }
