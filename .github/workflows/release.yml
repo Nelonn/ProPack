@@ -24,7 +24,9 @@ jobs:
         distribution: adopt
       
     - name: Build with Gradle
-      run: ./gradlew build
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: build
     
     - name: Get version
       id: version
