@@ -7,15 +7,15 @@
     "Type": "MiniMessage",
     "Text": "<white>Resource Pack"
   }
-  /*"Description": {
-    "Type": "Component",
-    "Text": {
-      "color": "white",
-      "text": "Resource Pack"
-    }
-  },*/
-  /*"Description": {
-    "Type": "Legacy",
-    "Text": "&fResource Pack"
-  }*/
+  //"Description": {
+  //  "Type": "Component",
+  //  "Text": {
+  //    "color": "white",
+  //    "text": "Resource Pack"
+  //  }
+  //}
+  //"Description": {
+  //  "Type": "Legacy",
+  //  "Text": "&fResource Pack"
+  //}
 }
