@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,23 +46,25 @@ public class CompatibilitiesManager {
         ACTIVE_COMPATIBILITY_PROVIDERS.forEach((pluginName, compatibilityProvider) -> disableCompatibility(pluginName));
     }
 
-    public static boolean enableCompatibility(final String pluginName) {
+    public static boolean enableCompatibility(@NotNull String pluginName) {
         try {
-            if (!ACTIVE_COMPATIBILITY_PROVIDERS.containsKey(pluginName) && COMPATIBILITY_PROVIDERS.containsKey(pluginName) && hasPlugin(pluginName)) {
-                final CompatibilityProvider<?> compatibilityProvider = COMPATIBILITY_PROVIDERS.get(pluginName).getConstructor().newInstance();
+            if (!ACTIVE_COMPATIBILITY_PROVIDERS.containsKey(pluginName) &&
+                    COMPATIBILITY_PROVIDERS.containsKey(pluginName) &&
+                    Bukkit.getPluginManager().isPluginEnabled(pluginName)) {
+                CompatibilityProvider<?> compatibilityProvider = COMPATIBILITY_PROVIDERS.get(pluginName).getConstructor().newInstance();
                 compatibilityProvider.enable(pluginName);
                 ACTIVE_COMPATIBILITY_PROVIDERS.put(pluginName, compatibilityProvider);
                 LOGGER.info("Plugin '{}' detected, enabling hooks", pluginName);
                 return true;
             }
-        } catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             e.printStackTrace();
             return false;
         }
         return false;
     }
 
-    public static boolean disableCompatibility(final String pluginName) {
+    public static boolean disableCompatibility(@NotNull String pluginName) {
         try {
             if (!ACTIVE_COMPATIBILITY_PROVIDERS.containsKey(pluginName)) return false;
             if (ACTIVE_COMPATIBILITY_PROVIDERS.get(pluginName).isEnabled()) {
@@ -70,53 +73,51 @@ public class CompatibilitiesManager {
             ACTIVE_COMPATIBILITY_PROVIDERS.remove(pluginName);
             LOGGER.info("Unhooking plugin '{}'", pluginName);
             return true;
-        } catch (final Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    public static boolean addCompatibility(final String compatibilityPluginName, final Class<? extends CompatibilityProvider<?>> clazz, final boolean tryEnable) {
+    public static boolean addCompatibility(@NotNull String compatibilityPluginName, @NotNull Class<? extends CompatibilityProvider<?>> clazz, boolean tryEnable) {
         try {
-            if (compatibilityPluginName != null && clazz != null) {
-                COMPATIBILITY_PROVIDERS.put(compatibilityPluginName, clazz);
-                return !tryEnable || enableCompatibility(compatibilityPluginName);
-            }
-        } catch (final Exception e) {
+            COMPATIBILITY_PROVIDERS.put(compatibilityPluginName, clazz);
+            return !tryEnable || enableCompatibility(compatibilityPluginName);
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-        return false;
     }
 
-    public static boolean addCompatibility(final String compatibilityPluginName, final Class<? extends CompatibilityProvider<?>> clazz) {
+    public static boolean addCompatibility(@NotNull String compatibilityPluginName, @NotNull Class<? extends CompatibilityProvider<?>> clazz) {
         return addCompatibility(compatibilityPluginName, clazz, false);
     }
 
-    public static CompatibilityProvider<?> getActiveCompatibility(final String pluginName) {
+    public static @Nullable CompatibilityProvider<?> getActiveCompatibility(@NotNull String pluginName) {
         return ACTIVE_COMPATIBILITY_PROVIDERS.get(pluginName);
     }
 
-    public static Class<? extends CompatibilityProvider<?>> getCompatibility(final String pluginName) {
+    public static @Nullable Class<? extends CompatibilityProvider<?>> getCompatibility(@NotNull String pluginName) {
         return COMPATIBILITY_PROVIDERS.get(pluginName);
     }
 
-    public static boolean isCompatibilityEnabled(final String pluginName) {
+    public static boolean isCompatibilityEnabled(@NotNull String pluginName) {
         return ACTIVE_COMPATIBILITY_PROVIDERS.containsKey(pluginName) && ACTIVE_COMPATIBILITY_PROVIDERS.get(pluginName).isEnabled();
     }
 
-    public static ConcurrentMap<String, Class<? extends CompatibilityProvider<?>>> getCompatibilityProviders() {
+    public static @NotNull ConcurrentMap<String, Class<? extends CompatibilityProvider<?>>> getCompatibilityProviders() {
         return COMPATIBILITY_PROVIDERS;
     }
 
-    public static ConcurrentMap<String, CompatibilityProvider<?>> getActiveCompatibilityProviders() {
+    public static @NotNull ConcurrentMap<String, CompatibilityProvider<?>> getActiveCompatibilityProviders() {
         return ACTIVE_COMPATIBILITY_PROVIDERS;
     }
 
-    public static boolean hasPlugin(String name) {
-        return Bukkit.getPluginManager().isPluginEnabled(name);
+    public static boolean hasPlugin(@NotNull String name) {
+        return Bukkit.getPluginManager().getPlugin(name) != null;
     }
 
     private CompatibilitiesManager() {
+        throw new UnsupportedOperationException();
     }
 }
