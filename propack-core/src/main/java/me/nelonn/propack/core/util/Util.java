@@ -87,18 +87,6 @@ public final class Util {
         return substringLast(string, cut.length());
     }
 
-    /*public static @NotNull Path parsePath(@NotNull String input) {
-        String[] args = input.split("\\+", 2);
-        return Path.of(args[0]);
-    }
-
-    public static @NotNull String[] parseCombinations(@NotNull String input) {
-        String[] args = input.split("\\+");
-        String[] combinations = new String[args.length - 1];
-        System.arraycopy(args, 1, combinations, 0, combinations.length);
-        return combinations;
-    }*/
-
     /*@SuppressWarnings("unchecked")
     public static @NotNull Hosting provideHosting(@NotNull String string) {
         try {
