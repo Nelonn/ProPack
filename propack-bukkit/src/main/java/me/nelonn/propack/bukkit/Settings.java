@@ -46,7 +46,7 @@ public enum Settings {
         this(path, null);
     }
 
-    public String getPath() {
+    public @NotNull String getPath() {
         return path;
     }
 
@@ -70,6 +70,7 @@ public enum Settings {
         return ProPackPlugin.getInstance().getConfig().getConfigurationSection(path);
     }
 
+    @Override
     public String toString() {
         return asString();
     }

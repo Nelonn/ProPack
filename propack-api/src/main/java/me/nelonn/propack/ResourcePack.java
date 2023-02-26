@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface ResourcePack {
 
@@ -50,10 +51,10 @@ public interface ResourcePack {
 
     @NotNull MeshMapping getMeshMapping();
 
-    @Nullable UploadedPack getUpload();
+    @NotNull Optional<UploadedPack> getUpload();
 
     default boolean isUploaded() {
-        return getUpload() != null;
+        return getUpload().isPresent();
     }
 
 }

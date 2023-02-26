@@ -39,6 +39,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class LocalResourcePack implements ResourcePack {
     private final Project project;
@@ -136,6 +137,11 @@ public class LocalResourcePack implements ResourcePack {
         return meshMapping;
     }
 
+    @Override
+    public @NotNull Optional<UploadedPack> getUpload() {
+        return Optional.ofNullable(uploadedPack);
+    }
+
     public @NotNull Project getProject() {
         return project;
     }
@@ -150,10 +156,6 @@ public class LocalResourcePack implements ResourcePack {
 
     public @NotNull Sha1 getSha1() {
         return sha1;
-    }
-
-    public @Nullable UploadedPack getUpload() {
-        return uploadedPack;
     }
 
 }

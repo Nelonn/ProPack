@@ -52,7 +52,7 @@ public class Dispatcher implements Listener {
         if (!resourcePack.isUploaded()) {
             throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not upload");
         }
-        packSender.sendPack(player, resourcePack.getUpload());
+        packSender.sendPack(player, resourcePack.getUpload().get());
         sent.put(player, resourcePack);
     }
 
@@ -74,6 +74,6 @@ public class Dispatcher implements Listener {
     }
 
     public @NotNull Optional<ResourcePack> getResourcePack(@NotNull Player player) {
-        return Optional.of(sent.get(player));
+        return Optional.ofNullable(sent.get(player));
     }
 }
