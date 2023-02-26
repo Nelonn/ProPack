@@ -68,6 +68,7 @@ public class ProcessModelsTask extends AbstractTask {
                 String type = GsonHelper.getString(rootJson, "Type");
                 String mesh = GsonHelper.getString(rootJson, "Mesh");
                 Path meshPath = PathUtil.resolve(mesh, resourcePath);
+                Set<Item> targetItems = parseTarget(rootJson);
                 ItemModelBuilder builder;
                 if (type.equalsIgnoreCase("DefaultItemModel")) {
                     builder = new DefaultItemModelBuilder(resourcePath).setMesh(meshPath);
@@ -93,7 +94,7 @@ public class ProcessModelsTask extends AbstractTask {
                     for (List<String> combination : CombinationUtil.generateAllCombinations(combinationElements.keySet())) {
                         String combinationStr = String.join("&", combination.toArray(new String[0]));
                         String hex = Integer.toHexString(combinationStr.hashCode());
-                        String generatedPath = PathUtil.contentPath(resourcePath) + '-' + hex + ".mesh.json";
+                        Path generatedPath = PathUtil.append(resourcePath, '-' + hex);
                         Map<String, String> textureMap = new HashMap<>(baseTextureMap);
                         List<ModelElement> modelElements = baseMesh.getElements();
                         for (String combinationElement : combination) {
@@ -106,7 +107,8 @@ public class ProcessModelsTask extends AbstractTask {
                         JsonModel generatedMesh = new JsonModel(baseMesh.getParent(), baseMesh.getTextureSize(),
                                 textureMap, modelElements, baseMesh.useAmbientOcclusion(), baseMesh.getGuiLight(),
                                 baseMesh.getTransformations(), baseMesh.getOverrides());
-                        io.getFiles().addFile(new JsonFile(generatedPath, generatedMesh.serialize()));
+                        io.getFiles().addFile(new JsonFile(PathUtil.contentPath(generatedPath) + ".mesh.json", generatedMesh.serialize()));
+                        meshesToOverride.put(generatedPath, new HashSet<>(targetItems));
                     }
                     builder = new CombinedItemModelBuilder(resourcePath).setMesh(meshPath).setElements(combinationElements.keySet());
                 } else if (type.equalsIgnoreCase("SlotItemModel")) {
@@ -160,11 +162,12 @@ public class ProcessModelsTask extends AbstractTask {
                         });
                         if (empty.get()) continue;
                         String hex = Integer.toHexString(sb.toString().hashCode());
-                        String generatedPath = PathUtil.contentPath(resourcePath) + '-' + hex + ".mesh.json";
+                        Path generatedPath = PathUtil.append(resourcePath, '-' + hex);
                         JsonModel generatedMesh = new JsonModel(baseMesh.getParent(), baseMesh.getTextureSize(),
                                 textureMap, modelElements, baseMesh.useAmbientOcclusion(), baseMesh.getGuiLight(),
                                 baseMesh.getTransformations(), baseMesh.getOverrides());
-                        io.getFiles().addFile(new JsonFile(generatedPath, generatedMesh.serialize()));
+                        io.getFiles().addFile(new JsonFile(PathUtil.contentPath(generatedPath) + ".mesh.json", generatedMesh.serialize()));
+                        meshesToOverride.put(generatedPath, new HashSet<>(targetItems));
                     }
                     Map<String, SlotItemModel.Slot> resultSlots = new HashMap<>();
                     for (Map.Entry<String, List<String>> slot : slotsMap.entrySet()) {
@@ -175,7 +178,9 @@ public class ProcessModelsTask extends AbstractTask {
                 } else {
                     throw new IllegalArgumentException("Unknown model type: " + type);
                 }
-                builder.setTargetItems(parseTarget(meshesToOverride, meshPath, rootJson));
+                Set<Item> toOverride = Util.getOrPut(meshesToOverride, meshPath, HashSet::new);
+                toOverride.addAll(targetItems);
+                builder.setTargetItems(targetItems);
                 io.getAssets().putItemModel(builder);
             } catch (Exception e) {
                 throw new FileProcessingException(file.getPath(), e);
@@ -233,15 +238,15 @@ public class ProcessModelsTask extends AbstractTask {
         }
     }
 
-    private Set<Item> parseTarget(Map<Path, Set<Item>> meshesToOverride, Path meshPath, JsonObject model) {
-        Set<Item> targetItems = Util.getOrPut(meshesToOverride, meshPath, HashSet::new);
+    private Set<Item> parseTarget(JsonObject model) {
+        Set<Item> output = new HashSet<>();
         if (GsonHelper.hasString(model, "Target")) {
             String target = GsonHelper.getString(model, "Target");
             Item item = getProject().getItemDefinition().getItem(Identifier.of(target));
             if (item == null) {
                 throw new IllegalArgumentException("Item not found:" + target);
             }
-            targetItems.add(item);
+            output.add(item);
         } else if (GsonHelper.hasArray(model, "Target")) {
             JsonArray targets = GsonHelper.getArray(model, "Target");
             for (JsonElement target : targets) {
@@ -249,12 +254,12 @@ public class ProcessModelsTask extends AbstractTask {
                 if (item == null) {
                     throw new IllegalArgumentException("Item not found:" + target.getAsString());
                 }
-                targetItems.add(item);
+                output.add(item);
             }
         } else {
             throw new IllegalArgumentException("Missing 'Target'");
         }
-        return targetItems;
+        return output;
     }
 
     private JsonModel parseGeneratingMesh(JsonElement jsonElement, Path resourcePath, TaskIO io) {
