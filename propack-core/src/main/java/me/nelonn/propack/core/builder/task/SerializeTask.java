@@ -55,15 +55,15 @@ public class SerializeTask extends AbstractTask {
         JsonObject root = new JsonObject();
 
         MappingsBuilder mappingsBuilder = io.getExtras().get(ProcessModelsTask.EXTRA_MAPPINGS_BUILDER);
-        JsonObject mappingsObject = new JsonObject();
+        JsonObject meshMappingObject = new JsonObject();
         for (MappingsBuilder.Mapper mapper : mappingsBuilder.getMappers()) {
             JsonObject mapping = new JsonObject();
             for (Map.Entry<Integer, Path> entry : mapper.getMap().entrySet()) {
                 mapping.addProperty(entry.getValue().toString(), entry.getKey());
             }
-            mappingsObject.add(mapper.getItem().getId().toString(), mapping);
+            meshMappingObject.add(mapper.getItem().getId().toString(), mapping);
         }
-        root.add("mesh_mapping", mappingsObject);
+        root.add("mesh_mapping", meshMappingObject);
 
         JsonObject itemModels = new JsonObject();
         for (ItemModelBuilder itemModel : io.getAssets().getItemModels()) {
