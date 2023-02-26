@@ -29,7 +29,12 @@ public class Extra<T> {
     public Extra(final @NotNull Class<T> type, final @NotNull String name) {
         this.type = type;
         this.name = name;
+    }
 
+    @SuppressWarnings("unchecked")
+    public Extra(final @NotNull String name) { // experimental
+        this.type = (Class<T>) getClass().getGenericSuperclass().getClass();
+        this.name = name;
     }
 
     public @NotNull Class<T> getType() {
