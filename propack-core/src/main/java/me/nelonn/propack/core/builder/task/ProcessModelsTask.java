@@ -29,7 +29,6 @@ import me.nelonn.propack.builder.file.File;
 import me.nelonn.propack.builder.file.JsonFile;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
-import me.nelonn.propack.core.builder.Mapper;
 import me.nelonn.propack.core.builder.MappingsBuilder;
 import me.nelonn.propack.core.builder.asset.CombinedItemModelBuilder;
 import me.nelonn.propack.core.builder.asset.DefaultItemModelBuilder;
@@ -193,7 +192,7 @@ public class ProcessModelsTask extends AbstractTask {
                 } else {
                     throw new IllegalArgumentException("Unknown model type: " + type);
                 }
-                Set<Item> toOverride = Util.getOrPut(meshesToOverride, meshPath, HashSet::new);
+                Set<Item> toOverride = meshesToOverride.computeIfAbsent(meshPath, key -> new HashSet<>());
                 toOverride.addAll(targetItems);
                 builder.setTargetItems(targetItems);
                 io.getAssets().putItemModel(builder);
@@ -226,7 +225,7 @@ public class ProcessModelsTask extends AbstractTask {
                 Set<Item> toOverride = meshesToOverride.get(resourcePath);
                 if (toOverride != null) {
                     for (Item item : toOverride) {
-                        mappingsBuilder.getMapper(item).map(resourcePath);
+                        mappingsBuilder.getMapper(item).add(resourcePath);
                     }
                 }
             } catch (Exception e) {
@@ -234,7 +233,7 @@ public class ProcessModelsTask extends AbstractTask {
             }
         }
         // overriding default models (custom_model_data)
-        for (Mapper mapper : mappingsBuilder.getMappers()) {
+        for (MappingsBuilder.Mapper mapper : mappingsBuilder.getMappers()) {
             String path = "include/assets/minecraft/models/item/" + mapper.getItem().getId().getValue() + ".json";
             File file = io.getFiles().getFile(path);
             if (!(file instanceof JsonFile)) {
@@ -243,7 +242,7 @@ public class ProcessModelsTask extends AbstractTask {
             }
             JsonObject jsonObject = ((JsonFile) file).getContent();
             JsonArray overrides = GsonHelper.getArray(jsonObject, "overrides", new JsonArray());
-            for (Map.Entry<Integer, Path> mapping : mapper.entrySet()) {
+            for (Map.Entry<Integer, Path> mapping : mapper.getMap().entrySet()) {
                 overrides.add(new JsonObjectBuilder()
                         .put("predicate", new JsonObjectBuilder().put("custom_model_data", mapping.getKey()).get())
                         .put("model", mapping.getValue().toString())

@@ -35,7 +35,6 @@ import me.nelonn.propack.bukkit.adapter.Adapter;
 import me.nelonn.propack.bukkit.adapter.WrappedCompoundTag;
 import me.nelonn.propack.bukkit.adapter.WrappedItemStack;
 import me.nelonn.propack.bukkit.adapter.WrappedListTag;
-import me.nelonn.propack.core.builder.LocalResourcePack;
 import me.nelonn.propack.definition.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -149,7 +148,7 @@ public class PacketListener extends PacketAdapter {
             assert material != null;
             Item itemType = ProPack.adapt(material);
             if (!itemModel.getTargetItems().contains(itemType)) return;
-            Integer cmd = ((LocalResourcePack) resourcePack).getMappings().getMapper(itemType).get(mesh);
+            Integer cmd = resourcePack.getMeshMapping().getCustomModelData(mesh, itemType);
             if (cmd == null) return;
             tag.putInt(CUSTOM_MODEL_DATA_FIELD, cmd);
         } catch (Exception e) {

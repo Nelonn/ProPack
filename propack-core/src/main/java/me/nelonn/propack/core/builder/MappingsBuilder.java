@@ -18,26 +18,63 @@
 
 package me.nelonn.propack.core.builder;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import me.nelonn.flint.path.Path;
+import me.nelonn.propack.MapMeshMapping;
 import me.nelonn.propack.definition.Item;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MappingsBuilder {
     private final Map<Item, Mapper> mappers = new HashMap<>();
 
-    @NotNull
-    public Mapper getMapper(@NotNull Item item) {
+    public @NotNull  Mapper getMapper(@NotNull Item item) {
         return mappers.computeIfAbsent(item, Mapper::new);
     }
 
-    public Collection<Mapper> getMappers() {
+    public @NotNull Collection<Mapper> getMappers() {
         return mappers.values();
     }
 
-    public void clear() {
-        mappers.clear();
+    public @NotNull MapMeshMapping build() {
+        Map<Item, Map<Path, Integer>> map = new HashMap<>();
+        for (Mapper mapper : getMappers()) {
+            map.put(mapper.getItem(), new HashMap<>(mapper.getMap().inverse()));
+        }
+        return new MapMeshMapping(map);
+    }
+
+    public static class Mapper {
+        private final Item item;
+        private final BiMap<Integer, Path> map = HashBiMap.create();
+        private final AtomicInteger integer = new AtomicInteger(1);
+
+        public Mapper(@NotNull Item item) {
+            this.item = item;
+        }
+
+        @NotNull
+        public Item getItem() {
+            return item;
+        }
+
+        @Nullable
+        public Integer get(@NotNull Path path) {
+            return map.inverse().get(path);
+        }
+
+        public void add(@NotNull Path path) {
+            map.put(integer.getAndIncrement(), path);
+        }
+
+        public @NotNull BiMap<Integer, Path> getMap() {
+            return map;
+        }
     }
 }

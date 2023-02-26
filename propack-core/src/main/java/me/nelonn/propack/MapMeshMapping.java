@@ -19,41 +19,25 @@
 package me.nelonn.propack;
 
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.asset.ArmorTexture;
-import me.nelonn.propack.asset.Font;
-import me.nelonn.propack.asset.ItemModel;
-import me.nelonn.propack.asset.SoundAsset;
+import me.nelonn.propack.definition.Item;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface ResourcePack {
+public class MapMeshMapping implements MeshMapping {
+    private final Map<Item, Map<Path, Integer>> map;
 
-    @NotNull String getName();
-
-    @Nullable ItemModel getItemModel(@NotNull Path path);
-
-    @NotNull Collection<ItemModel> getItemModels();
-
-    @Nullable SoundAsset getSound(@NotNull Path path);
-
-    @NotNull Collection<SoundAsset> getSounds();
-
-    @Nullable ArmorTexture getArmorTexture(@NotNull Path path);
-
-    @NotNull Collection<ArmorTexture> getArmorTextures();
-
-    @Nullable Font getFont(@NotNull Path path);
-
-    @NotNull Collection<Font> getFonts();
-
-    @NotNull MeshMapping getMeshMapping();
-
-    @Nullable UploadedPack getUpload();
-
-    default boolean isUploaded() {
-        return getUpload() != null;
+    public MapMeshMapping(Map<Item, Map<Path, Integer>> map) {
+        this.map = new HashMap<>(map);
+        this.map.replaceAll((k, v) -> new HashMap<>(v)); // deep copy
     }
 
+    @Override
+    public @Nullable Integer getCustomModelData(@NotNull Path mesh, @NotNull Item item) {
+        Map<Path, Integer> itemMap = map.get(item);
+        if (itemMap == null) return null;
+        return itemMap.get(mesh);
+    }
 }

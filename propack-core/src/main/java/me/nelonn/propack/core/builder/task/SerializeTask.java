@@ -24,7 +24,6 @@ import me.nelonn.flint.path.Path;
 import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
-import me.nelonn.propack.core.builder.Mapper;
 import me.nelonn.propack.core.builder.MappingsBuilder;
 import me.nelonn.propack.core.builder.asset.*;
 import me.nelonn.propack.core.util.LogManagerCompat;
@@ -60,9 +59,9 @@ public class SerializeTask extends AbstractTask {
 
         MappingsBuilder mappingsBuilder = io.getExtras().get(ProcessModelsTask.EXTRA_MAPPINGS_BUILDER);
         JsonObject mappingsObject = new JsonObject();
-        for (Mapper mapper : mappingsBuilder.getMappers()) {
+        for (MappingsBuilder.Mapper mapper : mappingsBuilder.getMappers()) {
             JsonObject mapping = new JsonObject();
-            for (Map.Entry<Integer, Path> entry : mapper.entrySet()) {
+            for (Map.Entry<Integer, Path> entry : mapper.getMap().entrySet()) {
                 mapping.addProperty(entry.getValue().toString(), entry.getKey());
             }
             mappingsObject.add(mapper.getItem().getId().toString(), mapping);
