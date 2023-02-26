@@ -91,7 +91,7 @@ public class ProcessSoundsTask extends AbstractTask {
                 }
                 SoundEntry soundEntryOut = new SoundEntry(soundsOut, soundEntryIn.canReplace(), soundEntryIn.getSubtitle());
                 io.getAssets().putSound(new SoundAssetBuilder(resourcePath).setSoundPath(resourcePath));
-                JsonObject resultSounds = Util.getOrPut(soundsJsons, resourcePath.getNamespace(), JsonObject::new);
+                JsonObject resultSounds = soundsJsons.computeIfAbsent(resourcePath.getNamespace(), key -> new JsonObject());
                 resultSounds.add(resourcePath.getValue(), SoundEntryDeserializer.INSTANCE.serialize(soundEntryOut, null, null));
             } catch (Exception e) {
                 throw new FileProcessingException(file.getPath(), e);

@@ -26,7 +26,6 @@ import me.nelonn.propack.builder.file.JsonFile;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.PathUtil;
-import me.nelonn.propack.core.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -61,7 +60,7 @@ public class ProcessLanguagesTask extends AbstractTask {
                 String langCode = resourcePath.getValue();
                 langCode = langCode.substring(langCode.indexOf('/') + 1, langCode.length() - ".font.json".length());
                 String langPath = "assets/" + resourcePath.getNamespace() + "/lang/" + langCode + ".json";
-                JsonFile langJsonFile = Util.getOrPut(languageFiles, langPath, () -> new JsonFile(langPath, new JsonObject()));
+                JsonFile langJsonFile = languageFiles.computeIfAbsent(langPath, key -> new JsonFile(key, new JsonObject()));
                 for (String key : jsonObject.keySet()) {
                     String translation = GsonHelper.getString(jsonObject, key);
                     key = key.replace("<namespace>", resourcePath.getNamespace());

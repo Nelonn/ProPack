@@ -25,20 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.Map;
-import java.util.function.Supplier;
 
 public final class Util {
-
-    public static <K, V> V getOrPut(@NotNull Map<K, V> map, @NotNull K key, @NotNull Supplier<V> supplier) {
-        if (map.containsKey(key)) {
-            return map.get(key);
-        } else {
-            V value = supplier.get();
-            map.put(key, value);
-            return value;
-        }
-    }
 
     public static @NotNull Color hexToRGB(@NotNull String hex) {
         if (hex.startsWith("#")) {
