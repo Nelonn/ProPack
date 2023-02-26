@@ -5,3 +5,7 @@ dispatch:
   required: true
   pack: example
   prompt: "&#fa4943Accept the pack to enjoy a full experience"
+
+patch_packets:
+  items: true
+  sounds: true

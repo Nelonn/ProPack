@@ -29,7 +29,10 @@ public enum Settings {
     DISPATCH_DELAY("dispatch.delay", -1),
     DISPATCH_REQUIRED("dispatch.required", true),
     DISPATCH_PACK("dispatch.pack"),
-    DISPATCH_PROMPT("dispatch.prompt", "&#fa4943Accept the pack to enjoy a full experience");
+    DISPATCH_PROMPT("dispatch.prompt", "&#fa4943Accept the pack to enjoy a full experience"),
+
+    PATCH_PACKETS_ITEMS("patch_packets.items", true),
+    PATCH_PACKETS_SOUNDS("patch_packets.sounds", true);
 
     private final String path;
     private final Object def;
