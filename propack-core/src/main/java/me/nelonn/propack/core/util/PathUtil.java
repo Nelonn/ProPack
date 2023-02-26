@@ -76,6 +76,10 @@ public final class PathUtil {
         return "assets/" + path.getNamespace() + '/' + type + '/' + path.getValue();
     }
 
+    public static @NotNull Path append(@NotNull Path path, @NotNull String string) {
+        return Path.of(path.getNamespace(), path.getValue() + string);
+    }
+
     public static @NotNull String format(@NotNull String path) {
         path = path.toLowerCase(Locale.ROOT);
         path = path.replace("\\", "/");
