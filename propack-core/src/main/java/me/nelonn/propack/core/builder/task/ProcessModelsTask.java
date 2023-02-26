@@ -37,6 +37,7 @@ import me.nelonn.propack.core.builder.asset.ItemModelBuilder;
 import me.nelonn.propack.core.builder.asset.SlotItemModelBuilder;
 import me.nelonn.propack.core.builder.json.mesh.JsonModel;
 import me.nelonn.propack.core.builder.json.mesh.ModelElement;
+import me.nelonn.propack.core.builder.json.mesh.ModelElementFace;
 import me.nelonn.propack.core.util.*;
 import me.nelonn.propack.definition.Item;
 import org.apache.logging.log4j.Logger;
@@ -100,9 +101,16 @@ public class ProcessModelsTask extends AbstractTask {
                         for (String combinationElement : combination) {
                             JsonModel combMesh = combinationElements.get(combinationElement);
                             for (Map.Entry<String, String> textureEntry : combMesh.getTextureMap().entrySet()) {
-                                textureMap.put(combinationElement + "." + textureEntry.getKey(), textureEntry.getValue());
+                                textureMap.put(combinationElement + '.' + textureEntry.getKey(), textureEntry.getValue());
                             }
-                            modelElements.addAll(combMesh.getElements());
+                            for (ModelElement modelElement : combMesh.getElements()) {
+                                for (Map.Entry<Direction, ModelElementFace> faceEntry : modelElement.faces.entrySet()) {
+                                    ModelElementFace face = faceEntry.getValue();
+                                    String texture = '#' + combinationElement + '.' + face.textureId.substring(1);
+                                    faceEntry.setValue(new ModelElementFace(face.cullFace, face.tintIndex, texture, face.textureData));
+                                }
+                                modelElements.add(modelElement);
+                            }
                         }
                         JsonModel generatedMesh = new JsonModel(baseMesh.getParent(), baseMesh.getTextureSize(),
                                 textureMap, modelElements, baseMesh.useAmbientOcclusion(), baseMesh.getGuiLight(),
@@ -155,9 +163,16 @@ public class ProcessModelsTask extends AbstractTask {
                                 empty.set(false);
                                 JsonModel elementMesh = slots.get(slotName).get(elementName);
                                 for (Map.Entry<String, String> textureEntry : elementMesh.getTextureMap().entrySet()) {
-                                    textureMap.put(slotName + "." + textureEntry.getKey(), textureEntry.getValue());
+                                    textureMap.put(slotName + '.' + textureEntry.getKey(), textureEntry.getValue());
                                 }
-                                modelElements.addAll(elementMesh.getElements());
+                                for (ModelElement modelElement : elementMesh.getElements()) {
+                                    for (Map.Entry<Direction, ModelElementFace> faceEntry : modelElement.faces.entrySet()) {
+                                        ModelElementFace face = faceEntry.getValue();
+                                        String texture = '#' + slotName + '.' + face.textureId.substring(1);
+                                        faceEntry.setValue(new ModelElementFace(face.cullFace, face.tintIndex, texture, face.textureData));
+                                    }
+                                    modelElements.add(modelElement);
+                                }
                             }
                         });
                         if (empty.get()) continue;
