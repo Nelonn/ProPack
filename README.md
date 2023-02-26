@@ -31,9 +31,9 @@ DefaultItemModel, example:
 
 ```json
 {
-	"Type": "DefaultItemModel",
-	"Mesh": "./mesh",
-	"Target": "minecraft:paper"
+  "Type": "DefaultItemModel",
+  "Mesh": "./mesh",
+  "Target": "minecraft:paper"
 }
 ```
 
@@ -42,16 +42,16 @@ CombinedItemModel, example:
 
 ```json
 {
-	"Type": "CombinedItemModel",
-	"Mesh": "./mesh",
-	"Elements": {
-		"element1": "./mesh1",
-		"element2": {
-			"Mesh": "./mesh2",
-			"Offset": [0.1, 0.2, 0.3]
-		}
-	},
-	"Target": "minecraft:paper"
+  "Type": "CombinedItemModel",
+  "Mesh": "./mesh",
+  "Elements": {
+    "element1": "./mesh1",
+    "element2": {
+      "Mesh": "./mesh2",
+      "Offset": [0.1, 0.2, 0.3]
+    }
+  },
+  "Target": "minecraft:paper"
 }
 ```
 
@@ -60,28 +60,28 @@ SlotItemModel, example:
 
 ```json
 {
-	"Type": "SlotItemModel",
-	"Mesh": "./awp",
-	"Slots": {
-		"scope": {
-			"collimator": "../scopes/collimator",
-			"holographic": {
-				"Mesh": "../scopes/holographic",
-				"Offset": [0.0, 3.0, 0.0]
-			}
-		},
-		"grip": {
-			"vertical": "../grips/vertical",
-			"bipods": "../grips/bipods"
-		},
-		"magazine": {
-			"exists": "../magazine"
-		}
-	},
-	"Target": [
-		"minecraft:paper",
-		"minecraft:crossbow"
-	]
+  "Type": "SlotItemModel",
+  "Mesh": "./awp",
+  "Slots": {
+    "scope": {
+      "collimator": "../scopes/collimator",
+      "holographic": {
+      	"Mesh": "../scopes/holographic",
+      	"Offset": [0.0, 3.0, 0.0]
+      }
+    },
+    "grip": {
+      "vertical": "../grips/vertical",
+      "bipods": "../grips/bipods"
+    },
+    "magazine": {
+      "exists": "../magazine"
+    }
+  },
+  "Target": [
+    "minecraft:paper",
+    "minecraft:crossbow"
+  ]
 }
 ```
 
@@ -121,31 +121,35 @@ Armor file must ends with `.armor.json`
 [Example file]():
 ```json
 {
-	"Color": {
-		"r": 255,
-		"g": 0,
-		"b": 0
-	},
-	"Layer1": "./emerald_armor_layer_1.png",
-	"Layer2": "./emerald_armor_layer_2.png"
+  "Color": {
+    "r": 255,
+    "g": 0,
+    "b": 0
+  },
+  "Layer1": "./emerald_armor_layer_1.png",
+  "Layer2": "./emerald_armor_layer_2.png"
 }
 ```
 The second animated version:
 ```json
 {
-	"Color": "#00ff00",
-	"Layer1": "./test_layer_1.png",
-	"Layer2": {
-		"Image": "./test_layer_2.png",
-		"Frames": 4,
-		"Speed": 24,
-		"Interpolation": true,
-		"Emissivity": 0
-	}
+  "Color": "#00ff00", 
+  "Layer1": "./test_layer_1.png",
+  "Layer2": {
+    "Image": "./test_layer_2.png",
+    "SaveImage": false,
+    "Frames": 4,
+    "Speed": 24,
+    "Interpolation": true,
+    "Emissivity": 0
+  }
 }
 ```
 `.png` is not required to be specified
 For more information, see [README.md of fancyPants](https://github.com/Ancientkingg/fancyPants/blob/master/README.md)
+
+`SaveImage` allows you to determine whether to save 
+the specified `Image` in the output resource pack
 
 ## Languages
 Language file must ends with `.lang.json`

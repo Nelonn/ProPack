@@ -122,6 +122,7 @@ public class ProcessArmorTextures extends AbstractTask {
 
     private Armor.Layer loadConfiguration(TaskIO io, JsonObject root, String layerKey, Path contentPath) throws IOException {
         String layerImagePath;
+        boolean saveImage = false;
         int frames = 1;
         int speed = 24;
         boolean interpolation = false;
@@ -131,6 +132,7 @@ public class ProcessArmorTextures extends AbstractTask {
         } else if (GsonHelper.hasJsonObject(root, layerKey)) {
             JsonObject jsonObject = root.getAsJsonObject(layerKey);
             layerImagePath = GsonHelper.getString(jsonObject, "Image");
+            saveImage = GsonHelper.getBoolean(jsonObject, "SaveImage", saveImage);
             frames = GsonHelper.getInt(jsonObject, "Frames", frames);
             speed = GsonHelper.getInt(jsonObject, "Speed", speed);
             interpolation = GsonHelper.getBoolean(jsonObject, "Interpolation", interpolation);
@@ -156,6 +158,9 @@ public class ProcessArmorTextures extends AbstractTask {
         }
         try (InputStream inputStream = pngFile.openInputStream()) {
             BufferedImage layerImage = ImageIO.read(inputStream);
+            if (!saveImage) {
+                io.getFiles().removeFile(pngFile.getPath());
+            }
             return new Armor.Layer(layerImage, frames, speed, interpolation, emissivity);
         }
     }
