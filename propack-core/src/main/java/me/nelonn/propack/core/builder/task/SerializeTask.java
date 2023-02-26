@@ -54,17 +54,6 @@ public class SerializeTask extends AbstractTask {
         }
         JsonObject root = new JsonObject();
 
-        MappingsBuilder mappingsBuilder = io.getExtras().get(ProcessModelsTask.EXTRA_MAPPINGS_BUILDER);
-        JsonObject meshMappingObject = new JsonObject();
-        for (MappingsBuilder.Mapper mapper : mappingsBuilder.getMappers()) {
-            JsonObject mapping = new JsonObject();
-            for (Map.Entry<Integer, Path> entry : mapper.getMap().entrySet()) {
-                mapping.addProperty(entry.getValue().toString(), entry.getKey());
-            }
-            meshMappingObject.add(mapper.getItem().getId().toString(), mapping);
-        }
-        root.add("mesh_mapping", meshMappingObject);
-
         JsonObject itemModels = new JsonObject();
         for (ItemModelBuilder itemModel : io.getAssets().getItemModels()) {
             JsonObject itemModelObject = new JsonObject();
@@ -101,6 +90,17 @@ public class SerializeTask extends AbstractTask {
             fonts.addProperty(font.getPath().toString(), font.getFontPath().toString());
         }
         root.add("fonts", fonts);
+
+        MappingsBuilder mappingsBuilder = io.getExtras().get(ProcessModelsTask.EXTRA_MAPPINGS_BUILDER);
+        JsonObject meshMappingObject = new JsonObject();
+        for (MappingsBuilder.Mapper mapper : mappingsBuilder.getMappers()) {
+            JsonObject mapping = new JsonObject();
+            for (Map.Entry<Integer, Path> entry : mapper.getMap().entrySet()) {
+                mapping.addProperty(entry.getValue().toString(), entry.getKey());
+            }
+            meshMappingObject.add(mapper.getItem().getId().toString(), mapping);
+        }
+        root.add("mesh_mapping", meshMappingObject);
 
         File outputFile = new File(buildDir, getProject().getName() + ".propack");
         if (outputFile.exists()) {
