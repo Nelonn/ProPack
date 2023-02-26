@@ -41,7 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class LocalResourcePack implements ResourcePack {
+public class BuiltResourcePack implements ResourcePack {
     private final Project project;
     private final Map<Path, ItemModel> itemModels;
     private final Map<Path, SoundAsset> sounds;
@@ -53,7 +53,7 @@ public class LocalResourcePack implements ResourcePack {
     private final Sha1 sha1;
     private final UploadedPack uploadedPack;
 
-    public LocalResourcePack(@NotNull Project project,
+    public BuiltResourcePack(@NotNull Project project,
                              @NotNull Collection<ItemModelBuilder> itemModels,
                              @NotNull Collection<SoundAssetBuilder> soundAssets,
                              @NotNull Collection<ArmorTextureBuilder> armorTextures,

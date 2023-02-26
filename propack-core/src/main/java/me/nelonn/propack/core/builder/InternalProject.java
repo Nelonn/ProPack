@@ -34,7 +34,7 @@ public class InternalProject implements Project {
     public final BuildConfiguration buildConfiguration;
     public final VirtualFile metaFile;
     public final VirtualFile iconFile;
-    private LocalResourcePack resourcePack;
+    private BuiltResourcePack resourcePack;
 
     public InternalProject(@NotNull String name,
                            @NotNull File projectDir,
@@ -100,7 +100,7 @@ public class InternalProject implements Project {
         resourcePack = createDefaultBuilder().build();
     }
 
-    public LocalResourcePack getResourcePack() {
+    public BuiltResourcePack getResourcePack() {
         return resourcePack;
     }
 }

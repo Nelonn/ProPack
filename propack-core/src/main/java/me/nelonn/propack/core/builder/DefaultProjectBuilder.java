@@ -61,7 +61,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         return tasks;
     }
 
-    public LocalResourcePack build() {
+    public BuiltResourcePack build() {
         long startTimestamp = System.currentTimeMillis();
         DefaultTaskIO io = new DefaultTaskIO(new File(project.getBuildDir(), "temp"));
         try {
@@ -80,7 +80,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 LOGGER.info("Task {}", task);
             }
 
-            LocalResourcePack localResourcePack = new LocalResourcePack(project,
+            BuiltResourcePack builtResourcePack = new BuiltResourcePack(project,
                     io.getAssets().getItemModels(),
                     io.getAssets().getSounds(),
                     io.getAssets().getArmorTextures(),
@@ -93,7 +93,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             LOGGER.info("BUILD SUCCESSFUL in {}s", (int) (System.currentTimeMillis() - startTimestamp) / 1000);
 
-            return localResourcePack;
+            return builtResourcePack;
         } catch (TaskFailedException e) {
             LOGGER.error("BUILD FAILED in {}s", (int) (System.currentTimeMillis() - startTimestamp) / 1000);
             return null;
