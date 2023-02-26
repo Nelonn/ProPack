@@ -27,7 +27,6 @@ import me.nelonn.propack.builder.util.Extra;
 import me.nelonn.propack.core.builder.MappingsBuilder;
 import me.nelonn.propack.core.builder.asset.*;
 import me.nelonn.propack.core.util.LogManagerCompat;
-import me.nelonn.propack.core.util.Sha1;
 import me.nelonn.propack.definition.Item;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -54,8 +53,6 @@ public class SerializeTask extends AbstractTask {
             buildDir.mkdirs();
         }
         JsonObject root = new JsonObject();
-        Sha1 sha1 = io.getExtras().get(PackageTask.EXTRA_SHA1);
-        root.addProperty("sha1", sha1.toString());
 
         MappingsBuilder mappingsBuilder = io.getExtras().get(ProcessModelsTask.EXTRA_MAPPINGS_BUILDER);
         JsonObject mappingsObject = new JsonObject();
@@ -66,7 +63,7 @@ public class SerializeTask extends AbstractTask {
             }
             mappingsObject.add(mapper.getItem().getId().toString(), mapping);
         }
-        root.add("mappings", mappingsObject);
+        root.add("mesh_mapping", mappingsObject);
 
         JsonObject itemModels = new JsonObject();
         for (ItemModelBuilder itemModel : io.getAssets().getItemModels()) {
