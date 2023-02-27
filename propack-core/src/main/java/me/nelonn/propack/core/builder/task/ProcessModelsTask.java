@@ -70,9 +70,9 @@ public class ProcessModelsTask extends AbstractTask {
                 Path meshPath = PathUtil.resolve(mesh, resourcePath);
                 Set<Item> targetItems = parseTarget(rootJson);
                 ItemModelBuilder builder;
-                if (type.equalsIgnoreCase("DefaultItemModel")) {
+                if (type.equals("DefaultItemModel")) {
                     builder = new DefaultItemModelBuilder(resourcePath).setMesh(meshPath);
-                } else if (type.equalsIgnoreCase("CombinedItemModel")) {
+                } else if (type.equals("CombinedItemModel")) {
                     File meshFile = io.getFiles().getFile(PathUtil.contentPath(meshPath) + ".mesh.json");
                     if (!(meshFile instanceof JsonFile)) {
                         throw new IllegalArgumentException("Mesh not found: " + meshPath);
@@ -118,7 +118,7 @@ public class ProcessModelsTask extends AbstractTask {
                         meshesToOverride.put(generatedPath, new HashSet<>(targetItems));
                     }
                     builder = new CombinedItemModelBuilder(resourcePath).setMesh(meshPath).setElements(combinationElements.keySet());
-                } else if (type.equalsIgnoreCase("SlotItemModel")) {
+                } else if (type.equals("SlotItemModel")) {
                     File meshFile = io.getFiles().getFile(PathUtil.contentPath(meshPath) + ".mesh.json");
                     if (!(meshFile instanceof JsonFile)) {
                         throw new IllegalArgumentException("Mesh not found: " + meshPath);
