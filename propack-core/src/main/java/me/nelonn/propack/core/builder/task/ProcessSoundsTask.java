@@ -29,8 +29,8 @@ import me.nelonn.propack.core.builder.asset.SoundAssetBuilder;
 import me.nelonn.propack.core.builder.json.sound.Sound;
 import me.nelonn.propack.core.builder.json.sound.SoundEntry;
 import me.nelonn.propack.core.builder.json.sound.SoundEntryDeserializer;
+import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.core.util.PathUtil;
-import me.nelonn.propack.core.util.WaveToVorbis;
 import me.nelonn.propack.core.util.Util;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,21 +49,27 @@ public class ProcessSoundsTask extends AbstractTask {
 
     @Override
     public void run(@NotNull TaskIO io) {
-        // WAV to OGG
-        // TODO: now the transcoding is not working correctly, need to fix it
+        // Converting sounds
         for (File file : io.getFiles()) {
             try {
                 String filePath = file.getPath();
-                if (!filePath.startsWith("content/") || !filePath.endsWith(".wav")) continue;
+                if (!filePath.startsWith("content/") || !filePath.endsWith(".wav") && !filePath.endsWith(".mp3")) continue;
                 io.getFiles().removeFile(filePath);
-                String oggFilePath = Util.substringLast(filePath, "wav") + "ogg";
-                java.io.File tempFile = new java.io.File(io.getTempDirectory(), oggFilePath);
-                tempFile.getParentFile().mkdirs();
-                try (InputStream inputStream = file.openInputStream();
-                     OutputStream outputStream = Files.newOutputStream(tempFile.toPath())) {
-                    WaveToVorbis.encode(inputStream, outputStream);
-                    io.getFiles().addFile(new RealFile(oggFilePath, tempFile));
+                java.io.File inputFile;
+                if (file instanceof RealFile) {
+                    inputFile = ((RealFile) file).getFile();
+                } else {
+                    inputFile = Util.tempFile(io, filePath);
+                    try (InputStream in = file.openInputStream();
+                        OutputStream out = Files.newOutputStream(inputFile.toPath())) {
+                        IOUtil.transferTo(in, out);
+                    }
                 }
+                String outputPath = Util.substringLast(filePath, 3) + "ogg";
+                java.io.File outputFile = Util.tempFile(io, outputPath);
+                String ffmpeg = System.getProperty("propack.ffmpeg", "ffmpeg");
+                String[] commandLine = new String[]{ffmpeg, "-i", inputFile.getAbsolutePath(), "-c:a", "libvorbis", "-q:a", "10", outputFile.getAbsolutePath()};
+                Runtime.getRuntime().exec(commandLine);
             } catch (Exception e) {
                 throw new FileProcessingException(file.getPath(), e);
             }

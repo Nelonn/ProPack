@@ -17,7 +17,6 @@ repositories {
 dependencies {
     "implementation"(project(":propack-api"))
     "implementation"(files("../libs/flint-path-0.0.1.jar"))
-    "implementation"(files("../libs/vorbis-java-1.0.0-beta.jar"))
 
     "compileOnly"("org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r")
 
@@ -48,7 +47,6 @@ tasks.named<Copy>("processResources") {
 
 tasks.named<ShadowJar>("shadowJar") {
     dependsOn(project.project(":propack-api").tasks.named("build"))
-    relocate("org.xiph", "me.nelonn.propack.core.ogg")
     archiveClassifier.set("")
 }
 
