@@ -30,10 +30,13 @@ import me.nelonn.propack.core.builder.json.sound.Sound;
 import me.nelonn.propack.core.builder.json.sound.SoundEntry;
 import me.nelonn.propack.core.builder.json.sound.SoundEntryDeserializer;
 import me.nelonn.propack.core.util.IOUtil;
+import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.PathUtil;
 import me.nelonn.propack.core.util.Util;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -41,8 +44,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class ProcessSoundsTask extends AbstractTask {
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     public ProcessSoundsTask(@NotNull Project project) {
         super("processSounds", project);
     }
@@ -50,10 +56,12 @@ public class ProcessSoundsTask extends AbstractTask {
     @Override
     public void run(@NotNull TaskIO io) {
         // Converting sounds
+        List<CompletableFuture<Void>> futureList = new ArrayList<>();
         for (File file : io.getFiles()) {
             try {
                 String filePath = file.getPath();
-                if (!filePath.startsWith("content/") || !filePath.endsWith(".wav") && !filePath.endsWith(".mp3")) continue;
+                if (!filePath.startsWith("content/") || !filePath.endsWith(".wav") && !filePath.endsWith(".mp3"))
+                    continue;
                 io.getFiles().removeFile(filePath);
                 java.io.File inputFile;
                 if (file instanceof RealFile) {
@@ -61,7 +69,7 @@ public class ProcessSoundsTask extends AbstractTask {
                 } else {
                     inputFile = Util.tempFile(io, filePath);
                     try (InputStream in = file.openInputStream();
-                        OutputStream out = Files.newOutputStream(inputFile.toPath())) {
+                         OutputStream out = Files.newOutputStream(inputFile.toPath())) {
                         IOUtil.transferTo(in, out);
                     }
                 }
@@ -69,17 +77,25 @@ public class ProcessSoundsTask extends AbstractTask {
                 java.io.File outputFile = Util.tempFile(io, outputPath);
                 String ffmpeg = System.getProperty("propack.ffmpeg", "ffmpeg");
                 String[] commandLine = new String[]{ffmpeg, "-i", inputFile.getAbsolutePath(), "-c:a", "libvorbis", "-q:a", "10", outputFile.getAbsolutePath()};
-                Runtime.getRuntime().exec(commandLine);
+                futureList.add(CompletableFuture.runAsync(() -> {
+                    try {
+                        Runtime.getRuntime().exec(commandLine).waitFor();
+                    } catch (IOException | InterruptedException e) {
+                        LOGGER.error("Unable to convert '" + filePath + "' to ogg", e);
+                    }
+                }));
             } catch (Exception e) {
                 throw new FileProcessingException(file.getPath(), e);
             }
         }
+        futureList.forEach(CompletableFuture::join);
         // *.sound.json to sounds.json
         Map<String, JsonObject> soundsJsons = new HashMap<>();
         for (File file : io.getFiles()) {
             try {
                 String filePath = file.getPath();
-                if (!filePath.startsWith("content/") || !filePath.endsWith(".sound.json") || !(file instanceof JsonFile)) continue;
+                if (!filePath.startsWith("content/") || !filePath.endsWith(".sound.json") || !(file instanceof JsonFile))
+                    continue;
                 io.getFiles().removeFile(filePath);
                 JsonObject jsonObject = ((JsonFile) file).getContent();
                 Path resourcePath = PathUtil.resourcePath(filePath, ".sound.json");
