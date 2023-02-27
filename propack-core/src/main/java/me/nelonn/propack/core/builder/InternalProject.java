@@ -18,6 +18,7 @@
 
 package me.nelonn.propack.core.builder;
 
+import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.file.VirtualFile;
 import me.nelonn.propack.definition.ItemDefinition;
@@ -25,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.Optional;
 
 public class InternalProject implements Project {
     public final String name;
@@ -34,14 +36,15 @@ public class InternalProject implements Project {
     public final BuildConfiguration buildConfiguration;
     public final VirtualFile metaFile;
     public final VirtualFile iconFile;
-    private BuiltResourcePack resourcePack;
+    private ResourcePack resourcePack;
 
     public InternalProject(@NotNull String name,
                            @NotNull File projectDir,
                            @NotNull ItemDefinition itemDefinition,
                            @NotNull BuildConfiguration buildConfiguration,
                            @NotNull VirtualFile metaFile,
-                           @Nullable VirtualFile iconFile) {
+                           @Nullable VirtualFile iconFile,
+                           @Nullable ResourcePack resourcePack) {
         this.name = name;
         this.projectDir = projectDir;
         this.buildDir = new File(projectDir, "build");
@@ -49,10 +52,11 @@ public class InternalProject implements Project {
         this.buildConfiguration = buildConfiguration;
         this.metaFile = metaFile;
         this.iconFile = iconFile;
+        this.resourcePack = resourcePack;
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
@@ -96,11 +100,12 @@ public class InternalProject implements Project {
         return new DefaultProjectBuilder(this);
     }
 
-    public void build() {
-        resourcePack = createDefaultBuilder().build();
+    @Override
+    public @NotNull Optional<ResourcePack> getResourcePack() {
+        return Optional.ofNullable(resourcePack);
     }
 
-    public BuiltResourcePack getResourcePack() {
-        return resourcePack;
+    public void build() {
+        resourcePack = createDefaultBuilder().build();
     }
 }

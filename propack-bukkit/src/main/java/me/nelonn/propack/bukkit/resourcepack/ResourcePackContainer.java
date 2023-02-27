@@ -69,10 +69,12 @@ public class ResourcePackContainer {
                 JsonObject jsonObject = GsonHelper.deserialize(content);
                 String type = GsonHelper.getString(jsonObject, "Type");
                 if (type.equalsIgnoreCase("Project")) {
+                    boolean buildAtStartup = GsonHelper.getBoolean(jsonObject, "BuildAtStartup", false);
                     InternalProject internalProject = projectLoader.load(new File(directory, name + File.separatorChar + "project.json5"));
-                    // TODO: fix
-                    internalProject.build();
-                    ResourcePackDefinition resourcePackDefinition = new ResourcePackDefinition(name, internalProject);
+                    if (buildAtStartup || internalProject.getResourcePack().isEmpty()) {
+                        internalProject.build(); // TODO: improve
+                    }
+                    ProjectResourcePackDefinition resourcePackDefinition = new ProjectResourcePackDefinition(internalProject);
                     definitions.put(name, resourcePackDefinition);
                 } else if (type.equalsIgnoreCase("File")) {
                     throw new UnsupportedOperationException("Resource pack definition type 'File' currently not supported");

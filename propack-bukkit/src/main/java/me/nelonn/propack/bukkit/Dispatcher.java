@@ -20,6 +20,7 @@ package me.nelonn.propack.bukkit;
 
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
+import me.nelonn.propack.bukkit.resourcepack.ResourcePackDefinition;
 import me.nelonn.propack.bukkit.sender.BukkitPackSender;
 import me.nelonn.propack.bukkit.sender.PackSender;
 import me.nelonn.propack.bukkit.sender.ProtocolPackSender;
@@ -59,12 +60,15 @@ public class Dispatcher implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         if (!Settings.DISPATCH_ENABLED.asBoolean()) return;
-        ResourcePack resourcePack = ProPack.getResourcePackContainer().getDefinition(Settings.DISPATCH_PACK.asString()).getResourcePack();
+        ResourcePackDefinition definition = ProPack.getResourcePackContainer().getDefinition(Settings.DISPATCH_PACK.asString());
+        if (definition == null) return;
+        Optional<ResourcePack> resourcePack = definition.getResourcePack();
+        if (resourcePack.isEmpty()) return;
         int delay = (int) Settings.DISPATCH_DELAY.getValue();
         if (delay > 0) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> sendPack(event.getPlayer(), resourcePack), delay * 20L);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> sendPack(event.getPlayer(), resourcePack.get()), delay * 20L);
         } else {
-            sendPack(event.getPlayer(), resourcePack);
+            sendPack(event.getPlayer(), resourcePack.get());
         }
     }
 

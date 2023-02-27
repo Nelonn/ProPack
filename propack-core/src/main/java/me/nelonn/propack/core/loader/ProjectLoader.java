@@ -20,6 +20,7 @@ package me.nelonn.propack.core.loader;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.*;
+import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.builder.Hosting;
 import me.nelonn.propack.builder.StrictMode;
 import me.nelonn.propack.builder.ZipPackager;
@@ -290,8 +291,17 @@ public class ProjectLoader {
         BuildConfiguration buildConfiguration = new BuildConfiguration(strictMode, ignoredExtensions,
                 obfuscationConfiguration, allLangTranslations, languages, zipPackager, packageOptions, hosting);
 
+        ResourcePack resourcePack;
+        File builtResourcePack = new File(projectFile.getParentFile(), "build/" + name + ".propack");
+        if (builtResourcePack.exists()) {
+            ResourcePackLoader resourcePackLoader = new ResourcePackLoader();
+            resourcePack = resourcePackLoader.load(builtResourcePack);
+        } else {
+            resourcePack = null;
+        }
+
         InternalProject project = new InternalProject(name, projectFile.getParentFile(),
-                itemDefinition, buildConfiguration, packMeta, packIcon);
+                itemDefinition, buildConfiguration, packMeta, packIcon, resourcePack);
 
         LOGGER.info("Project '{}' successfully loaded", name);
 
