@@ -39,6 +39,11 @@ public class ResourcePackLoader {
     public @NotNull ResourcePack load(@NotNull File file) {
         try {
             JsonObject root = GsonHelper.deserialize(IOUtil.readString(file));
+            int version = GsonHelper.getInt(root, "version");
+            if (version != 1) {
+                throw new UnsupportedOperationException("Version " + version + " not supported");
+            }
+
             JsonObject resources = GsonHelper.getObject(root, "resources");
 
             JsonObject itemModelsObject = GsonHelper.getObject(resources, "item_models");

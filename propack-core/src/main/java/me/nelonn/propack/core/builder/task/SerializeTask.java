@@ -53,6 +53,7 @@ public class SerializeTask extends AbstractTask {
             buildDir.mkdirs();
         }
         JsonObject root = new JsonObject();
+        root.addProperty("version", 1);
 
         JsonObject resources = new JsonObject();
         root.add("resources", resources);
