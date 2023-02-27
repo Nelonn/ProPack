@@ -23,7 +23,7 @@ import me.nelonn.propack.builder.Hosting;
 import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
-import me.nelonn.propack.core.util.Sha1;
+import me.nelonn.propack.Sha1;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -43,7 +43,7 @@ public class UploadTask extends AbstractTask {
         }
         File zip = io.getExtras().get(PackageTask.EXTRA_ZIP);
         Sha1 sha1 = io.getExtras().get(PackageTask.EXTRA_SHA1);
-        UploadedPack uploadedPack = hosting.upload(zip, sha1.toBytes(), sha1.toString());
+        UploadedPack uploadedPack = hosting.upload(zip, sha1);
         io.getExtras().put(EXTRA_UPLOADED_PACK, uploadedPack);
     }
 }

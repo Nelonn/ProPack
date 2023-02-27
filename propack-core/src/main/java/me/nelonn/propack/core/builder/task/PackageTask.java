@@ -23,7 +23,7 @@ import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
 import me.nelonn.propack.core.builder.BuildConfiguration;
 import me.nelonn.propack.core.util.LogManagerCompat;
-import me.nelonn.propack.core.util.Sha1;
+import me.nelonn.propack.Sha1;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,9 +68,9 @@ public class PackageTask extends AbstractTask {
         BuildConfiguration buildConfiguration = getProject().getBuildConfiguration();
         buildConfiguration.getZipPackager().packageFiles(zip, io.getFiles(), buildConfiguration.getPackageOptions());
         io.getExtras().put(EXTRA_ZIP, zip);
-        Sha1 sha1;
+        me.nelonn.propack.Sha1 sha1;
         try (InputStream inputStream = Files.newInputStream(zip.toPath())) {
-            sha1 = Sha1.create(inputStream);
+            sha1 = Sha1.hash(inputStream);
         } catch (Exception e) {
             throw new IllegalStateException("Unable to hash sha1 file", e);
         }

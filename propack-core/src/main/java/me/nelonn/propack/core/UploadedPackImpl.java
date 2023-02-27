@@ -19,7 +19,7 @@
 package me.nelonn.propack.core;
 
 import me.nelonn.propack.UploadedPack;
-import me.nelonn.propack.core.util.Sha1;
+import me.nelonn.propack.Sha1;
 import org.jetbrains.annotations.NotNull;
 
 public class UploadedPackImpl implements UploadedPack {
@@ -33,8 +33,8 @@ public class UploadedPackImpl implements UploadedPack {
         this.sha1String = sha1String;
     }
 
-    public UploadedPackImpl(@NotNull String url, byte @NotNull [] sha1Bytes) {
-        this(url, sha1Bytes, Sha1.bytesToString(sha1Bytes));
+    public UploadedPackImpl(@NotNull String url, @NotNull Sha1 sha1) {
+        this(url, sha1.asBytes(), sha1.asString());
     }
 
     public @NotNull String getUrl() {

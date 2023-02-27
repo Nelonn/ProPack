@@ -31,7 +31,7 @@ import me.nelonn.propack.core.builder.asset.ArmorTextureBuilder;
 import me.nelonn.propack.core.builder.asset.FontBuilder;
 import me.nelonn.propack.core.builder.asset.ItemModelBuilder;
 import me.nelonn.propack.core.builder.asset.SoundAssetBuilder;
-import me.nelonn.propack.core.util.Sha1;
+import me.nelonn.propack.Sha1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

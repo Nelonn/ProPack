@@ -23,6 +23,7 @@ import me.nelonn.propack.builder.Hosting;
 import me.nelonn.propack.core.UploadedPackImpl;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.NamedThreadFactory;
+import me.nelonn.propack.Sha1;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,16 +33,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Supplier;
 
 public class DevServer implements Hosting {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private HttpRunner runner;
     private String returnUrl;
-    private File file;
+    private Map<String, File> files;
 
     public void enable(@NotNull Map<String, Object> options) {
         if (runner != null) return;
@@ -58,8 +59,9 @@ public class DevServer implements Hosting {
         }
         String returnIp = (String) returnIpRaw;
         returnUrl = "http://" + returnIp + ":" + port;
+        files = new HashMap<>();
         try {
-            runner = new HttpRunner(port, () -> file);
+            runner = new HttpRunner(port);
             new Thread(runner, "devhttp-server").start();
         } catch (Exception e) {
             throw new IllegalStateException("Something went wrong when running http server", e);
@@ -79,20 +81,18 @@ public class DevServer implements Hosting {
     }
 
     @Override
-    public @Nullable UploadedPack upload(@NotNull File file, byte @NotNull [] hash, @NotNull String hashString) {
-        this.file = file;
-        return new UploadedPackImpl(returnUrl + '/' + hashString + ".zip", hash, hashString);
+    public @Nullable UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1) {
+        files.put(sha1.toString(), file);
+        return new UploadedPackImpl(returnUrl + '/' + sha1.asString() + ".zip", sha1.asBytes(), sha1.asString());
     }
 
-    public static class HttpRunner implements Runnable, Closeable {
+    public class HttpRunner implements Runnable, Closeable {
         private volatile boolean shouldStop = false;
         private final ServerSocket serverSocket;
-        private final Supplier<File> fileSupplier;
         private final ExecutorService executorService = Executors.newCachedThreadPool(new NamedThreadFactory(r -> "devhttp-client-" + r.hashCode()));
 
-        public HttpRunner(int port, @NotNull Supplier<File> fileSupplier) throws IOException {
+        public HttpRunner(int port) throws IOException {
             serverSocket = new ServerSocket(port);
-            this.fileSupplier = fileSupplier;
             LOGGER.info("Dev HTTP server started successfully on port {}", port);
         }
 
@@ -125,24 +125,28 @@ public class DevServer implements Hosting {
             }
 
             //String method = requestLine[0];
-            //String path = requestLine[1];
+            String path = requestLine[1];
             String httpVersion = requestLine[2];
 
             OutputStream outputStream = socket.getOutputStream();
             PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.ISO_8859_1), true);
 
-            File result = fileSupplier.get();
-            if (result == null) {
+            String sha1 = path.substring(1);
+            if (sha1.endsWith(".zip")) {
+                sha1 = sha1.substring(0, sha1.length() - ".zip".length());
+            }
+            File file = files.get(sha1);
+            if (file == null) {
                 printWriter.println(httpVersion + " 404 Not Found");
                 socket.close();
                 return;
             }
 
-            try (InputStream inputStream = new FileInputStream(result)) {
+            try (InputStream inputStream = new FileInputStream(file)) {
                 printWriter.println(httpVersion + " 200 OK");
                 printWriter.println("Content-Type: application/zip");
-                printWriter.println("Content-Length: " + result.length());
-                printWriter.println("Server: ProPackDev");
+                printWriter.println("Content-Length: " + file.length());
+                printWriter.println("Server: ProPackDevServer");
                 printWriter.println();
                 printWriter.flush();
 

@@ -19,6 +19,7 @@
 package me.nelonn.propack.builder;
 
 import me.nelonn.propack.UploadedPack;
+import me.nelonn.propack.Sha1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +32,6 @@ public interface Hosting {
 
     void disable();
 
-    @Nullable UploadedPack upload(@NotNull File file, byte @NotNull [] hash, @NotNull String hashString);
+    @Nullable UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1);
 
 }
