@@ -63,24 +63,24 @@ public class ProcessSoundsTask extends AbstractTask {
                 if (!filePath.startsWith("content/") || !filePath.endsWith(".wav") && !filePath.endsWith(".mp3"))
                     continue;
                 io.getFiles().removeFile(filePath);
-                java.io.File inputFile;
-                if (file instanceof RealFile) {
-                    inputFile = ((RealFile) file).getFile();
-                } else {
-                    inputFile = Util.tempFile(io, filePath);
-                    try (InputStream in = file.openInputStream();
-                         OutputStream out = Files.newOutputStream(inputFile.toPath())) {
-                        IOUtil.transferTo(in, out);
-                    }
-                }
-                String outputPath = Util.substringLast(filePath, 3) + "ogg";
-                java.io.File outputFile = Util.tempFile(io, outputPath);
-                String ffmpeg = System.getProperty("propack.ffmpeg", "ffmpeg");
-                String[] commandLine = new String[]{ffmpeg, "-i", inputFile.getAbsolutePath(), "-c:a", "libvorbis", "-q:a", "10", outputFile.getAbsolutePath()};
                 futureList.add(CompletableFuture.runAsync(() -> {
                     try {
-                        Runtime.getRuntime().exec(commandLine).waitFor();
-                    } catch (IOException | InterruptedException e) {
+                        java.io.File inputFile;
+                        if (file instanceof RealFile) {
+                            inputFile = ((RealFile) file).getFile();
+                        } else {
+                            inputFile = Util.tempFile(io, filePath);
+                            try (InputStream in = file.openInputStream();
+                                 OutputStream out = Files.newOutputStream(inputFile.toPath())) {
+                                IOUtil.transferTo(in, out);
+                            }
+                        }
+                        String outputPath = Util.substringLast(filePath, 3) + "ogg";
+                        java.io.File outputFile = Util.tempFile(io, outputPath);
+                        String ffmpeg = System.getProperty("propack.ffmpeg", "ffmpeg");
+                        String[] commandLine = new String[]{ffmpeg, "-i", inputFile.getAbsolutePath(), "-c:a", "libvorbis", "-q:a", "10", outputFile.getAbsolutePath()};
+                        Runtime.getRuntime().exec(commandLine);
+                    } catch (IOException e) {
                         LOGGER.error("Unable to convert '" + filePath + "' to ogg", e);
                     }
                 }));
