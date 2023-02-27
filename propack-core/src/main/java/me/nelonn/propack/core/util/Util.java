@@ -47,7 +47,7 @@ public final class Util {
             throw new JsonParseException("Expected 2 '" + key + "' values, found: " + jsonArray.size());
         }
         int[] arr = new int[2];
-        for(int i = 0; i < arr.length; ++i) {
+        for (int i = 0; i < arr.length; ++i) {
             arr[i] = GsonHelper.asInt(jsonArray.get(i), key + '[' + i + ']');
         }
         return new Vec2i(arr[0], arr[1]);
@@ -60,7 +60,7 @@ public final class Util {
             throw new JsonParseException("Expected 3 '" + key + "' values, found: " + jsonArray.size());
         }
         float[] arr = new float[3];
-        for(int i = 0; i < arr.length; ++i) {
+        for (int i = 0; i < arr.length; ++i) {
             arr[i] = GsonHelper.asFloat(jsonArray.get(i), key + '[' + i + ']');
         }
         return new Vec3f(arr[0], arr[1], arr[2]);

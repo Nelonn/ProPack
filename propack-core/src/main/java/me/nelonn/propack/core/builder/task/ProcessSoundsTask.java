@@ -78,7 +78,8 @@ public class ProcessSoundsTask extends AbstractTask {
                         String outputPath = Util.substringLast(filePath, 3) + "ogg";
                         java.io.File outputFile = Util.tempFile(io, outputPath);
                         String ffmpeg = System.getProperty("propack.ffmpeg", "ffmpeg");
-                        String[] commandLine = new String[]{ffmpeg, "-i", inputFile.getAbsolutePath(), "-c:a", "libvorbis", "-q:a", "10", outputFile.getAbsolutePath()};
+                        String[] commandLine = new String[]{ffmpeg, "-i", inputFile.getAbsolutePath(), "-c:a",
+                                "libvorbis", "-q:a", "10", outputFile.getAbsolutePath()};
                         Runtime.getRuntime().exec(commandLine);
                     } catch (IOException e) {
                         LOGGER.error("Unable to convert '" + filePath + "' to ogg", e);
