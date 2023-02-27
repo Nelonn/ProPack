@@ -18,7 +18,6 @@
 
 package me.nelonn.propack.core.loader;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.*;
 import me.nelonn.propack.builder.Hosting;
@@ -40,6 +39,7 @@ import me.nelonn.propack.core.loader.text.TextComponentLoader;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.core.util.LogManagerCompat;
+import me.nelonn.propack.core.util.Util;
 import me.nelonn.propack.definition.ItemDefinition;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -181,7 +181,7 @@ public class ProjectLoader {
 
             if (buildConfigObject.has("IgnoredExtensions")) {
                 JsonArray ignoredExtensionsArray = GsonHelper.getArray(buildConfigObject, "IgnoredExtensions");
-                arrayToStringList(ignoredExtensionsArray, "IgnoredExtensions", ignoredExtensionsBuilder);
+                Util.arrayToConsumer(ignoredExtensionsArray, "IgnoredExtensions", ignoredExtensionsBuilder::add);
             }
 
             JsonObject obfuscationObject = GsonHelper.getObject(buildConfigObject, "Obfuscation");
@@ -216,7 +216,7 @@ public class ProjectLoader {
                 }
 
                 JsonArray languagesArray = GsonHelper.getArray(languagesConfigObject, "Languages");
-                arrayToStringList(languagesArray, "Languages", languagesBuilder);
+                Util.arrayToConsumer(languagesArray, "Languages", languagesBuilder::add);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Something went wrong when loading 'config/languages.json5'", e);
             }
@@ -333,15 +333,5 @@ public class ProjectLoader {
             }
         }
         return options;
-    }
-
-    private static void arrayToStringList(JsonArray input, String name, ImmutableCollection.Builder<String> output) {
-        for (int i = 0; i < input.size(); i++) {
-            JsonElement element = input.get(i);
-            if (!GsonHelper.isString(element)) {
-                throw new JsonSyntaxException("Element in array '" + name + "' at index " + i + " is not a string");
-            }
-            output.add(element.getAsString());
-        }
     }
 }

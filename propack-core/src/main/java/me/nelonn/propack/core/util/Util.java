@@ -19,6 +19,7 @@
 package me.nelonn.propack.core.util;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import me.nelonn.propack.builder.task.TaskIO;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.io.File;
+import java.util.function.Consumer;
 
 public final class Util {
 
@@ -79,6 +81,13 @@ public final class Util {
         jsonArray.add(vec3f.getY());
         jsonArray.add(vec3f.getZ());
         return jsonArray;
+    }
+
+    public static void arrayToConsumer(@NotNull JsonArray input, @NotNull String name, @NotNull Consumer<String> output) {
+        for (int i = 0; i < input.size(); i++) {
+            JsonElement element = input.get(i);
+            output.accept(GsonHelper.asString(element, name + '[' + i + ']'));
+        }
     }
 
     public static @NotNull String substringLast(@NotNull String string, int size) {
