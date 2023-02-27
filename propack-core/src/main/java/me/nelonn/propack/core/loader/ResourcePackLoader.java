@@ -24,6 +24,7 @@ import com.google.gson.JsonObject;
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.MapItemDefinition;
+import me.nelonn.propack.MapMeshMapping;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.asset.SlotItemModel;
 import me.nelonn.propack.core.builder.asset.*;
@@ -36,6 +37,7 @@ import me.nelonn.propack.definition.ItemDefinition;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,6 +54,8 @@ public class ResourcePackLoader {
             if (version != 1) {
                 throw new UnsupportedOperationException("Version " + version + " not supported");
             }
+
+            String name = GsonHelper.getString(root, "name");
 
             JsonObject itemsObject = GsonHelper.getObject(root, "items");
             Map<Identifier, Item> items = new HashMap<>();
@@ -110,15 +114,45 @@ public class ResourcePackLoader {
             }
 
             JsonObject armorTexturesObject = GsonHelper.getObject(resources, "armor_textures");
-            // TODO: deserialization
+            Map<Path, ArmorTextureBuilder> armorTextures = new HashMap<>();
+            for (Map.Entry<String, JsonElement> armorTextureEntry : armorTexturesObject.entrySet()) {
+                Path path = Path.of(armorTextureEntry.getKey());
+                JsonObject armorTextureObject = GsonHelper.asObject(armorTextureEntry.getValue(), armorTextureEntry.getKey());
+                Color color = Util.hexToRGB(GsonHelper.getString(armorTextureObject, "Color"));
+                boolean hasLayer1 = GsonHelper.getBoolean(armorTextureObject, "Layer1");
+                boolean hasLayer2 = GsonHelper.getBoolean(armorTextureObject, "Layer2");
+                armorTextures.put(path, new ArmorTextureBuilder(path)
+                        .setColor(color).setHasLayer1(hasLayer1).setHasLayer2(hasLayer2));
+            }
 
             JsonObject fontsObject = GsonHelper.getObject(resources, "fonts");
-            // TODO: deserialization
+            Map<Path, FontBuilder> fonts = new HashMap<>();
+            for (Map.Entry<String, JsonElement> fontEntry : fontsObject.entrySet()) {
+                Path path = Path.of(fontEntry.getKey());
+                Path fontPath = Path.of(GsonHelper.asString(fontEntry.getValue(), fontEntry.getKey()));
+                fonts.put(path, new FontBuilder(path).setFontPath(fontPath));
+            }
 
             JsonObject meshMappingObject = GsonHelper.getObject(resources, "mesh_mapping");
-            // TODO: deserialization
+            Map<Item, Map<Path, Integer>> map = new HashMap<>();
+            for (Map.Entry<String, JsonElement> entry : meshMappingObject.entrySet()) {
+                Item item = itemDefinition.getItem(Identifier.of(entry.getKey()));
+                JsonObject jsonObject = GsonHelper.asObject(entry.getValue(), entry.getKey());
+                Map<Path, Integer> meshMap = new HashMap<>();
+                for (Map.Entry<String, JsonElement> meshEntry : jsonObject.entrySet()) {
+                    int cmd = GsonHelper.asInt(meshEntry.getValue(), meshEntry.getKey());
+                    meshMap.put(Path.of(meshEntry.getKey()), cmd);
+                }
+                map.put(item, meshMap);
+            }
+            MapMeshMapping meshMapping = new MapMeshMapping(map);
 
-            return null;
+            return new LoadedResourcePack(name,
+                    itemModels.values(),
+                    sounds.values(),
+                    armorTextures.values(),
+                    fonts.values(),
+                    meshMapping);
         } catch (Exception e) {
             throw new IllegalArgumentException("Something went wrong when loading '" + file.getName() + "'", e);
         }
