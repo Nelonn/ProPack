@@ -83,7 +83,7 @@ public final class Util {
         return jsonArray;
     }
 
-    public static void arrayToConsumer(@NotNull JsonArray input, @NotNull String name, @NotNull Consumer<String> output) {
+    public static void forEachStringArray(@NotNull JsonArray input, @NotNull String name, @NotNull Consumer<String> output) {
         for (int i = 0; i < input.size(); i++) {
             JsonElement element = input.get(i);
             output.accept(GsonHelper.asString(element, name + '[' + i + ']'));

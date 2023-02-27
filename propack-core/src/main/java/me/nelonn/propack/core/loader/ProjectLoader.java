@@ -181,7 +181,7 @@ public class ProjectLoader {
 
             if (buildConfigObject.has("IgnoredExtensions")) {
                 JsonArray ignoredExtensionsArray = GsonHelper.getArray(buildConfigObject, "IgnoredExtensions");
-                Util.arrayToConsumer(ignoredExtensionsArray, "IgnoredExtensions", ignoredExtensionsBuilder::add);
+                Util.forEachStringArray(ignoredExtensionsArray, "IgnoredExtensions", ignoredExtensionsBuilder::add);
             }
 
             JsonObject obfuscationObject = GsonHelper.getObject(buildConfigObject, "Obfuscation");
@@ -216,7 +216,7 @@ public class ProjectLoader {
                 }
 
                 JsonArray languagesArray = GsonHelper.getArray(languagesConfigObject, "Languages");
-                Util.arrayToConsumer(languagesArray, "Languages", languagesBuilder::add);
+                Util.forEachStringArray(languagesArray, "Languages", languagesBuilder::add);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Something went wrong when loading 'config/languages.json5'", e);
             }
