@@ -70,7 +70,8 @@ public class ResourcePackContainer {
                 String type = GsonHelper.getString(jsonObject, "Type");
                 if (type.equalsIgnoreCase("Project")) {
                     boolean buildAtStartup = GsonHelper.getBoolean(jsonObject, "BuildAtStartup", false);
-                    InternalProject internalProject = projectLoader.load(new File(directory, name + File.separatorChar + "project.json5"));
+                    File projectFile = new File(directory, name + File.separatorChar + "project.json5");
+                    InternalProject internalProject = projectLoader.load(projectFile, !buildAtStartup);
                     if (buildAtStartup || internalProject.getResourcePack().isEmpty()) {
                         internalProject.build(); // TODO: improve
                     }

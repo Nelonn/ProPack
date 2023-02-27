@@ -45,7 +45,7 @@ public class BuildCommand implements Runnable {
             projectFile = new File(dir, name + File.separator + "project.json5");
         }
         ProjectLoader projectLoader = new ProjectLoader();
-        InternalProject internalProject = projectLoader.load(projectFile);
+        InternalProject internalProject = projectLoader.load(projectFile, false);
         internalProject.build();
     }
 }

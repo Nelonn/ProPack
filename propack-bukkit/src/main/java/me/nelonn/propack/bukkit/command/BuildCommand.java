@@ -45,7 +45,7 @@ public class BuildCommand extends Command {
             try {
                 ProPack.getResourcePackContainer().getDefinition(args[0]);
                 File projectFile = new File(plugin.getDataFolder(), args[0] + File.separatorChar + "project.json5");
-                InternalProject internalProject = ProPack.getResourcePackContainer().getProjectLoader().load(projectFile);
+                InternalProject internalProject = ProPack.getResourcePackContainer().getProjectLoader().load(projectFile, false);
                 internalProject.build();
             } catch (Exception e) {
                 Util.send(sender, "<red>Exception: " + e.getMessage());

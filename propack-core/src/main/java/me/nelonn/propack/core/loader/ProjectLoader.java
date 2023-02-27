@@ -83,7 +83,7 @@ public class ProjectLoader {
         this(null, null);
     }
 
-    public @NotNull InternalProject load(@NotNull File projectFile) {
+    public @NotNull InternalProject load(@NotNull File projectFile, boolean loadBuilt) {
         String name;
         VirtualFile packMeta;
         VirtualFile packIcon;
