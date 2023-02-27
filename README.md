@@ -109,9 +109,10 @@ Example NBT tag for SlotItemModel: `{CustomModel:"example:models/example_slotmod
 Sound files must ends with `.sound.json`
 - Example: `scream.sound.json`
 
-Ogg paths can be relative, example `../folder/sound.ogg`.
+Sound file paths can be relative, example `../folder/sound`.
 
-`.ogg` is not required to be specified
+FFmpeg auto conversion is supported. Use `-Dpropack.ffmpeg=path` to indicate its location,
+by default it `ffmpeg`
 
 ## <a name="armortextures"></a> Armor Textures
 Added an automatic builder of custom textures for leather armor for the [shader `fancyPants`](https://github.com/Ancientkingg/fancyPants)
