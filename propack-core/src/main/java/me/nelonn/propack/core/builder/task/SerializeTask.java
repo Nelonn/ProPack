@@ -119,9 +119,13 @@ public class SerializeTask extends AbstractTask {
 
         JsonObject armorTextures = new JsonObject();
         for (ArmorTextureBuilder armorTexture : io.getAssets().getArmorTextures()) {
+            JsonObject armorTextureObject = new JsonObject();
             Color color = armorTexture.getColor();
             String hex = String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-            armorTextures.addProperty(armorTexture.getPath().toString(), hex);
+            armorTextureObject.addProperty("Color", hex);
+            armorTextureObject.addProperty("Layer1", armorTexture.hasLayer1());
+            armorTextureObject.addProperty("Layer2", armorTexture.hasLayer2());
+            armorTextures.add(armorTexture.getPath().toString(), armorTextureObject);
         }
         resources.add("armor_textures", armorTextures);
 
