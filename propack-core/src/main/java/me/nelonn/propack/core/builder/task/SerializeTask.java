@@ -55,6 +55,13 @@ public class SerializeTask extends AbstractTask {
         JsonObject root = new JsonObject();
         root.addProperty("version", 1);
 
+        JsonObject items = new JsonObject();
+        root.add("items", items);
+
+        for (Item item : getProject().getItemDefinition().getItems()) {
+            items.addProperty(item.getId().toString(), item.isBlock());
+        }
+
         JsonObject resources = new JsonObject();
         root.add("resources", resources);
 
