@@ -291,13 +291,15 @@ public class ProjectLoader {
         BuildConfiguration buildConfiguration = new BuildConfiguration(strictMode, ignoredExtensions,
                 obfuscationConfiguration, allLangTranslations, languages, zipPackager, packageOptions, hosting);
 
-        ResourcePack resourcePack;
+        ResourcePack resourcePack = null;
         File builtResourcePack = new File(projectFile.getParentFile(), "build/" + name + ".propack");
         if (builtResourcePack.exists() && loadBuilt) {
-            ResourcePackLoader resourcePackLoader = new ResourcePackLoader();
-            resourcePack = resourcePackLoader.load(builtResourcePack);
-        } else {
-            resourcePack = null;
+            try {
+                ResourcePackLoader resourcePackLoader = new ResourcePackLoader();
+                resourcePack = resourcePackLoader.load(builtResourcePack);
+            } catch (Exception e) {
+                LOGGER.error("Unable to load built resource pack", e);
+            }
         }
 
         InternalProject project = new InternalProject(name, projectFile.getParentFile(),
