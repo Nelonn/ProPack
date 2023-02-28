@@ -293,7 +293,7 @@ public class ProjectLoader {
 
         ResourcePack resourcePack;
         File builtResourcePack = new File(projectFile.getParentFile(), "build/" + name + ".propack");
-        if (builtResourcePack.exists()) {
+        if (builtResourcePack.exists() && loadBuilt) {
             ResourcePackLoader resourcePackLoader = new ResourcePackLoader();
             resourcePack = resourcePackLoader.load(builtResourcePack);
         } else {
