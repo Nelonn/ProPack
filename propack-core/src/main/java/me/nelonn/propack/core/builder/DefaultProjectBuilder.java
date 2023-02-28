@@ -85,7 +85,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     io.getAssets().getSounds(),
                     io.getAssets().getArmorTextures(),
                     io.getAssets().getFonts(),
-                    requireNonNull(io.getExtras().get(ProcessModelsTask.EXTRA_MAPPINGS_BUILDER)).build(),
+                    requireNonNull(io.getExtras().get(ProcessModelsTask.EXTRA_MESH_MAPPING_BUILDER)).build(),
                     requireNonNull(io.getExtras().get(SerializeTask.EXTRA_FILE)),
                     requireNonNull(io.getExtras().get(PackageTask.EXTRA_ZIP)),
                     requireNonNull(io.getExtras().get(PackageTask.EXTRA_SHA1)),

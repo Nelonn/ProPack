@@ -29,7 +29,7 @@ import me.nelonn.propack.builder.file.File;
 import me.nelonn.propack.builder.file.JsonFile;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
-import me.nelonn.propack.core.builder.MappingsBuilder;
+import me.nelonn.propack.core.builder.MeshMappingBuilder;
 import me.nelonn.propack.core.builder.asset.CombinedItemModelBuilder;
 import me.nelonn.propack.core.builder.asset.DefaultItemModelBuilder;
 import me.nelonn.propack.core.builder.asset.ItemModelBuilder;
@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProcessModelsTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    public static final Extra<MappingsBuilder> EXTRA_MAPPINGS_BUILDER = new Extra<>(MappingsBuilder.class, "propack.process_models.mappings_builder");
+    public static final Extra<MeshMappingBuilder> EXTRA_MESH_MAPPING_BUILDER = new Extra<>(MeshMappingBuilder.class, "propack.process_models.mesh_mapping_builder");
 
     public ProcessModelsTask(@NotNull Project project) {
         super("processModels", project);
@@ -55,8 +55,8 @@ public class ProcessModelsTask extends AbstractTask {
 
     @Override
     public void run(@NotNull TaskIO io) {
-        MappingsBuilder mappingsBuilder = new MappingsBuilder();
-        io.getExtras().put(EXTRA_MAPPINGS_BUILDER, mappingsBuilder);
+        MeshMappingBuilder meshMappingBuilder = new MeshMappingBuilder();
+        io.getExtras().put(EXTRA_MESH_MAPPING_BUILDER, meshMappingBuilder);
         Map<Path, Set<Item>> meshesToOverride = new HashMap<>();
         for (File file : io.getFiles()) {
             try {
@@ -225,7 +225,7 @@ public class ProcessModelsTask extends AbstractTask {
                 Set<Item> toOverride = meshesToOverride.get(resourcePath);
                 if (toOverride != null) {
                     for (Item item : toOverride) {
-                        mappingsBuilder.getMapper(item).add(resourcePath);
+                        meshMappingBuilder.getMapper(item).add(resourcePath);
                     }
                 }
             } catch (Exception e) {
@@ -233,8 +233,8 @@ public class ProcessModelsTask extends AbstractTask {
             }
         }
         // overriding default models (custom_model_data)
-        for (MappingsBuilder.Mapper mapper : mappingsBuilder.getMappers()) {
-            String path = "include/assets/minecraft/models/item/" + mapper.getItem().getId().getValue() + ".json";
+        for (MeshMappingBuilder.ItemEntry itemEntry : meshMappingBuilder.getMappers()) {
+            String path = "include/assets/minecraft/models/item/" + itemEntry.getItem().getId().getValue() + ".json";
             File file = io.getFiles().getFile(path);
             if (!(file instanceof JsonFile)) {
                 LOGGER.error("Default model not found: {}", path);
@@ -242,7 +242,7 @@ public class ProcessModelsTask extends AbstractTask {
             }
             JsonObject jsonObject = ((JsonFile) file).getContent();
             JsonArray overrides = GsonHelper.getArray(jsonObject, "overrides", new JsonArray());
-            for (Map.Entry<Integer, Path> mapping : mapper.getMap().entrySet()) {
+            for (Map.Entry<Integer, Path> mapping : itemEntry.getMap().entrySet()) {
                 overrides.add(new JsonObjectBuilder()
                         .put("predicate", new JsonObjectBuilder().put("custom_model_data", mapping.getKey()).get())
                         .put("model", mapping.getValue().toString())

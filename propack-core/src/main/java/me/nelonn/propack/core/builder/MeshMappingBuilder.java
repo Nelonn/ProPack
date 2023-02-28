@@ -31,31 +31,31 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MappingsBuilder {
-    private final Map<Item, Mapper> mappers = new HashMap<>();
+public class MeshMappingBuilder {
+    private final Map<Item, ItemEntry> mappers = new HashMap<>();
 
-    public @NotNull  Mapper getMapper(@NotNull Item item) {
-        return mappers.computeIfAbsent(item, Mapper::new);
+    public @NotNull MeshMappingBuilder.ItemEntry getMapper(@NotNull Item item) {
+        return mappers.computeIfAbsent(item, ItemEntry::new);
     }
 
-    public @NotNull Collection<Mapper> getMappers() {
+    public @NotNull Collection<ItemEntry> getMappers() {
         return mappers.values();
     }
 
     public @NotNull MapMeshMapping build() {
         Map<Item, Map<Path, Integer>> map = new HashMap<>();
-        for (Mapper mapper : getMappers()) {
-            map.put(mapper.getItem(), new HashMap<>(mapper.getMap().inverse()));
+        for (ItemEntry itemEntry : getMappers()) {
+            map.put(itemEntry.getItem(), new HashMap<>(itemEntry.getMap().inverse()));
         }
         return new MapMeshMapping(map);
     }
 
-    public static class Mapper {
+    public static class ItemEntry {
         private final Item item;
         private final BiMap<Integer, Path> map = HashBiMap.create();
         private final AtomicInteger integer = new AtomicInteger(1);
 
-        public Mapper(@NotNull Item item) {
+        public ItemEntry(@NotNull Item item) {
             this.item = item;
         }
 

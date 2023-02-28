@@ -25,7 +25,7 @@ import me.nelonn.propack.asset.SlotItemModel;
 import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
-import me.nelonn.propack.core.builder.MappingsBuilder;
+import me.nelonn.propack.core.builder.MeshMappingBuilder;
 import me.nelonn.propack.core.builder.asset.*;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.definition.Item;
@@ -137,14 +137,14 @@ public class SerializeTask extends AbstractTask {
         }
         resources.add("fonts", fonts);
 
-        MappingsBuilder mappingsBuilder = io.getExtras().get(ProcessModelsTask.EXTRA_MAPPINGS_BUILDER);
+        MeshMappingBuilder meshMappingBuilder = io.getExtras().get(ProcessModelsTask.EXTRA_MESH_MAPPING_BUILDER);
         JsonObject meshMappingObject = new JsonObject();
-        for (MappingsBuilder.Mapper mapper : mappingsBuilder.getMappers()) {
+        for (MeshMappingBuilder.ItemEntry itemEntry : meshMappingBuilder.getMappers()) {
             JsonObject mapping = new JsonObject();
-            for (Map.Entry<Integer, Path> entry : mapper.getMap().entrySet()) {
+            for (Map.Entry<Integer, Path> entry : itemEntry.getMap().entrySet()) {
                 mapping.addProperty(entry.getValue().toString(), entry.getKey());
             }
-            meshMappingObject.add(mapper.getItem().getId().toString(), mapping);
+            meshMappingObject.add(itemEntry.getItem().getId().toString(), mapping);
         }
         resources.add("mesh_mapping", meshMappingObject);
 
