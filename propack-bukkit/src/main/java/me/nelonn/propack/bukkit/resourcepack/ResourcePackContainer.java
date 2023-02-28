@@ -53,7 +53,7 @@ public class ResourcePackContainer {
         projectLoader = new ProjectLoader(null, itemDefinitionLoaders);
     }
 
-    public void load() {
+    public void loadAll() {
         definitions.clear();
         File[] files = directory.listFiles();
         if (files == null) {

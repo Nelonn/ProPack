@@ -59,10 +59,8 @@ public final class ProPackPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         adventure = BukkitAudiences.create(this);
-        reloadConfigs();
-
         resourcePackContainer = new ResourcePackContainer(getDataFolder());
-        resourcePackContainer.load();
+        reloadConfigs();
 
         dispatcher = new Dispatcher(this);
         Bukkit.getPluginManager().registerEvents(dispatcher, this);
@@ -85,6 +83,7 @@ public final class ProPackPlugin extends JavaPlugin {
 
     public void reloadConfigs() {
         reloadConfig();
+        resourcePackContainer.loadAll();
     }
 
     public @NotNull BukkitAudiences adventure() {

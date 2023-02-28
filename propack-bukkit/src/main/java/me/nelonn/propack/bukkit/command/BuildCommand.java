@@ -18,14 +18,19 @@
 
 package me.nelonn.propack.bukkit.command;
 
-import me.nelonn.propack.core.builder.InternalProject;
+import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.Util;
+import me.nelonn.propack.bukkit.resourcepack.ProjectResourcePackDefinition;
+import me.nelonn.propack.bukkit.resourcepack.ResourcePackDefinition;
+import me.nelonn.propack.core.builder.InternalProject;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
+import java.util.Optional;
 
 public class BuildCommand extends Command {
     private final ProPackPlugin plugin;
@@ -41,12 +46,24 @@ public class BuildCommand extends Command {
             Util.send(sender, "<red>Usage: /" + s + " <project>");
             return;
         }
+        ResourcePackDefinition definition = ProPack.getResourcePackContainer().getDefinition(args[0]);
+        if (!(definition instanceof ProjectResourcePackDefinition)) {
+            Util.send(sender, "<red>Resource pack '" + args[0] + "' is not project");
+        }
+        ProjectResourcePackDefinition projectDefinition = (ProjectResourcePackDefinition) definition;
         new Thread(() -> {
             try {
-                ProPack.getResourcePackContainer().getDefinition(args[0]);
-                File projectFile = new File(plugin.getDataFolder(), args[0] + File.separatorChar + "project.json5");
-                InternalProject internalProject = ProPack.getResourcePackContainer().getProjectLoader().load(projectFile, false);
+                InternalProject internalProject = (InternalProject) projectDefinition.getProject();
                 internalProject.build();
+                ResourcePack resourcePack = internalProject.getResourcePack().orElseThrow();
+                if (resourcePack.isUploaded()) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        Optional<ResourcePack> playerPack = ProPack.getDispatcher().getResourcePack(player);
+                        if (playerPack.isPresent() && playerPack.get().equals(resourcePack)) {
+                            ProPack.getDispatcher().sendPack(player, resourcePack);
+                        }
+                    }
+                }
             } catch (Exception e) {
                 Util.send(sender, "<red>Exception: " + e.getMessage());
                 Util.send(sender, "<red>Check console for additional info");
