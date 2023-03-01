@@ -27,7 +27,9 @@ public interface Adapter {
 
     void patchSetSlot(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
 
-    void patchWindowItems(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
+    void patchSetContent(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
 
     void patchEntityEquipment(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
+
+    void patchSetEntityData(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
 }

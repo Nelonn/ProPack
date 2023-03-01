@@ -28,16 +28,16 @@ import me.nelonn.propack.bukkit.adapter.WrappedListTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket;
-import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
-import net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacket;
+import net.minecraft.network.protocol.game.*;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class PaperweightAdapter implements Adapter {
@@ -54,7 +54,7 @@ public class PaperweightAdapter implements Adapter {
     }
 
     @Override
-    public void patchWindowItems(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher) {
+    public void patchSetContent(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher) {
         ClientboundContainerSetContentPacket nms = (ClientboundContainerSetContentPacket) packet;
         for (ItemStack itemStack : nms.getItems()) {
             patcher.accept(new CraftItemStack(itemStack));
@@ -66,6 +66,23 @@ public class PaperweightAdapter implements Adapter {
         ClientboundSetEquipmentPacket nms = (ClientboundSetEquipmentPacket) packet;
         for (Pair<EquipmentSlot, ItemStack> slot : nms.getSlots()) {
             patcher.accept(new CraftItemStack(slot.getSecond()));
+        }
+    }
+
+    // not tested
+    @Override
+    public void patchSetEntityData(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher) {
+        ClientboundSetEntityDataPacket nms = (ClientboundSetEntityDataPacket) packet;
+        List<SynchedEntityData.DataValue<?>> packetItems = nms.packedItems();
+        List<SynchedEntityData.DataValue<?>> list = packetItems.stream()
+                .filter(dataValue -> dataValue.serializer().equals(EntityDataSerializers.ITEM_STACK))
+                .toList();
+        for (SynchedEntityData.DataValue<?> entry : list) {
+            packetItems.remove(entry);
+            ItemStack itemStack = ((ItemStack) entry.value()).copy();
+            patcher.accept(new CraftItemStack(itemStack));
+            SynchedEntityData.DataValue<ItemStack> newItem = new SynchedEntityData.DataValue<>(entry.id(), EntityDataSerializers.ITEM_STACK, itemStack);
+            packetItems.add(newItem);
         }
     }
 

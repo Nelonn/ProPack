@@ -58,6 +58,7 @@ public class PacketListener extends PacketAdapter {
                 PacketType.Play.Server.SET_SLOT,
                 PacketType.Play.Server.WINDOW_ITEMS,
                 PacketType.Play.Server.ENTITY_EQUIPMENT,
+                PacketType.Play.Server.ENTITY_METADATA,
 
                 PacketType.Play.Server.CUSTOM_SOUND_EFFECT);
         try {
@@ -102,9 +103,11 @@ public class PacketListener extends PacketAdapter {
             if (type == PacketType.Play.Server.SET_SLOT) {
                 method = adapter::patchSetSlot;
             } else if (type == PacketType.Play.Server.WINDOW_ITEMS) {
-                method = adapter::patchWindowItems;
+                method = adapter::patchSetContent;
             } else if (type == PacketType.Play.Server.ENTITY_EQUIPMENT) {
                 method = adapter::patchEntityEquipment;
+            } else if (type == PacketType.Play.Server.ENTITY_METADATA) {
+                method = adapter::patchSetEntityData;
             } else {
                 return;
             }
