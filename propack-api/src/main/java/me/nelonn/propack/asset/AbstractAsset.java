@@ -23,8 +23,8 @@ import me.nelonn.propack.ResourcePack;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractAsset implements Asset {
-    private final ResourcePack resourcePack;
-    private final Path path;
+    protected final ResourcePack resourcePack;
+    protected final Path path;
 
     protected AbstractAsset(@NotNull ResourcePack resourcePack, @NotNull Path path) {
         this.resourcePack = resourcePack;

@@ -21,7 +21,12 @@ package me.nelonn.propack.core.builder;
 import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.ProjectBuilder;
 import me.nelonn.propack.builder.task.Task;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.builder.task.*;
+import me.nelonn.propack.core.builder.task.PackageTask;
+import me.nelonn.propack.core.builder.task.ProcessModelsTask;
+import me.nelonn.propack.core.builder.task.SerializeTask;
+import me.nelonn.propack.core.builder.task.UploadTask;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -35,37 +40,26 @@ import static java.util.Objects.requireNonNull;
 public class DefaultProjectBuilder implements ProjectBuilder {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final Project project;
-    private final LinkedHashSet<Task> tasks = new LinkedHashSet<>();
 
     public DefaultProjectBuilder(@NotNull Project project) {
         this.project = project;
-        tasks.add(new GatherSourcesTask(project));
-        tasks.add(new ProcessModelsTask(project));
-        tasks.add(new ProcessSoundsTask(project));
-        tasks.add(new ProcessArmorTextures(project));
-        tasks.add(new ProcessLanguagesTask(project));
-        tasks.add(new ProcessFontsTask(project));
-        if (project.getBuildConfiguration().getObfuscationConfiguration().isEnabled()) {
-            tasks.add(new ObfuscateTask(project));
-        }
-        tasks.add(new SortAssetsTask(project));
-        tasks.add(new PackageTask(project));
-        tasks.add(new SerializeTask(project));
-        if (project.getBuildConfiguration().getHosting() != null) {
-            tasks.add(new UploadTask(project));
-        }
     }
 
-    @Override
-    public @NotNull Set<Task> getTasks() {
-        return tasks;
-    }
-
-    public LocalResourcePack build() {
+    public BuiltResourcePack build() {
         long startTimestamp = System.currentTimeMillis();
         DefaultTaskIO io = new DefaultTaskIO(new File(project.getBuildDir(), "temp"));
         try {
-            for (Task task : tasks) {
+            Set<Task> tasksInstances = new LinkedHashSet<>();
+
+            try {
+                for (TaskBootstrap bootstrap : project.getBuildConfiguration().getTasks()) {
+                    tasksInstances.add(bootstrap.createTask(project));
+                }
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Unable to create instance of task", e);
+            }
+
+            for (Task task : tasksInstances) {
                 try {
                     task.run(io);
                 } catch (Exception e) {
@@ -80,12 +74,12 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 LOGGER.info("Task {}", task);
             }
 
-            LocalResourcePack localResourcePack = new LocalResourcePack(project,
-                    requireNonNull(io.getExtras().get(ProcessModelsTask.EXTRA_MAPPINGS_BUILDER)),
+            BuiltResourcePack builtResourcePack = new BuiltResourcePack(project,
                     io.getAssets().getItemModels(),
                     io.getAssets().getSounds(),
                     io.getAssets().getArmorTextures(),
                     io.getAssets().getFonts(),
+                    requireNonNull(io.getExtras().get(ProcessModelsTask.EXTRA_MESH_MAPPING_BUILDER)).build(),
                     requireNonNull(io.getExtras().get(SerializeTask.EXTRA_FILE)),
                     requireNonNull(io.getExtras().get(PackageTask.EXTRA_ZIP)),
                     requireNonNull(io.getExtras().get(PackageTask.EXTRA_SHA1)),
@@ -93,13 +87,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             LOGGER.info("BUILD SUCCESSFUL in {}s", (int) (System.currentTimeMillis() - startTimestamp) / 1000);
 
-            return localResourcePack;
+            return builtResourcePack;
         } catch (TaskFailedException e) {
             LOGGER.error("BUILD FAILED in {}s", (int) (System.currentTimeMillis() - startTimestamp) / 1000);
             return null;
         }
     }
 
+    @Override
     public @NotNull Project getProject() {
         return project;
     }

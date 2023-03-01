@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.util;
+package me.nelonn.propack;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class Sha1 {
+public final class Sha1 {
     private final byte[] bytes;
     private final String string;
 
@@ -34,22 +34,35 @@ public class Sha1 {
         this.string = string;
     }
 
-    public byte @NotNull [] toBytes() {
-        return bytes;
+    public byte @NotNull [] asBytes() {
+        byte[] res = new byte[bytes.length];
+        System.arraycopy(bytes, 0, res, 0, bytes.length);
+        return res;
     }
 
-    @Override
-    public @NotNull String toString() {
+    public @NotNull String asString() {
         return string;
     }
 
-    public static @NotNull Sha1 create(@NotNull InputStream inputStream) throws IOException, NoSuchAlgorithmException {
+    @Override
+    public String toString() {
+        return asString();
+    }
+
+    public static @NotNull Sha1 hash(@NotNull InputStream inputStream) throws IOException, NoSuchAlgorithmException {
         byte[] bytes = bytes(inputStream);
         String string = bytesToString(bytes);
         return new Sha1(bytes, string);
     }
 
-    public static byte @NotNull [] bytes(@NotNull InputStream inputStream) throws IOException, NoSuchAlgorithmException {
+    public static @NotNull Sha1 fromHashBytes(byte @NotNull [] hash) {
+        byte[] bytes = new byte[hash.length];
+        System.arraycopy(hash, 0, bytes, 0, hash.length);
+        String string = bytesToString(bytes);
+        return new Sha1(bytes, string);
+    }
+
+    private static byte @NotNull [] bytes(@NotNull InputStream inputStream) throws IOException, NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-1");
         byte[] buffer = new byte[8 * 1024];
         int read;
@@ -59,7 +72,7 @@ public class Sha1 {
         return digest.digest();
     }
 
-    public static @NotNull String bytesToString(byte @NotNull [] hash) {
+    private static @NotNull String bytesToString(byte @NotNull [] hash) {
         StringBuilder sb = new StringBuilder();
         for (byte b : hash) {
             int value = b & 0xFF;

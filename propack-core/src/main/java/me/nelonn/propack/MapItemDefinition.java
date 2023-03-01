@@ -16,12 +16,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.task;
+package me.nelonn.propack;
 
+import me.nelonn.flint.path.Identifier;
+import me.nelonn.propack.definition.Item;
+import me.nelonn.propack.definition.ItemDefinition;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class FileProcessingException extends RuntimeException {
-    public FileProcessingException(@NotNull String file, @NotNull Throwable cause) {
-        super("Exception while processing " + file, cause);
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MapItemDefinition implements ItemDefinition {
+    private final Map<Identifier, Item> items;
+
+    public MapItemDefinition(@NotNull Map<Identifier, Item> items) {
+        this.items = new HashMap<>(items);
+    }
+
+    @Override
+    public @Nullable Item getItem(@NotNull Identifier identifier) {
+        return items.get(identifier);
+    }
+
+    @Override
+    public @NotNull Collection<Item> getItems() {
+        return items.values();
     }
 }

@@ -31,12 +31,9 @@ public final class Vec3f {
     public static final Vec3f POSITIVE_Z = new Vec3f(0.0F, 0.0F, 1.0F);
     public static final Vec3f ZERO = new Vec3f(0.0F, 0.0F, 0.0F);
 
-    private float x;
-    private float y;
-    private float z;
-
-    public Vec3f() {
-    }
+    private final float x;
+    private final float y;
+    private final float z;
 
     public Vec3f(float x, float y, float z) {
         this.x = x;
@@ -45,34 +42,34 @@ public final class Vec3f {
     }
 
     public float getX() {
-        return this.x;
+        return x;
     }
 
     public float getY() {
-        return this.y;
+        return y;
     }
 
     public float getZ() {
-        return this.z;
+        return z;
     }
 
-    public Vec3f scale(float scale) {
+    public @NotNull Vec3f scale(float scale) {
         return new Vec3f(x * scale, y * scale, z * scale);
     }
 
-    public Vec3f add(float x, float y, float z) {
+    public @NotNull Vec3f add(float x, float y, float z) {
         return new Vec3f(this.x + x, this.y + y, this.z + z);
     }
 
-    public Vec3f add(@NotNull Vec3f vec) {
+    public @NotNull Vec3f add(@NotNull Vec3f vec) {
         return add(vec.getX(), vec.getY(), vec.getZ());
     }
 
-    public Vec3f subtract(float x, float y, float z) {
+    public @NotNull Vec3f subtract(float x, float y, float z) {
         return new Vec3f(this.x - x, this.y - y, this.z - z);
     }
 
-    public Vec3f subtract(@NotNull Vec3f vec) {
+    public @NotNull Vec3f subtract(@NotNull Vec3f vec) {
         return subtract(vec.getX(), vec.getY(), vec.getZ());
     }
 

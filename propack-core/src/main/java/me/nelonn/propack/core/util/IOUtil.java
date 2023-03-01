@@ -29,7 +29,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.jar.JarInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -106,7 +105,6 @@ public final class IOUtil {
     }
 
     public static long transferTo(@NotNull InputStream in, @NotNull OutputStream out) throws IOException {
-        Objects.requireNonNull(out, "out");
         long transferred = 0;
         byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
         int read;
@@ -125,9 +123,10 @@ public final class IOUtil {
 
     /**
      * Extract files from jar
+     *
      * @param source the class from which to take jar
-     * @param from directory in jar, example: "example/"
-     * @param to output file
+     * @param from   directory in jar, example: "example/"
+     * @param to     output file
      */
     public static void extractResources(@NotNull Class<?> source, @NotNull String from, @NotNull File to) {
         try {

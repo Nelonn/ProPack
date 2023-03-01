@@ -29,7 +29,14 @@ public enum Settings {
     DISPATCH_DELAY("dispatch.delay", -1),
     DISPATCH_REQUIRED("dispatch.required", true),
     DISPATCH_PACK("dispatch.pack"),
-    DISPATCH_PROMPT("dispatch.prompt", "&#fa4943Accept the pack to enjoy a full experience");
+    DISPATCH_PROMPT("dispatch.prompt", "&#fa4943Accept the pack to enjoy a full experience"),
+
+    DEV_SERVER_ENABLED("dev_server.enabled", false),
+    DEV_SERVER_RETURN_IP("dev_server.return_ip", "127.0.0.1"),
+    DEV_SERVER_PORT("dev_server.port", 3000),
+
+    PATCH_PACKETS_ITEMS("patch_packets.items", true),
+    PATCH_PACKETS_SOUNDS("patch_packets.sounds", true);
 
     private final String path;
     private final Object def;
@@ -43,7 +50,7 @@ public enum Settings {
         this(path, null);
     }
 
-    public String getPath() {
+    public @NotNull String getPath() {
         return path;
     }
 
@@ -59,6 +66,10 @@ public enum Settings {
         return (Boolean) getValue();
     }
 
+    public Integer asInteger() {
+        return (Integer) getValue();
+    }
+
     public List<String> asStringList() {
         return ProPackPlugin.getInstance().getConfig().getStringList(path);
     }
@@ -67,6 +78,7 @@ public enum Settings {
         return ProPackPlugin.getInstance().getConfig().getConfigurationSection(path);
     }
 
+    @Override
     public String toString() {
         return asString();
     }

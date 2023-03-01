@@ -28,6 +28,9 @@ import me.nelonn.propack.builder.file.TextFile;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
 import me.nelonn.propack.core.builder.asset.ArmorTextureBuilder;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.FileProcessingException;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.PathUtil;
 import me.nelonn.propack.core.util.Util;
@@ -44,6 +47,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ProcessArmorTextures extends AbstractTask {
+    public static final TaskBootstrap BOOTSTRAP = ProcessArmorTextures::new;
     public static final Extra<Integer> EXTRA_ARMOR_RESOLUTION = new Extra<>(Integer.class, "propack.process_armor_textures.armor_resolution");
     private static final String LEATHER_LAYER = "assets/minecraft/textures/models/armor/leather_layer_";
     private static final String INCLUDED_LEATHER_LAYER = "include/" + LEATHER_LAYER;
@@ -122,6 +126,7 @@ public class ProcessArmorTextures extends AbstractTask {
 
     private Armor.Layer loadConfiguration(TaskIO io, JsonObject root, String layerKey, Path contentPath) throws IOException {
         String layerImagePath;
+        boolean saveImage = false;
         int frames = 1;
         int speed = 24;
         boolean interpolation = false;
@@ -131,6 +136,7 @@ public class ProcessArmorTextures extends AbstractTask {
         } else if (GsonHelper.hasJsonObject(root, layerKey)) {
             JsonObject jsonObject = root.getAsJsonObject(layerKey);
             layerImagePath = GsonHelper.getString(jsonObject, "Image");
+            saveImage = GsonHelper.getBoolean(jsonObject, "SaveImage", saveImage);
             frames = GsonHelper.getInt(jsonObject, "Frames", frames);
             speed = GsonHelper.getInt(jsonObject, "Speed", speed);
             interpolation = GsonHelper.getBoolean(jsonObject, "Interpolation", interpolation);
@@ -156,6 +162,9 @@ public class ProcessArmorTextures extends AbstractTask {
         }
         try (InputStream inputStream = pngFile.openInputStream()) {
             BufferedImage layerImage = ImageIO.read(inputStream);
+            if (!saveImage) {
+                io.getFiles().removeFile(pngFile.getPath());
+            }
             return new Armor.Layer(layerImage, frames, speed, interpolation, emissivity);
         }
     }

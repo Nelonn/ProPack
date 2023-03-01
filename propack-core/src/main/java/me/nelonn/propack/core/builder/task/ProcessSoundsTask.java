@@ -29,11 +29,17 @@ import me.nelonn.propack.core.builder.asset.SoundAssetBuilder;
 import me.nelonn.propack.core.builder.json.sound.Sound;
 import me.nelonn.propack.core.builder.json.sound.SoundEntry;
 import me.nelonn.propack.core.builder.json.sound.SoundEntryDeserializer;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.FileProcessingException;
+import me.nelonn.propack.builder.task.TaskBootstrap;
+import me.nelonn.propack.core.util.IOUtil;
+import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.PathUtil;
-import me.nelonn.propack.core.util.WaveToVorbis;
 import me.nelonn.propack.core.util.Util;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -41,39 +47,60 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class ProcessSoundsTask extends AbstractTask {
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+    public static final TaskBootstrap BOOTSTRAP = ProcessSoundsTask::new;
+
     public ProcessSoundsTask(@NotNull Project project) {
         super("processSounds", project);
     }
 
     @Override
     public void run(@NotNull TaskIO io) {
-        // WAV to OGG
-        // TODO: now the transcoding is not working correctly, need to fix it
+        // Converting sounds
+        List<CompletableFuture<Void>> futureList = new ArrayList<>();
         for (File file : io.getFiles()) {
             try {
                 String filePath = file.getPath();
-                if (!filePath.startsWith("content/") || !filePath.endsWith(".wav")) continue;
+                if (!filePath.startsWith("content/") || !filePath.endsWith(".wav") && !filePath.endsWith(".mp3"))
+                    continue;
                 io.getFiles().removeFile(filePath);
-                String oggFilePath = filePath.substring(0, filePath.length() - "wav".length()) + "ogg";
-                java.io.File tempFile = new java.io.File(io.getTempDirectory(), oggFilePath);
-                tempFile.getParentFile().mkdirs();
-                try (InputStream inputStream = file.openInputStream();
-                     OutputStream outputStream = Files.newOutputStream(tempFile.toPath())) {
-                    WaveToVorbis.encode(inputStream, outputStream);
-                    io.getFiles().addFile(new RealFile(oggFilePath, tempFile));
-                }
+                futureList.add(CompletableFuture.runAsync(() -> {
+                    try {
+                        java.io.File inputFile;
+                        if (file instanceof RealFile) {
+                            inputFile = ((RealFile) file).getFile();
+                        } else {
+                            inputFile = Util.tempFile(io, filePath);
+                            try (InputStream in = file.openInputStream();
+                                 OutputStream out = Files.newOutputStream(inputFile.toPath())) {
+                                IOUtil.transferTo(in, out);
+                            }
+                        }
+                        String outputPath = Util.substringLast(filePath, 3) + "ogg";
+                        java.io.File outputFile = Util.tempFile(io, outputPath);
+                        String ffmpeg = System.getProperty("propack.ffmpeg", "ffmpeg");
+                        String[] commandLine = new String[]{ffmpeg, "-i", inputFile.getAbsolutePath(), "-c:a",
+                                "libvorbis", "-q:a", "10", outputFile.getAbsolutePath()};
+                        Runtime.getRuntime().exec(commandLine);
+                    } catch (IOException e) {
+                        LOGGER.error("Unable to convert '" + filePath + "' to ogg", e);
+                    }
+                }));
             } catch (Exception e) {
                 throw new FileProcessingException(file.getPath(), e);
             }
         }
+        futureList.forEach(CompletableFuture::join);
         // *.sound.json to sounds.json
         Map<String, JsonObject> soundsJsons = new HashMap<>();
         for (File file : io.getFiles()) {
             try {
                 String filePath = file.getPath();
-                if (!filePath.startsWith("content/") || !filePath.endsWith(".sound.json") || !(file instanceof JsonFile)) continue;
+                if (!filePath.startsWith("content/") || !filePath.endsWith(".sound.json") || !(file instanceof JsonFile))
+                    continue;
                 io.getFiles().removeFile(filePath);
                 JsonObject jsonObject = ((JsonFile) file).getContent();
                 Path resourcePath = PathUtil.resourcePath(filePath, ".sound.json");
@@ -82,16 +109,16 @@ public class ProcessSoundsTask extends AbstractTask {
                 for (Sound soundIn : soundEntryIn.getSounds()) {
                     String oggPathStr = soundIn.getName();
                     if (oggPathStr.endsWith(".ogg")) {
-                        oggPathStr = oggPathStr.substring(0, oggPathStr.length() - ".ogg".length());
+                        oggPathStr = Util.substringLast(oggPathStr, ".ogg");
                     }
-                    Path oggPath = PathUtil.resolve(soundIn.getName(), resourcePath);
+                    Path oggPath = PathUtil.resolve(oggPathStr, resourcePath);
                     soundsOut.add(new Sound(oggPath.toString(), soundIn.getVolume(), soundIn.getPitch(),
                             soundIn.getWeight(), soundIn.getRegistrationType(), soundIn.isStreamed(), soundIn.isPreloaded(),
                             soundIn.getAttenuation()));
                 }
                 SoundEntry soundEntryOut = new SoundEntry(soundsOut, soundEntryIn.canReplace(), soundEntryIn.getSubtitle());
                 io.getAssets().putSound(new SoundAssetBuilder(resourcePath).setSoundPath(resourcePath));
-                JsonObject resultSounds = Util.getOrPut(soundsJsons, resourcePath.getNamespace(), JsonObject::new);
+                JsonObject resultSounds = soundsJsons.computeIfAbsent(resourcePath.getNamespace(), key -> new JsonObject());
                 resultSounds.add(resourcePath.getValue(), SoundEntryDeserializer.INSTANCE.serialize(soundEntryOut, null, null));
             } catch (Exception e) {
                 throw new FileProcessingException(file.getPath(), e);

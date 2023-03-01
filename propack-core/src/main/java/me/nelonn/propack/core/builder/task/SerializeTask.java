@@ -21,14 +21,15 @@ package me.nelonn.propack.core.builder.task;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import me.nelonn.flint.path.Path;
+import me.nelonn.propack.asset.SlotItemModel;
 import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
-import me.nelonn.propack.core.builder.Mapper;
-import me.nelonn.propack.core.builder.MappingsBuilder;
+import me.nelonn.propack.core.builder.MeshMappingBuilder;
 import me.nelonn.propack.core.builder.asset.*;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.LogManagerCompat;
-import me.nelonn.propack.core.util.Sha1;
 import me.nelonn.propack.definition.Item;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +43,7 @@ import java.util.Map;
 
 public class SerializeTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    public static final TaskBootstrap BOOTSTRAP = SerializeTask::new;
     public static final Extra<File> EXTRA_FILE = new Extra<>(File.class, "propack.serialize.file");
 
     public SerializeTask(@NotNull Project project) {
@@ -55,19 +57,19 @@ public class SerializeTask extends AbstractTask {
             buildDir.mkdirs();
         }
         JsonObject root = new JsonObject();
-        Sha1 sha1 = io.getExtras().get(PackageTask.EXTRA_SHA1);
-        root.addProperty("sha1", sha1.toString());
+        root.addProperty("version", 1);
 
-        MappingsBuilder mappingsBuilder = io.getExtras().get(ProcessModelsTask.EXTRA_MAPPINGS_BUILDER);
-        JsonObject mappingsObject = new JsonObject();
-        for (Mapper mapper : mappingsBuilder.getMappers()) {
-            JsonObject mapping = new JsonObject();
-            for (Map.Entry<Integer, Path> entry : mapper.entrySet()) {
-                mapping.addProperty(entry.getValue().toString(), entry.getKey());
-            }
-            mappingsObject.add(mapper.getItem().getId().toString(), mapping);
+        root.addProperty("name", getProject().getName());
+
+        JsonObject items = new JsonObject();
+        root.add("items", items);
+
+        for (Item item : getProject().getItemDefinition().getItems()) {
+            items.addProperty(item.getId().toString(), item.isBlock());
         }
-        root.add("mappings", mappingsObject);
+
+        JsonObject resources = new JsonObject();
+        root.add("resources", resources);
 
         JsonObject itemModels = new JsonObject();
         for (ItemModelBuilder itemModel : io.getAssets().getItemModels()) {
@@ -75,36 +77,79 @@ public class SerializeTask extends AbstractTask {
             if (itemModel instanceof DefaultItemModelBuilder) {
                 DefaultItemModelBuilder defaultModel = (DefaultItemModelBuilder) itemModel;
                 itemModelObject.addProperty("Type", "DefaultItemModel");
+                itemModelObject.addProperty("Mesh", defaultModel.getMesh().toString());
                 JsonArray targetItems = new JsonArray();
                 for (Item targetItem : defaultModel.getTargetItems()) {
                     targetItems.add(targetItem.getId().toString());
                 }
                 itemModelObject.add("Target", targetItems);
-                itemModelObject.addProperty("Mesh", defaultModel.getMesh().toString());
+            } else if (itemModel instanceof CombinedItemModelBuilder) {
+                CombinedItemModelBuilder combinedModel = (CombinedItemModelBuilder) itemModel;
+                itemModelObject.addProperty("Type", "CombinedItemModel");
+                itemModelObject.addProperty("Mesh", combinedModel.getMesh().toString());
+                JsonArray elementsArray = new JsonArray(combinedModel.getElements().size());
+                combinedModel.getElements().forEach(elementsArray::add);
+                itemModelObject.add("Elements", elementsArray);
+                JsonArray targetItems = new JsonArray();
+                for (Item targetItem : combinedModel.getTargetItems()) {
+                    targetItems.add(targetItem.getId().toString());
+                }
+                itemModelObject.add("Target", targetItems);
+            } else if (itemModel instanceof SlotItemModelBuilder) {
+                SlotItemModelBuilder slotModel = (SlotItemModelBuilder) itemModel;
+                itemModelObject.addProperty("Type", "SlotItemModel");
+                itemModelObject.addProperty("Mesh", slotModel.getMesh().toString());
+                JsonObject slotsObject = new JsonObject();
+                itemModelObject.add("Slots", slotsObject);
+                for (SlotItemModel.Slot slot : slotModel.getSlots().values()) {
+                    JsonArray slotEntries = new JsonArray(slot.getEntries().size());
+                    slot.getEntries().forEach(slotEntries::add);
+                    slotsObject.add(slot.getName(), slotEntries);
+                }
+                JsonArray targetItems = new JsonArray();
+                for (Item targetItem : slotModel.getTargetItems()) {
+                    targetItems.add(targetItem.getId().toString());
+                }
+                itemModelObject.add("Target", targetItems);
             }
             itemModels.add(itemModel.getPath().toString(), itemModelObject);
         }
-        root.add("item_models", itemModels);
+        resources.add("item_models", itemModels);
 
         JsonObject sounds = new JsonObject();
         for (SoundAssetBuilder soundAsset : io.getAssets().getSounds()) {
             sounds.addProperty(soundAsset.getPath().toString(), soundAsset.getSoundPath().toString());
         }
-        root.add("sounds", sounds);
+        resources.add("sounds", sounds);
 
         JsonObject armorTextures = new JsonObject();
         for (ArmorTextureBuilder armorTexture : io.getAssets().getArmorTextures()) {
+            JsonObject armorTextureObject = new JsonObject();
             Color color = armorTexture.getColor();
             String hex = String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-            armorTextures.addProperty(armorTexture.getPath().toString(), hex);
+            armorTextureObject.addProperty("Color", hex);
+            armorTextureObject.addProperty("Layer1", armorTexture.hasLayer1());
+            armorTextureObject.addProperty("Layer2", armorTexture.hasLayer2());
+            armorTextures.add(armorTexture.getPath().toString(), armorTextureObject);
         }
-        root.add("armor_textures", armorTextures);
+        resources.add("armor_textures", armorTextures);
 
         JsonObject fonts = new JsonObject();
         for (FontBuilder font : io.getAssets().getFonts()) {
             fonts.addProperty(font.getPath().toString(), font.getFontPath().toString());
         }
-        root.add("fonts", fonts);
+        resources.add("fonts", fonts);
+
+        MeshMappingBuilder meshMappingBuilder = io.getExtras().get(ProcessModelsTask.EXTRA_MESH_MAPPING_BUILDER);
+        JsonObject meshMappingObject = new JsonObject();
+        for (MeshMappingBuilder.ItemEntry itemEntry : meshMappingBuilder.getMappers()) {
+            JsonObject mapping = new JsonObject();
+            for (Map.Entry<Integer, Path> entry : itemEntry.getMap().entrySet()) {
+                mapping.addProperty(entry.getValue().toString(), entry.getKey());
+            }
+            meshMappingObject.add(itemEntry.getItem().getId().toString(), mapping);
+        }
+        resources.add("mesh_mapping", meshMappingObject);
 
         File outputFile = new File(buildDir, getProject().getName() + ".propack");
         if (outputFile.exists()) {

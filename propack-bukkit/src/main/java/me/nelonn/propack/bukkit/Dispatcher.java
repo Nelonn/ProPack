@@ -20,6 +20,7 @@ package me.nelonn.propack.bukkit;
 
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
+import me.nelonn.propack.bukkit.resourcepack.PackDefinition;
 import me.nelonn.propack.bukkit.sender.BukkitPackSender;
 import me.nelonn.propack.bukkit.sender.PackSender;
 import me.nelonn.propack.bukkit.sender.ProtocolPackSender;
@@ -52,19 +53,22 @@ public class Dispatcher implements Listener {
         if (!resourcePack.isUploaded()) {
             throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not upload");
         }
-        packSender.sendPack(player, resourcePack.getUpload());
+        packSender.sendPack(player, resourcePack.getUpload().get());
         sent.put(player, resourcePack);
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         if (!Settings.DISPATCH_ENABLED.asBoolean()) return;
-        ResourcePack resourcePack = ProPack.getResourcePackContainer().getDefinition(Settings.DISPATCH_PACK.asString()).getResourcePack();
+        PackDefinition definition = ProPack.getPackContainer().getDefinition(Settings.DISPATCH_PACK.asString());
+        if (definition == null) return;
+        Optional<ResourcePack> resourcePack = definition.getResourcePack();
+        if (resourcePack.isEmpty()) return;
         int delay = (int) Settings.DISPATCH_DELAY.getValue();
         if (delay > 0) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> sendPack(event.getPlayer(), resourcePack), delay * 20L);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> sendPack(event.getPlayer(), resourcePack.get()), delay * 20L);
         } else {
-            sendPack(event.getPlayer(), resourcePack);
+            sendPack(event.getPlayer(), resourcePack.get());
         }
     }
 
@@ -74,6 +78,6 @@ public class Dispatcher implements Listener {
     }
 
     public @NotNull Optional<ResourcePack> getResourcePack(@NotNull Player player) {
-        return Optional.of(sent.get(player));
+        return Optional.ofNullable(sent.get(player));
     }
 }

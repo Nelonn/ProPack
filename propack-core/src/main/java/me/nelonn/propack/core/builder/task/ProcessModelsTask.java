@@ -29,14 +29,17 @@ import me.nelonn.propack.builder.file.File;
 import me.nelonn.propack.builder.file.JsonFile;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
-import me.nelonn.propack.core.builder.Mapper;
-import me.nelonn.propack.core.builder.MappingsBuilder;
+import me.nelonn.propack.core.builder.MeshMappingBuilder;
 import me.nelonn.propack.core.builder.asset.CombinedItemModelBuilder;
 import me.nelonn.propack.core.builder.asset.DefaultItemModelBuilder;
 import me.nelonn.propack.core.builder.asset.ItemModelBuilder;
 import me.nelonn.propack.core.builder.asset.SlotItemModelBuilder;
 import me.nelonn.propack.core.builder.json.mesh.JsonModel;
 import me.nelonn.propack.core.builder.json.mesh.ModelElement;
+import me.nelonn.propack.core.builder.json.mesh.ModelElementFace;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.FileProcessingException;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.*;
 import me.nelonn.propack.definition.Item;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +50,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProcessModelsTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    public static final Extra<MappingsBuilder> EXTRA_MAPPINGS_BUILDER = new Extra<>(MappingsBuilder.class, "propack.process_models.mappings_builder");
+    public static final TaskBootstrap BOOTSTRAP = ProcessModelsTask::new;
+    public static final Extra<MeshMappingBuilder> EXTRA_MESH_MAPPING_BUILDER = new Extra<>(MeshMappingBuilder.class, "propack.process_models.mesh_mapping_builder");
 
     public ProcessModelsTask(@NotNull Project project) {
         super("processModels", project);
@@ -55,8 +59,8 @@ public class ProcessModelsTask extends AbstractTask {
 
     @Override
     public void run(@NotNull TaskIO io) {
-        MappingsBuilder mappingsBuilder = new MappingsBuilder();
-        io.getExtras().put(EXTRA_MAPPINGS_BUILDER, mappingsBuilder);
+        MeshMappingBuilder meshMappingBuilder = new MeshMappingBuilder();
+        io.getExtras().put(EXTRA_MESH_MAPPING_BUILDER, meshMappingBuilder);
         Map<Path, Set<Item>> meshesToOverride = new HashMap<>();
         for (File file : io.getFiles()) {
             try {
@@ -68,10 +72,11 @@ public class ProcessModelsTask extends AbstractTask {
                 String type = GsonHelper.getString(rootJson, "Type");
                 String mesh = GsonHelper.getString(rootJson, "Mesh");
                 Path meshPath = PathUtil.resolve(mesh, resourcePath);
+                Set<Item> targetItems = parseTarget(rootJson);
                 ItemModelBuilder builder;
-                if (type.equalsIgnoreCase("DefaultItemModel")) {
+                if (type.equals("DefaultItemModel")) {
                     builder = new DefaultItemModelBuilder(resourcePath).setMesh(meshPath);
-                } else if (type.equalsIgnoreCase("CombinedItemModel")) {
+                } else if (type.equals("CombinedItemModel")) {
                     File meshFile = io.getFiles().getFile(PathUtil.contentPath(meshPath) + ".mesh.json");
                     if (!(meshFile instanceof JsonFile)) {
                         throw new IllegalArgumentException("Mesh not found: " + meshPath);
@@ -91,25 +96,35 @@ public class ProcessModelsTask extends AbstractTask {
                         combinationElements.put(elementEntry.getKey(), elementMesh);
                     }
                     for (List<String> combination : CombinationUtil.generateAllCombinations(combinationElements.keySet())) {
-                        String combinationStr = String.join("&", combination.toArray(new String[0]));
+                        String combinationStr = String.join("&", combination.stream().sorted().toArray(String[]::new));
                         String hex = Integer.toHexString(combinationStr.hashCode());
-                        String generatedPath = PathUtil.contentPath(resourcePath) + '-' + hex + ".mesh.json";
+                        Path generatedPath = PathUtil.append(resourcePath, '-' + hex);
                         Map<String, String> textureMap = new HashMap<>(baseTextureMap);
                         List<ModelElement> modelElements = baseMesh.getElements();
                         for (String combinationElement : combination) {
                             JsonModel combMesh = combinationElements.get(combinationElement);
                             for (Map.Entry<String, String> textureEntry : combMesh.getTextureMap().entrySet()) {
-                                textureMap.put(combinationElement + "." + textureEntry.getKey(), textureEntry.getValue());
+                                textureMap.put(combinationElement + '.' + textureEntry.getKey(), textureEntry.getValue());
                             }
-                            modelElements.addAll(combMesh.getElements());
+                            for (ModelElement modelElement : combMesh.getElements()) {
+                                Map<Direction, ModelElementFace> faces = new EnumMap<>(modelElement.faces);
+                                for (Map.Entry<Direction, ModelElementFace> faceEntry : faces.entrySet()) {
+                                    ModelElementFace face = faceEntry.getValue();
+                                    String texture = '#' + combinationElement + '.' + face.textureId.substring(1);
+                                    faceEntry.setValue(new ModelElementFace(face.cullFace, face.tintIndex, texture, face.textureData));
+                                }
+                                modelElements.add(new ModelElement(modelElement.from, modelElement.to, faces,
+                                        modelElement.rotation, modelElement.shade));
+                            }
                         }
                         JsonModel generatedMesh = new JsonModel(baseMesh.getParent(), baseMesh.getTextureSize(),
                                 textureMap, modelElements, baseMesh.useAmbientOcclusion(), baseMesh.getGuiLight(),
                                 baseMesh.getTransformations(), baseMesh.getOverrides());
-                        io.getFiles().addFile(new JsonFile(generatedPath, generatedMesh.serialize()));
+                        io.getFiles().addFile(new JsonFile(PathUtil.contentPath(generatedPath) + ".mesh.json", generatedMesh.serialize()));
+                        meshesToOverride.put(generatedPath, new HashSet<>(targetItems));
                     }
                     builder = new CombinedItemModelBuilder(resourcePath).setMesh(meshPath).setElements(combinationElements.keySet());
-                } else if (type.equalsIgnoreCase("SlotItemModel")) {
+                } else if (type.equals("SlotItemModel")) {
                     File meshFile = io.getFiles().getFile(PathUtil.contentPath(meshPath) + ".mesh.json");
                     if (!(meshFile instanceof JsonFile)) {
                         throw new IllegalArgumentException("Mesh not found: " + meshPath);
@@ -153,18 +168,28 @@ public class ProcessModelsTask extends AbstractTask {
                                 empty.set(false);
                                 JsonModel elementMesh = slots.get(slotName).get(elementName);
                                 for (Map.Entry<String, String> textureEntry : elementMesh.getTextureMap().entrySet()) {
-                                    textureMap.put(slotName + "." + textureEntry.getKey(), textureEntry.getValue());
+                                    textureMap.put(slotName + '.' + textureEntry.getKey(), textureEntry.getValue());
                                 }
-                                modelElements.addAll(elementMesh.getElements());
+                                for (ModelElement modelElement : elementMesh.getElements()) {
+                                    Map<Direction, ModelElementFace> faces = new EnumMap<>(modelElement.faces);
+                                    for (Map.Entry<Direction, ModelElementFace> faceEntry : faces.entrySet()) {
+                                        ModelElementFace face = faceEntry.getValue();
+                                        String texture = '#' + slotName + '.' + face.textureId.substring(1);
+                                        faceEntry.setValue(new ModelElementFace(face.cullFace, face.tintIndex, texture, face.textureData));
+                                    }
+                                    modelElements.add(new ModelElement(modelElement.from, modelElement.to, faces,
+                                            modelElement.rotation, modelElement.shade));
+                                }
                             }
                         });
                         if (empty.get()) continue;
                         String hex = Integer.toHexString(sb.toString().hashCode());
-                        String generatedPath = PathUtil.contentPath(resourcePath) + '-' + hex + ".mesh.json";
+                        Path generatedPath = PathUtil.append(resourcePath, '-' + hex);
                         JsonModel generatedMesh = new JsonModel(baseMesh.getParent(), baseMesh.getTextureSize(),
                                 textureMap, modelElements, baseMesh.useAmbientOcclusion(), baseMesh.getGuiLight(),
                                 baseMesh.getTransformations(), baseMesh.getOverrides());
-                        io.getFiles().addFile(new JsonFile(generatedPath, generatedMesh.serialize()));
+                        io.getFiles().addFile(new JsonFile(PathUtil.contentPath(generatedPath) + ".mesh.json", generatedMesh.serialize()));
+                        meshesToOverride.put(generatedPath, new HashSet<>(targetItems));
                     }
                     Map<String, SlotItemModel.Slot> resultSlots = new HashMap<>();
                     for (Map.Entry<String, List<String>> slot : slotsMap.entrySet()) {
@@ -175,7 +200,9 @@ public class ProcessModelsTask extends AbstractTask {
                 } else {
                     throw new IllegalArgumentException("Unknown model type: " + type);
                 }
-                builder.setTargetItems(parseTarget(meshesToOverride, meshPath, rootJson));
+                Set<Item> toOverride = meshesToOverride.computeIfAbsent(meshPath, key -> new HashSet<>());
+                toOverride.addAll(targetItems);
+                builder.setTargetItems(targetItems);
                 io.getAssets().putItemModel(builder);
             } catch (Exception e) {
                 throw new FileProcessingException(file.getPath(), e);
@@ -206,7 +233,7 @@ public class ProcessModelsTask extends AbstractTask {
                 Set<Item> toOverride = meshesToOverride.get(resourcePath);
                 if (toOverride != null) {
                     for (Item item : toOverride) {
-                        mappingsBuilder.getMapper(item).map(resourcePath);
+                        meshMappingBuilder.getMapper(item).add(resourcePath);
                     }
                 }
             } catch (Exception e) {
@@ -214,8 +241,8 @@ public class ProcessModelsTask extends AbstractTask {
             }
         }
         // overriding default models (custom_model_data)
-        for (Mapper mapper : mappingsBuilder.getMappers()) {
-            String path = "include/assets/minecraft/models/item/" + mapper.getItem().getId().getValue() + ".json";
+        for (MeshMappingBuilder.ItemEntry itemEntry : meshMappingBuilder.getMappers()) {
+            String path = "include/assets/minecraft/models/item/" + itemEntry.getItem().getId().getValue() + ".json";
             File file = io.getFiles().getFile(path);
             if (!(file instanceof JsonFile)) {
                 LOGGER.error("Default model not found: {}", path);
@@ -223,7 +250,7 @@ public class ProcessModelsTask extends AbstractTask {
             }
             JsonObject jsonObject = ((JsonFile) file).getContent();
             JsonArray overrides = GsonHelper.getArray(jsonObject, "overrides", new JsonArray());
-            for (Map.Entry<Integer, Path> mapping : mapper.entrySet()) {
+            for (Map.Entry<Integer, Path> mapping : itemEntry.getMap().entrySet()) {
                 overrides.add(new JsonObjectBuilder()
                         .put("predicate", new JsonObjectBuilder().put("custom_model_data", mapping.getKey()).get())
                         .put("model", mapping.getValue().toString())
@@ -233,15 +260,15 @@ public class ProcessModelsTask extends AbstractTask {
         }
     }
 
-    private Set<Item> parseTarget(Map<Path, Set<Item>> meshesToOverride, Path meshPath, JsonObject model) {
-        Set<Item> targetItems = Util.getOrPut(meshesToOverride, meshPath, HashSet::new);
+    private Set<Item> parseTarget(JsonObject model) {
+        Set<Item> output = new HashSet<>();
         if (GsonHelper.hasString(model, "Target")) {
             String target = GsonHelper.getString(model, "Target");
             Item item = getProject().getItemDefinition().getItem(Identifier.of(target));
             if (item == null) {
                 throw new IllegalArgumentException("Item not found:" + target);
             }
-            targetItems.add(item);
+            output.add(item);
         } else if (GsonHelper.hasArray(model, "Target")) {
             JsonArray targets = GsonHelper.getArray(model, "Target");
             for (JsonElement target : targets) {
@@ -249,12 +276,12 @@ public class ProcessModelsTask extends AbstractTask {
                 if (item == null) {
                     throw new IllegalArgumentException("Item not found:" + target.getAsString());
                 }
-                targetItems.add(item);
+                output.add(item);
             }
         } else {
             throw new IllegalArgumentException("Missing 'Target'");
         }
-        return targetItems;
+        return output;
     }
 
     private JsonModel parseGeneratingMesh(JsonElement jsonElement, Path resourcePath, TaskIO io) {
@@ -266,7 +293,7 @@ public class ProcessModelsTask extends AbstractTask {
         } else {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
             elementMeshPath = PathUtil.resolve(GsonHelper.getString(jsonObject, "Mesh"), resourcePath);
-            offset = Util.parseVector3f(jsonObject, "Offset", Vec3f.ZERO);
+            offset = Util.parseVec3f(jsonObject, "Offset", Vec3f.ZERO);
         }
         File elementMeshFile = io.getFiles().getFile(PathUtil.contentPath(elementMeshPath) + ".mesh.json");
         if (!(elementMeshFile instanceof JsonFile)) {

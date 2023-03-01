@@ -19,16 +19,22 @@
 package me.nelonn.propack.core.builder.task;
 
 import me.nelonn.propack.UploadedPack;
-import me.nelonn.propack.builder.Hosting;
+import me.nelonn.propack.builder.hosting.Hosting;
 import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
-import me.nelonn.propack.core.util.Sha1;
+import me.nelonn.propack.Sha1;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.TaskBootstrap;
+import me.nelonn.propack.core.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
 public class UploadTask extends AbstractTask {
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+    public static final TaskBootstrap BOOTSTRAP = UploadTask::new;
     public static final Extra<UploadedPack> EXTRA_UPLOADED_PACK = new Extra<>(UploadedPack.class, "propack.upload.uploaded_pack");
 
     public UploadTask(@NotNull Project project) {
@@ -42,8 +48,18 @@ public class UploadTask extends AbstractTask {
             throw new IllegalArgumentException("Upload task is unavailable because hosting is not specified");
         }
         File zip = io.getExtras().get(PackageTask.EXTRA_ZIP);
+        if (zip == null) {
+            throw new NullPointerException("EXTRA_ZIP");
+        }
         Sha1 sha1 = io.getExtras().get(PackageTask.EXTRA_SHA1);
-        UploadedPack uploadedPack = hosting.upload(zip, sha1.toBytes(), sha1.toString());
-        io.getExtras().put(EXTRA_UPLOADED_PACK, uploadedPack);
+        if (sha1 == null) {
+            throw new NullPointerException("EXTRA_SHA1");
+        }
+        try {
+            UploadedPack uploadedPack = hosting.upload(zip, sha1, getProject().getBuildConfiguration().getUploadOptions());
+            io.getExtras().put(EXTRA_UPLOADED_PACK, uploadedPack);
+        } catch (Exception e) {
+            LOGGER.error("Unable to upload '" + getProject().getName() + "' to '" + hosting.getName() + "'", e);
+        }
     }
 }

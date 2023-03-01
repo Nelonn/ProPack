@@ -23,21 +23,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
-public class ItemDefinition {
-    private final Map<Identifier, Item> items;
+public interface ItemDefinition {
+    @Nullable Item getItem(@NotNull Identifier identifier);
 
-    public ItemDefinition(Map<Identifier, Item> items) {
-        this.items = new HashMap<>(items);
-    }
-
-    public @Nullable Item getItem(@NotNull Identifier identifier) {
-        return items.get(identifier);
-    }
-
-    public @NotNull Collection<Item> getItems() {
-        return items.values();
-    }
+    @NotNull Collection<Item> getItems();
 }

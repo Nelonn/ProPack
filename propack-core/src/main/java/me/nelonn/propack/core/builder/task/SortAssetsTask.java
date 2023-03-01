@@ -21,10 +21,14 @@ package me.nelonn.propack.core.builder.task;
 import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.file.File;
 import me.nelonn.propack.builder.task.TaskIO;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class SortAssetsTask extends AbstractTask {
+    public static final TaskBootstrap BOOTSTRAP = SortAssetsTask::new;
+
     public SortAssetsTask(@NotNull Project project) {
         super("sortAssets", project);
     }

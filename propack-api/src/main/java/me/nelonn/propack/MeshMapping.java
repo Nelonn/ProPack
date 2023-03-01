@@ -16,16 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.builder;
+package me.nelonn.propack;
 
-import me.nelonn.propack.builder.task.FileCollection;
+import me.nelonn.flint.path.Path;
+import me.nelonn.propack.definition.Item;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.util.Map;
+public interface MeshMapping {
 
-public interface ZipPackager {
-
-    void packageFiles(@NotNull File output, @NotNull FileCollection input, @NotNull Map<String, Object> options);
+    @Nullable Integer getCustomModelData(@NotNull Path mesh, @NotNull Item item);
 
 }

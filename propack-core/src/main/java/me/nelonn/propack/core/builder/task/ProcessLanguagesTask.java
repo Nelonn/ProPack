@@ -24,15 +24,19 @@ import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.file.File;
 import me.nelonn.propack.builder.file.JsonFile;
 import me.nelonn.propack.builder.task.TaskIO;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.FileProcessingException;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.PathUtil;
-import me.nelonn.propack.core.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ProcessLanguagesTask extends AbstractTask {
+    public static final TaskBootstrap BOOTSTRAP = ProcessLanguagesTask::new;
+
     public ProcessLanguagesTask(@NotNull Project project) {
         super("processLanguages", project);
     }
@@ -60,8 +64,8 @@ public class ProcessLanguagesTask extends AbstractTask {
                 Path resourcePath = PathUtil.resourcePath(filePath);
                 String langCode = resourcePath.getValue();
                 langCode = langCode.substring(langCode.indexOf('/') + 1, langCode.length() - ".font.json".length());
-                final String langPath = PathUtil.assetsPath(resourcePath, "lang") + ".json";
-                JsonFile langJsonFile = Util.getOrPut(languageFiles, langPath, () -> new JsonFile(langPath, new JsonObject()));
+                String langPath = "assets/" + resourcePath.getNamespace() + "/lang/" + langCode + ".json";
+                JsonFile langJsonFile = languageFiles.computeIfAbsent(langPath, key -> new JsonFile(key, new JsonObject()));
                 for (String key : jsonObject.keySet()) {
                     String translation = GsonHelper.getString(jsonObject, key);
                     key = key.replace("<namespace>", resourcePath.getNamespace());

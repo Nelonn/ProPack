@@ -18,15 +18,18 @@
 
 package me.nelonn.propack.builder;
 
+import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.builder.file.VirtualFile;
 import me.nelonn.propack.core.builder.BuildConfiguration;
 import me.nelonn.propack.definition.ItemDefinition;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.Optional;
 
 public interface Project {
 
-    String getName();
+    @NotNull String getName();
 
     File getProjectDir();
 
@@ -43,5 +46,7 @@ public interface Project {
     VirtualFile getIconFile();
 
     ProjectBuilder createDefaultBuilder();
+
+    @NotNull Optional<ResourcePack> getResourcePack();
 
 }

@@ -18,21 +18,23 @@
 
 package me.nelonn.propack.core.loader;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.*;
-import me.nelonn.propack.builder.Hosting;
+import me.nelonn.flint.path.Identifier;
+import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.builder.StrictMode;
-import me.nelonn.propack.builder.ZipPackager;
 import me.nelonn.propack.builder.file.ByteFile;
 import me.nelonn.propack.builder.file.VirtualFile;
+import me.nelonn.propack.builder.hosting.Hosting;
 import me.nelonn.propack.builder.loader.ItemDefinitionLoader;
 import me.nelonn.propack.builder.loader.TextLoader;
 import me.nelonn.propack.builder.util.Extra;
 import me.nelonn.propack.builder.util.Extras;
+import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.core.builder.BuildConfiguration;
 import me.nelonn.propack.core.builder.InternalProject;
 import me.nelonn.propack.core.builder.ObfuscationConfiguration;
+import me.nelonn.propack.core.builder.PackageOptions;
 import me.nelonn.propack.core.loader.itemdefinition.JsonFileItemDefinitionLoader;
 import me.nelonn.propack.core.loader.text.LegacyTextLoader;
 import me.nelonn.propack.core.loader.text.MiniMessageTextLoader;
@@ -40,6 +42,7 @@ import me.nelonn.propack.core.loader.text.TextComponentLoader;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.core.util.LogManagerCompat;
+import me.nelonn.propack.core.util.Util;
 import me.nelonn.propack.definition.ItemDefinition;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -49,19 +52,22 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.Deflater;
 
 public class ProjectLoader {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     public static final Extra<File> EXTRA_CONFIG_DIR = new Extra<>(File.class, "propack.project_loader.config_dir");
+    private final ProPackCore core;
     private final List<TextLoader> textLoaders;
     private final List<ItemDefinitionLoader> itemDefinitionLoaders;
 
-    public ProjectLoader(@Nullable List<TextLoader> textLoaders,
+    public ProjectLoader(@NotNull ProPackCore core,
+                         @Nullable List<TextLoader> textLoaders,
                          @Nullable List<ItemDefinitionLoader> itemDefinitionLoaders) {
+        this.core = core;
         if (textLoaders != null) {
             this.textLoaders = new ArrayList<>(textLoaders);
         } else {
@@ -78,11 +84,19 @@ public class ProjectLoader {
         }
     }
 
-    public ProjectLoader() {
-        this(null, null);
+    public ProjectLoader(@NotNull ProPackCore core) {
+        this(core, null, null);
     }
 
-    public @NotNull InternalProject load(@NotNull File projectFile) {
+    public List<TextLoader> getTextLoaders() {
+        return textLoaders;
+    }
+
+    public List<ItemDefinitionLoader> getItemDefinitionLoaders() {
+        return itemDefinitionLoaders;
+    }
+
+    public @NotNull InternalProject load(@NotNull File projectFile, boolean loadBuilt) {
         String name;
         VirtualFile packMeta;
         VirtualFile packIcon;
@@ -181,7 +195,7 @@ public class ProjectLoader {
 
             if (buildConfigObject.has("IgnoredExtensions")) {
                 JsonArray ignoredExtensionsArray = GsonHelper.getArray(buildConfigObject, "IgnoredExtensions");
-                arrayToStringList(ignoredExtensionsArray, "IgnoredExtensions", ignoredExtensionsBuilder);
+                Util.forEachStringArray(ignoredExtensionsArray, "IgnoredExtensions", ignoredExtensionsBuilder::add);
             }
 
             JsonObject obfuscationObject = GsonHelper.getObject(buildConfigObject, "Obfuscation");
@@ -216,82 +230,78 @@ public class ProjectLoader {
                 }
 
                 JsonArray languagesArray = GsonHelper.getArray(languagesConfigObject, "Languages");
-                arrayToStringList(languagesArray, "Languages", languagesBuilder);
+                Util.forEachStringArray(languagesArray, "Languages", languagesBuilder::add);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Something went wrong when loading 'config/languages.json5'", e);
             }
         }
         Set<String> languages = languagesBuilder.build();
 
-        ZipPackager zipPackager;
-        Map<String, Object> packageOptions;
+        PackageOptions packageOptions;
         try {
             File packageConfigFile = new File(projectFile.getParentFile(), "config/package.json5");
             String packageConfigContent = IOUtil.readString(packageConfigFile);
             JsonObject packageConfigObject = GsonHelper.deserialize(packageConfigContent, true);
-
-            String className = GsonHelper.getString(packageConfigObject, "Class");
-            Class<?> clazz = Class.forName(className);
-            if (!ZipPackager.class.isAssignableFrom(clazz)) {
-                throw new IllegalArgumentException("Class '" + className + "' must implement '" +
-                        ZipPackager.class.getName() + "'");
+            int compressionLevel;
+            if (packageConfigObject.has("compression")) {
+                JsonElement jsonElement = packageConfigObject.get("compression");
+                if (GsonHelper.isString(jsonElement)) {
+                    String string = jsonElement.getAsString();
+                    try {
+                        compressionLevel = Deflater.class.getDeclaredField(string).getInt(null);
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException("Compression level with name '" + string + "' not found");
+                    }
+                } else if (GsonHelper.isNumber(jsonElement)) {
+                    compressionLevel = GsonHelper.getInt(packageConfigObject, "compression");
+                } else {
+                    throw new IllegalArgumentException("Expected 'compression' to be a string or number");
+                }
+            } else {
+                compressionLevel = Deflater.BEST_COMPRESSION;
             }
-            Constructor<?> constructor;
-            try {
-                constructor = clazz.getDeclaredConstructor();
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Class '" + className +
-                        "' must have a constructor without parameters");
-            }
-            zipPackager = (ZipPackager) constructor.newInstance();
-
-            JsonObject optionsObject = GsonHelper.getObject(packageConfigObject, "Options");
-            packageOptions = toOptions(optionsObject);
+            boolean protection = GsonHelper.getBoolean(packageConfigObject, "protection", false);
+            String comment = GsonHelper.getString(packageConfigObject, "comment", "");
+            packageOptions = new PackageOptions(compressionLevel, protection, comment);
         } catch (Exception e) {
             throw new IllegalArgumentException("Something went wrong when loading 'config/package.json5'", e);
         }
 
         Hosting hosting;
+        Map<String, Object> uploadOptions;
         try {
             File uploadConfigFile = new File(projectFile.getParentFile(), "config/upload.json5");
             String uploadConfigContent = IOUtil.readString(uploadConfigFile);
             JsonObject uploadConfigObject = GsonHelper.getGson().fromJson(uploadConfigContent, JsonObject.class);
             if (GsonHelper.getBoolean(uploadConfigObject, "Enabled")) {
-                try {
-                    String className = GsonHelper.getString(uploadConfigObject, "Class");
-                    Class<?> clazz = Class.forName(className);
-                    if (!Hosting.class.isAssignableFrom(clazz)) {
-                        throw new IllegalArgumentException("Class '" + className + "' must implement '" +
-                                Hosting.class.getName() + "'");
-                    }
-                    Constructor<?> constructor;
-                    try {
-                        constructor = clazz.getDeclaredConstructor();
-                    } catch (Exception e) {
-                        throw new IllegalArgumentException("Class '" + className +
-                                "' must have a constructor without parameters");
-                    }
-                    hosting = (Hosting) constructor.newInstance();
-                    JsonObject sharedOptionsObject = GsonHelper.getObject(uploadConfigObject, "SharedOptions");
-                    // TODO: separate SharedOptions and Options
-                    JsonObject optionsObject = GsonHelper.getObject(uploadConfigObject, "Options");
-                    hosting.enable(toOptions(sharedOptionsObject));
-                } catch (Exception e) {
-                    LOGGER.error("Unable to initialize upload system", e);
-                    hosting = null;
-                }
+                Identifier to = Identifier.ofWithFallback(GsonHelper.getString(uploadConfigObject, "To"), "propack");
+                hosting = core.getHostingMap().getHosting(to);
+                JsonObject optionsObject = GsonHelper.getObject(uploadConfigObject, "Options");
+                uploadOptions = toOptions(optionsObject);
             } else {
                 hosting = null;
+                uploadOptions = null;
             }
         } catch (Exception e) {
             throw new IllegalArgumentException("Something went wrong when loading 'config/upload.json5'", e);
         }
 
         BuildConfiguration buildConfiguration = new BuildConfiguration(strictMode, ignoredExtensions,
-                obfuscationConfiguration, allLangTranslations, languages, zipPackager, packageOptions, hosting);
+                obfuscationConfiguration, allLangTranslations, languages, packageOptions, hosting, uploadOptions);
+
+        ResourcePack resourcePack = null;
+        File builtResourcePack = new File(projectFile.getParentFile(), "build/" + name + ".propack");
+        if (builtResourcePack.exists() && loadBuilt) {
+            try {
+                ResourcePackLoader resourcePackLoader = new ResourcePackLoader();
+                resourcePack = resourcePackLoader.load(builtResourcePack);
+            } catch (Exception e) {
+                LOGGER.error("Unable to load built resource pack", e);
+            }
+        }
 
         InternalProject project = new InternalProject(name, projectFile.getParentFile(),
-                itemDefinition, buildConfiguration, packMeta, packIcon);
+                itemDefinition, buildConfiguration, packMeta, packIcon, resourcePack);
 
         LOGGER.info("Project '{}' successfully loaded", name);
 
@@ -333,15 +343,5 @@ public class ProjectLoader {
             }
         }
         return options;
-    }
-
-    private static void arrayToStringList(JsonArray input, String name, ImmutableCollection.Builder<String> output) {
-        for (int i = 0; i < input.size(); i++) {
-            JsonElement element = input.get(i);
-            if (!GsonHelper.isString(element)) {
-                throw new JsonSyntaxException("Element in array '" + name + "' at index " + i + " is not a string");
-            }
-            output.add(element.getAsString());
-        }
     }
 }

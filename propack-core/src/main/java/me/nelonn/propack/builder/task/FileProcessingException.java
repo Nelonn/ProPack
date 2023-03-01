@@ -16,31 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.resourcepack;
+package me.nelonn.propack.builder.task;
 
-import me.nelonn.propack.ResourcePack;
-import me.nelonn.propack.builder.Project;
-import me.nelonn.propack.core.builder.InternalProject;
 import org.jetbrains.annotations.NotNull;
 
-public class ResourcePackDefinition {
-    private final String name;
-    private final Project project;
-
-    public ResourcePackDefinition(@NotNull String name, @NotNull Project project) {
-        this.name = name;
-        this.project = project;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public ResourcePack getResourcePack() {
-        return ((InternalProject) project).getResourcePack();
-    }
-
-    public Project getProject() {
-        return project;
+public class FileProcessingException extends RuntimeException {
+    public FileProcessingException(@NotNull String file, @NotNull Throwable cause) {
+        super("Exception while processing " + file, cause);
     }
 }

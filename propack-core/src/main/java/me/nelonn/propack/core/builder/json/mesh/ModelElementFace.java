@@ -39,17 +39,15 @@ public class ModelElementFace {
     }
 
     protected static class Deserializer implements JsonDeserializer<ModelElementFace>, JsonSerializer<ModelElementFace> {
-        private static final int DEFAULT_TINT_INDEX = -1;
-
         protected Deserializer() {
         }
 
-        public ModelElementFace deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        public ModelElementFace deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext ctx) throws JsonParseException {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            Direction direction = this.deserializeCullFace(jsonObject);
-            int i = this.deserializeTintIndex(jsonObject);
-            String string = this.deserializeTexture(jsonObject);
-            ModelElementTexture modelElementTexture = jsonDeserializationContext.deserialize(jsonObject, ModelElementTexture.class);
+            Direction direction = deserializeCullFace(jsonObject);
+            int i = deserializeTintIndex(jsonObject);
+            String string = deserializeTexture(jsonObject);
+            ModelElementTexture modelElementTexture = ctx.deserialize(jsonObject, ModelElementTexture.class);
             return new ModelElementFace(direction, i, string, modelElementTexture);
         }
 
@@ -68,8 +66,8 @@ public class ModelElementFace {
         }
 
         @Override
-        public JsonElement serialize(ModelElementFace modelElementFace, Type type, JsonSerializationContext jsonSerializationContext) {
-            JsonObject jsonObject = jsonSerializationContext.serialize(modelElementFace.textureData).getAsJsonObject();
+        public JsonElement serialize(ModelElementFace modelElementFace, Type type, JsonSerializationContext ctx) {
+            JsonObject jsonObject = ctx.serialize(modelElementFace.textureData).getAsJsonObject();
             if (modelElementFace.cullFace != null) {
                 jsonObject.addProperty("cullface", modelElementFace.cullFace.name().toLowerCase());
             }

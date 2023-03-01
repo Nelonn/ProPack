@@ -1,3 +1,4 @@
 {
-  "Type": "Project"
+  "Type": "Project",
+  "BuildAtStartup": false
 }

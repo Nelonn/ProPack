@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface ResourcePack {
 
@@ -48,10 +49,12 @@ public interface ResourcePack {
 
     @NotNull Collection<Font> getFonts();
 
-    @Nullable UploadedPack getUpload();
+    @NotNull MeshMapping getMeshMapping();
+
+    @NotNull Optional<UploadedPack> getUpload();
 
     default boolean isUploaded() {
-        return getUpload() != null;
+        return getUpload().isPresent();
     }
 
 }

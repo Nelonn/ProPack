@@ -19,26 +19,18 @@
 package me.nelonn.propack.core.util;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import me.nelonn.propack.builder.task.TaskIO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.Map;
-import java.util.function.Supplier;
+import java.io.File;
+import java.util.function.Consumer;
 
 public final class Util {
-
-    public static <K, V> V getOrPut(@NotNull Map<K, V> map, @NotNull K key, @NotNull Supplier<V> supplier) {
-        if (map.containsKey(key)) {
-            return map.get(key);
-        } else {
-            V value = supplier.get();
-            map.put(key, value);
-            return value;
-        }
-    }
 
     public static @NotNull Color hexToRGB(@NotNull String hex) {
         if (hex.startsWith("#")) {
@@ -50,40 +42,56 @@ public final class Util {
                 Integer.valueOf(hex.substring(4, 6), 16));
     }
 
-    public static Vec2i parseVector2i(@NotNull JsonObject json, @NotNull String key, @Nullable Vec2i fallback) {
+    public static Vec2i parseVec2i(@NotNull JsonObject json, @NotNull String key, @Nullable Vec2i fallback) {
         if (!json.has(key)) return fallback;
         JsonArray jsonArray = GsonHelper.getArray(json, key);
         if (jsonArray.size() != 2) {
             throw new JsonParseException("Expected 2 '" + key + "' values, found: " + jsonArray.size());
         }
         int[] arr = new int[2];
-        for(int i = 0; i < arr.length; ++i) {
+        for (int i = 0; i < arr.length; ++i) {
             arr[i] = GsonHelper.asInt(jsonArray.get(i), key + '[' + i + ']');
         }
         return new Vec2i(arr[0], arr[1]);
     }
 
-    public static Vec3f parseVector3f(@NotNull JsonObject json, @NotNull String key, @Nullable Vec3f fallback) {
-        if (!json.has(key)) return fallback;
+    public static Vec3f parseVec3f(@NotNull JsonObject json, @NotNull String key) {
         JsonArray jsonArray = GsonHelper.getArray(json, key);
         if (jsonArray.size() != 3) {
             throw new JsonParseException("Expected 3 '" + key + "' values, found: " + jsonArray.size());
         }
         float[] arr = new float[3];
-        for(int i = 0; i < arr.length; ++i) {
+        for (int i = 0; i < arr.length; ++i) {
             arr[i] = GsonHelper.asFloat(jsonArray.get(i), key + '[' + i + ']');
         }
         return new Vec3f(arr[0], arr[1], arr[2]);
     }
 
-    public static @NotNull JsonArray serializeVector2i(@NotNull Vec2i vec2i) {
+    public static Vec3f parseVec3f(@NotNull JsonObject json, @NotNull String key, @Nullable Vec3f fallback) {
+        if (!json.has(key)) return fallback;
+        return parseVec3f(json, key);
+    }
+
+    public static Vec4f parseVec4f(@NotNull JsonObject json, @NotNull String key) {
+        JsonArray jsonArray = GsonHelper.getArray(json, key);
+        if (jsonArray.size() != 4) {
+            throw new JsonParseException("Expected 4 '" + key + "' values, found: " + jsonArray.size());
+        }
+        float[] arr = new float[4];
+        for (int i = 0; i < arr.length; ++i) {
+            arr[i] = GsonHelper.asFloat(jsonArray.get(i), key + '[' + i + ']');
+        }
+        return new Vec4f(arr[0], arr[1], arr[2], arr[3]);
+    }
+
+    public static @NotNull JsonArray serializeVec2i(@NotNull Vec2i vec2i) {
         JsonArray jsonArray = new JsonArray();
         jsonArray.add(vec2i.getX());
         jsonArray.add(vec2i.getY());
         return jsonArray;
     }
 
-    public static @NotNull JsonArray serializeVector3f(@NotNull Vec3f vec3f) {
+    public static @NotNull JsonArray serializeVec3f(@NotNull Vec3f vec3f) {
         JsonArray jsonArray = new JsonArray();
         jsonArray.add(vec3f.getX());
         jsonArray.add(vec3f.getY());
@@ -91,17 +99,35 @@ public final class Util {
         return jsonArray;
     }
 
-    /*public static @NotNull Path parsePath(@NotNull String input) {
-        String[] args = input.split("\\+", 2);
-        return Path.of(args[0]);
+    public static @NotNull JsonArray serializeVec4f(@NotNull Vec4f vec4f) {
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add(vec4f.getX());
+        jsonArray.add(vec4f.getY());
+        jsonArray.add(vec4f.getZ());
+        jsonArray.add(vec4f.getW());
+        return jsonArray;
     }
 
-    public static @NotNull String[] parseCombinations(@NotNull String input) {
-        String[] args = input.split("\\+");
-        String[] combinations = new String[args.length - 1];
-        System.arraycopy(args, 1, combinations, 0, combinations.length);
-        return combinations;
-    }*/
+    public static void forEachStringArray(@NotNull JsonArray input, @NotNull String name, @NotNull Consumer<String> output) {
+        for (int i = 0; i < input.size(); i++) {
+            JsonElement element = input.get(i);
+            output.accept(GsonHelper.asString(element, name + '[' + i + ']'));
+        }
+    }
+
+    public static @NotNull String substringLast(@NotNull String string, int size) {
+        return string.substring(0, string.length() - size);
+    }
+
+    public static @NotNull String substringLast(@NotNull String string, @NotNull String cut) {
+        return substringLast(string, cut.length());
+    }
+
+    public static @NotNull File tempFile(@NotNull TaskIO io, @NotNull String path) {
+        File file = new File(io.getTempDirectory(), path);
+        file.getParentFile().mkdirs();
+        return file;
+    }
 
     /*@SuppressWarnings("unchecked")
     public static @NotNull Hosting provideHosting(@NotNull String string) {

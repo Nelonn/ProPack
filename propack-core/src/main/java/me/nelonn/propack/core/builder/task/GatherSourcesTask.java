@@ -26,6 +26,8 @@ import me.nelonn.propack.builder.file.JsonFile;
 import me.nelonn.propack.builder.file.RealFile;
 import me.nelonn.propack.builder.file.TextFile;
 import me.nelonn.propack.builder.task.TaskIO;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.core.util.LogManagerCompat;
@@ -37,6 +39,7 @@ import java.io.File;
 
 public class GatherSourcesTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
 
     public GatherSourcesTask(@NotNull Project project) {
         super("gatherSources", project);

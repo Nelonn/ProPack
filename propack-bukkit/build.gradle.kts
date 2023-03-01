@@ -103,7 +103,6 @@ tasks.named<ShadowJar>("shadowJar") {
         exclude("net.kyori.adventure.key.*")
     }
     exclude("net/kyori/adventure/key/**") // problems with different classes
-    relocate("org.xiph", "me.nelonn.propack.core.ogg")
     archiveClassifier.set("")
 }
 

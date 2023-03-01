@@ -27,11 +27,16 @@ import me.nelonn.propack.builder.file.File;
 import me.nelonn.propack.builder.file.JsonFile;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.core.builder.asset.FontBuilder;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.FileProcessingException;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class ProcessFontsTask extends AbstractTask {
+    public static final TaskBootstrap BOOTSTRAP = ProcessFontsTask::new;
+
     public ProcessFontsTask(@NotNull Project project) {
         super("processFonts", project);
     }

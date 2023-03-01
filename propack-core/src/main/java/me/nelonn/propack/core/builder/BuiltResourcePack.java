@@ -19,6 +19,7 @@
 package me.nelonn.propack.core.builder;
 
 import me.nelonn.flint.path.Path;
+import me.nelonn.propack.MeshMapping;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.UploadedPack;
 import me.nelonn.propack.asset.ArmorTexture;
@@ -30,7 +31,7 @@ import me.nelonn.propack.core.builder.asset.ArmorTextureBuilder;
 import me.nelonn.propack.core.builder.asset.FontBuilder;
 import me.nelonn.propack.core.builder.asset.ItemModelBuilder;
 import me.nelonn.propack.core.builder.asset.SoundAssetBuilder;
-import me.nelonn.propack.core.util.Sha1;
+import me.nelonn.propack.Sha1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,31 +39,31 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
-public class LocalResourcePack implements ResourcePack {
+public class BuiltResourcePack implements ResourcePack {
     private final Project project;
-    private final MappingsBuilder mappingsBuilder;
     private final Map<Path, ItemModel> itemModels;
     private final Map<Path, SoundAsset> sounds;
     private final Map<Path, ArmorTexture> armorTextures;
     private final Map<Path, Font> fonts;
+    private final MeshMapping meshMapping;
     private final File file;
     private final File zip;
     private final Sha1 sha1;
     private final UploadedPack uploadedPack;
 
-    public LocalResourcePack(@NotNull Project project,
-                             @NotNull MappingsBuilder mappingsBuilder,
+    public BuiltResourcePack(@NotNull Project project,
                              @NotNull Collection<ItemModelBuilder> itemModels,
                              @NotNull Collection<SoundAssetBuilder> soundAssets,
                              @NotNull Collection<ArmorTextureBuilder> armorTextures,
                              @NotNull Collection<FontBuilder> fonts,
+                             @NotNull MeshMapping meshMapping,
                              @NotNull File file,
                              @NotNull File zip,
                              @NotNull Sha1 sha1,
                              @Nullable UploadedPack uploadedPack) {
         this.project = project;
-        this.mappingsBuilder = mappingsBuilder;
         this.itemModels = new HashMap<>();
         for (ItemModelBuilder itemModel : itemModels) {
             this.itemModels.put(itemModel.getPath(), itemModel.build(this));
@@ -79,6 +80,7 @@ public class LocalResourcePack implements ResourcePack {
         for (FontBuilder font : fonts) {
             this.fonts.put(font.getPath(), font.build(this));
         }
+        this.meshMapping = meshMapping;
         this.file = file;
         this.zip = zip;
         this.sha1 = sha1;
@@ -88,10 +90,6 @@ public class LocalResourcePack implements ResourcePack {
     @Override
     public @NotNull String getName() {
         return project.getName();
-    }
-
-    public MappingsBuilder getMappings() {
-        return mappingsBuilder;
     }
 
     @Override
@@ -134,6 +132,16 @@ public class LocalResourcePack implements ResourcePack {
         return fonts.values();
     }
 
+    @Override
+    public @NotNull MeshMapping getMeshMapping() {
+        return meshMapping;
+    }
+
+    @Override
+    public @NotNull Optional<UploadedPack> getUpload() {
+        return Optional.ofNullable(uploadedPack);
+    }
+
     public @NotNull Project getProject() {
         return project;
     }
@@ -148,10 +156,6 @@ public class LocalResourcePack implements ResourcePack {
 
     public @NotNull Sha1 getSha1() {
         return sha1;
-    }
-
-    public @Nullable UploadedPack getUpload() {
-        return uploadedPack;
     }
 
 }

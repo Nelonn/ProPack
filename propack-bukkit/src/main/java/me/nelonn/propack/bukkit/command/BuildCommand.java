@@ -18,14 +18,22 @@
 
 package me.nelonn.propack.bukkit.command;
 
-import me.nelonn.propack.core.builder.InternalProject;
+import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.Util;
+import me.nelonn.propack.bukkit.resourcepack.PackDefinition;
+import me.nelonn.propack.bukkit.resourcepack.ProjectDefinition;
+import me.nelonn.propack.core.builder.InternalProject;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 public class BuildCommand extends Command {
     private final ProPackPlugin plugin;
@@ -41,17 +49,38 @@ public class BuildCommand extends Command {
             Util.send(sender, "<red>Usage: /" + s + " <project>");
             return;
         }
+        PackDefinition definition = plugin.getPackContainer().getDefinition(args[0]);
+        if (!(definition instanceof ProjectDefinition projectDefinition)) {
+            Util.send(sender, "<red>Resource pack '" + args[0] + "' is not project");
+            return;
+        }
         new Thread(() -> {
             try {
-                ProPack.getResourcePackContainer().getDefinition(args[0]);
-                File projectFile = new File(plugin.getDataFolder(), args[0] + File.separatorChar + "project.json5");
-                InternalProject internalProject = ProPack.getResourcePackContainer().getProjectLoader().load(projectFile);
+                InternalProject internalProject = (InternalProject) projectDefinition.getProject();
                 internalProject.build();
+                ResourcePack resourcePack = internalProject.getResourcePack().orElseThrow();
+                if (resourcePack.isUploaded()) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        Optional<ResourcePack> playerPack = ProPack.getDispatcher().getResourcePack(player);
+                        if (playerPack.isPresent() && playerPack.get().getName().equals(resourcePack.getName())) {
+                            ProPack.getDispatcher().sendPack(player, resourcePack);
+                        }
+                    }
+                }
             } catch (Exception e) {
                 Util.send(sender, "<red>Exception: " + e.getMessage());
                 Util.send(sender, "<red>Check console for additional info");
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    @Override
+    protected List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
+        if (args.length > 1) return Collections.emptyList();
+        String lower = args.length == 0 ? "" : args[0].toLowerCase(Locale.ROOT);
+        return plugin.getPackContainer().getDefinitions().stream().filter(packDefinition -> {
+            return packDefinition instanceof ProjectDefinition && packDefinition.getName().startsWith(lower);
+        }).map(PackDefinition::getName).toList();
     }
 }

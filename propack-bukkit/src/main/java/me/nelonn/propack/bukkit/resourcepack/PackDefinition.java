@@ -16,28 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder;
+package me.nelonn.propack.bukkit.resourcepack;
 
-import me.nelonn.propack.definition.Item;
+import me.nelonn.propack.ResourcePack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
-public class MappingsBuilder {
-    private final Map<Item, Mapper> mappers = new HashMap<>();
+public interface PackDefinition {
+    @NotNull String getName();
 
-    @NotNull
-    public Mapper getMapper(@NotNull Item item) {
-        return mappers.computeIfAbsent(item, Mapper::new);
-    }
-
-    public Collection<Mapper> getMappers() {
-        return mappers.values();
-    }
-
-    public void clear() {
-        mappers.clear();
-    }
+    @NotNull Optional<ResourcePack> getResourcePack();
 }

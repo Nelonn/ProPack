@@ -18,11 +18,13 @@
 
 package me.nelonn.propack.bukkit;
 
+import me.nelonn.propack.core.DevServer;
+import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
-import me.nelonn.propack.bukkit.resourcepack.ResourcePackContainer;
+import me.nelonn.propack.bukkit.resourcepack.PackContainer;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -40,8 +42,10 @@ public final class ProPackPlugin extends JavaPlugin {
     }
 
     private BukkitAudiences adventure;
-    private ResourcePackContainer resourcePackContainer;
+    private ProPackCore proPackCore;
+    private PackContainer packContainer;
     private Dispatcher dispatcher;
+    private DevServer devServer;
 
     @Override
     public void onLoad() {
@@ -61,9 +65,6 @@ public final class ProPackPlugin extends JavaPlugin {
         adventure = BukkitAudiences.create(this);
         reloadConfigs();
 
-        resourcePackContainer = new ResourcePackContainer(getDataFolder());
-        resourcePackContainer.load();
-
         dispatcher = new Dispatcher(this);
         Bukkit.getPluginManager().registerEvents(dispatcher, this);
 
@@ -80,11 +81,33 @@ public final class ProPackPlugin extends JavaPlugin {
         CompatibilitiesManager.disableCompatibilities();
         adventure.close();
         adventure = null;
+        if (devServer != null) {
+            try {
+                devServer.close();
+            } catch (Exception ignored) {
+            }
+            devServer = null;
+        }
         LOGGER.info("ProPack {} is now disabled", getDescription().getVersion());
     }
 
     public void reloadConfigs() {
         reloadConfig();
+        if (devServer != null) {
+            try {
+                devServer.close();
+            } catch (Exception ignored) {
+            }
+            devServer = null;
+        }
+        proPackCore = new ProPackCore();
+        proPackCore.getProjectLoader().getItemDefinitionLoaders().add(BukkitItemDefinitionLoader.INSTANCE);
+        if (Settings.DEV_SERVER_ENABLED.asBoolean()) {
+            devServer = new DevServer(Settings.DEV_SERVER_RETURN_IP.asString(), Settings.DEV_SERVER_PORT.asInteger());
+            proPackCore.getHostingMap().register("propack", devServer);
+        }
+        packContainer = new PackContainer(proPackCore, getDataFolder());
+        packContainer.loadAll();
     }
 
     public @NotNull BukkitAudiences adventure() {
@@ -94,8 +117,12 @@ public final class ProPackPlugin extends JavaPlugin {
         return this.adventure;
     }
 
-    public ResourcePackContainer getResourcePackContainer() {
-        return resourcePackContainer;
+    public ProPackCore getProPackCore() {
+        return proPackCore;
+    }
+
+    public PackContainer getPackContainer() {
+        return packContainer;
     }
 
     public Dispatcher getDispatcher() {

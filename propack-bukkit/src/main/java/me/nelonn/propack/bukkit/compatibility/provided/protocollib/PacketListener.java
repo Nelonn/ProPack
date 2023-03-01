@@ -23,19 +23,17 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.MinecraftKey;
 import com.comphenix.protocol.wrappers.nbt.NbtType;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
-import me.nelonn.propack.asset.CombinedItemModel;
-import me.nelonn.propack.asset.DefaultItemModel;
-import me.nelonn.propack.asset.ItemModel;
-import me.nelonn.propack.asset.SlotItemModel;
+import me.nelonn.propack.asset.*;
 import me.nelonn.propack.bukkit.ProPack;
+import me.nelonn.propack.bukkit.Settings;
 import me.nelonn.propack.bukkit.adapter.Adapter;
 import me.nelonn.propack.bukkit.adapter.WrappedCompoundTag;
 import me.nelonn.propack.bukkit.adapter.WrappedItemStack;
 import me.nelonn.propack.bukkit.adapter.WrappedListTag;
-import me.nelonn.propack.core.builder.LocalResourcePack;
 import me.nelonn.propack.definition.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -59,7 +57,10 @@ public class PacketListener extends PacketAdapter {
 
                 PacketType.Play.Server.SET_SLOT,
                 PacketType.Play.Server.WINDOW_ITEMS,
-                PacketType.Play.Server.ENTITY_EQUIPMENT);
+                PacketType.Play.Server.ENTITY_EQUIPMENT,
+                PacketType.Play.Server.ENTITY_METADATA,
+
+                PacketType.Play.Server.CUSTOM_SOUND_EFFECT);
         try {
             String craftBukkit = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
             String minecraft = Bukkit.getServer().getBukkitVersion().split("-")[0];
@@ -86,8 +87,8 @@ public class PacketListener extends PacketAdapter {
     public void onPacketReceiving(PacketEvent event) {
         PacketType type = event.getPacketType();
         Object packet = event.getPacket().getHandle();
-        if (type == PacketType.Play.Client.SET_CREATIVE_SLOT) {
-            adapter.patchSetCreativeSlot(packet, this::patchIn);
+        if (type == PacketType.Play.Client.SET_CREATIVE_SLOT && Settings.PATCH_PACKETS_ITEMS.asBoolean()) {
+            adapter.patchSetCreativeSlot(packet, this::patchInItems);
         }
     }
 
@@ -97,27 +98,41 @@ public class PacketListener extends PacketAdapter {
         Object packet = event.getPacket().getHandle();
         Optional<ResourcePack> resourcePack = ProPack.getDispatcher().getResourcePack(event.getPlayer());
         if (resourcePack.isEmpty()) return;
-        BiConsumer<Object, Consumer<WrappedItemStack>> method;
-        if (type == PacketType.Play.Server.SET_SLOT) {
-            method = adapter::patchSetSlot;
-        } else if (type == PacketType.Play.Server.WINDOW_ITEMS) {
-            method = adapter::patchWindowItems;
-        } else if (type == PacketType.Play.Server.ENTITY_EQUIPMENT) {
-            method = adapter::patchEntityEquipment;
-        } else {
-            return;
+        if (Settings.PATCH_PACKETS_ITEMS.asBoolean()) {
+            BiConsumer<Object, Consumer<WrappedItemStack>> method;
+            if (type == PacketType.Play.Server.SET_SLOT) {
+                method = adapter::patchSetSlot;
+            } else if (type == PacketType.Play.Server.WINDOW_ITEMS) {
+                method = adapter::patchSetContent;
+            } else if (type == PacketType.Play.Server.ENTITY_EQUIPMENT) {
+                method = adapter::patchEntityEquipment;
+            } else if (type == PacketType.Play.Server.ENTITY_METADATA) {
+                method = adapter::patchSetEntityData;
+            } else {
+                return;
+            }
+            method.accept(packet, stack -> patchOutItems(stack, resourcePack.get()));
         }
-        method.accept(packet, stack -> patchOut(stack, resourcePack.get()));
+        if (Settings.PATCH_PACKETS_SOUNDS.asBoolean() && type == PacketType.Play.Server.CUSTOM_SOUND_EFFECT) {
+            MinecraftKey minecraftKey = event.getPacket().getMinecraftKeys().read(0);
+            Path path = Path.of(minecraftKey.getPrefix(), minecraftKey.getKey());
+            SoundAsset soundAsset = resourcePack.get().getSound(path);
+            if (soundAsset != null) {
+                path = soundAsset.getSoundPath();
+                minecraftKey = new MinecraftKey(path.getNamespace(), path.getValue());
+                event.getPacket().getMinecraftKeys().write(0, minecraftKey);
+            }
+        }
     }
 
-    private void patchIn(WrappedItemStack itemStack) {
+    private void patchInItems(WrappedItemStack itemStack) {
         WrappedCompoundTag tag = itemStack.getTag();
         if (tag == null || !tag.contains(CUSTOM_MODEL_DATA_FIELD, NbtType.TAG_INT.getRawID()) ||
                 !tag.contains(CUSTOM_MODEL_FIELD, NbtType.TAG_STRING.getRawID())) return;
         tag.remove(CUSTOM_MODEL_DATA_FIELD);
     }
 
-    private void patchOut(WrappedItemStack itemStack, ResourcePack resourcePack) {
+    private void patchOutItems(WrappedItemStack itemStack, ResourcePack resourcePack) {
         try {
             WrappedCompoundTag tag = itemStack.getTag();
             if (tag == null || !tag.contains(CUSTOM_MODEL_FIELD, NbtType.TAG_STRING.getRawID())) return;
@@ -149,7 +164,7 @@ public class PacketListener extends PacketAdapter {
             assert material != null;
             Item itemType = ProPack.adapt(material);
             if (!itemModel.getTargetItems().contains(itemType)) return;
-            Integer cmd = ((LocalResourcePack) resourcePack).getMappings().getMapper(itemType).get(mesh);
+            Integer cmd = resourcePack.getMeshMapping().getCustomModelData(mesh, itemType);
             if (cmd == null) return;
             tag.putInt(CUSTOM_MODEL_DATA_FIELD, cmd);
         } catch (Exception e) {

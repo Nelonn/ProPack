@@ -22,6 +22,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import me.nelonn.flint.path.Identifier;
+import me.nelonn.propack.MapItemDefinition;
 import me.nelonn.propack.builder.loader.ItemDefinitionLoader;
 import me.nelonn.propack.builder.util.Extras;
 import me.nelonn.propack.core.loader.ProjectLoader;
@@ -77,6 +78,6 @@ public class JsonFileItemDefinitionLoader implements ItemDefinitionLoader {
                 throw new JsonSyntaxException("Element in array 'block' at index " + i + " is not a string");
             }
         }
-        return new ItemDefinition(itemMap);
+        return new MapItemDefinition(itemMap);
     }
 }

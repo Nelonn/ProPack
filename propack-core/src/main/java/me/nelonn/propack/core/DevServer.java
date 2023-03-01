@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package propack;
+package me.nelonn.propack.core;
 
+import me.nelonn.propack.Sha1;
 import me.nelonn.propack.UploadedPack;
-import me.nelonn.propack.builder.Hosting;
-import me.nelonn.propack.core.UploadedPackImpl;
+import me.nelonn.propack.builder.hosting.Hosting;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.NamedThreadFactory;
 import org.apache.logging.log4j.Logger;
@@ -32,67 +32,47 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Supplier;
 
-public class DevServer implements Hosting {
+public final class DevServer extends Hosting implements Closeable {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private HttpRunner runner;
-    private String returnUrl;
-    private File file;
+    private final Map<String, File> files = new HashMap<>();
+    private final String returnUrl;
+    private final HttpRunner runner;
 
-    public void enable(@NotNull Map<String, Object> options) {
-        if (runner != null) return;
-        int port;
-        Object portRaw = options.getOrDefault("port", 3000);
-        if (portRaw instanceof Number) {
-            port = ((Number) portRaw).intValue();
-        } else {
-            throw new IllegalArgumentException("Expected 'port' to be a number");
-        }
-        Object returnIpRaw = options.getOrDefault("return_ip", "127.0.0.1");
-        if (!(returnIpRaw instanceof String)) {
-            throw new IllegalArgumentException("Expected 'return_ip' to be a string");
-        }
-        String returnIp = (String) returnIpRaw;
+    public DevServer(@NotNull String returnIp, int port) {
+        super("dev_server");
         returnUrl = "http://" + returnIp + ":" + port;
         try {
-            runner = new HttpRunner(port, () -> file);
+            runner = new HttpRunner(port);
             new Thread(runner, "devhttp-server").start();
         } catch (Exception e) {
             throw new IllegalStateException("Something went wrong when running http server", e);
         }
     }
 
-    public void disable() {
-        if (runner != null) {
-            try {
-                runner.close();
-                LOGGER.info("Server is turned off");
-            } catch (Exception ignored) {
-            }
-            runner = null;
-        }
-        returnUrl = null;
+    @Override
+    public void close() throws IOException {
+        runner.close();
+        LOGGER.info("Server is turned off");
     }
 
     @Override
-    public @Nullable UploadedPack upload(@NotNull File file, byte @NotNull [] hash, @NotNull String hashString) {
-        this.file = file;
-        return new UploadedPackImpl(returnUrl + '/' + hashString + ".zip", hash, hashString);
+    public @NotNull UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1, @Nullable Map<String, Object> options) {
+        files.put(sha1.toString(), file);
+        return new UploadedPackImpl(returnUrl + '/' + sha1.asString() + ".zip", sha1.asBytes(), sha1.asString());
     }
 
-    public static class HttpRunner implements Runnable, Closeable {
+    public class HttpRunner implements Runnable, Closeable {
         private volatile boolean shouldStop = false;
         private final ServerSocket serverSocket;
-        private final Supplier<File> fileSupplier;
         private final ExecutorService executorService = Executors.newCachedThreadPool(new NamedThreadFactory(r -> "devhttp-client-" + r.hashCode()));
 
-        public HttpRunner(int port, @NotNull Supplier<File> fileSupplier) throws IOException {
+        public HttpRunner(int port) throws IOException {
             serverSocket = new ServerSocket(port);
-            this.fileSupplier = fileSupplier;
             LOGGER.info("Dev HTTP server started successfully on port {}", port);
         }
 
@@ -125,24 +105,28 @@ public class DevServer implements Hosting {
             }
 
             //String method = requestLine[0];
-            //String path = requestLine[1];
+            String path = requestLine[1];
             String httpVersion = requestLine[2];
 
             OutputStream outputStream = socket.getOutputStream();
             PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.ISO_8859_1), true);
 
-            File result = fileSupplier.get();
-            if (result == null) {
+            String sha1 = path.substring(1);
+            if (sha1.endsWith(".zip")) {
+                sha1 = sha1.substring(0, sha1.length() - ".zip".length());
+            }
+            File file = files.get(sha1);
+            if (file == null) {
                 printWriter.println(httpVersion + " 404 Not Found");
                 socket.close();
                 return;
             }
 
-            try (InputStream inputStream = new FileInputStream(result)) {
+            try (InputStream inputStream = new FileInputStream(file)) {
                 printWriter.println(httpVersion + " 200 OK");
                 printWriter.println("Content-Type: application/zip");
-                printWriter.println("Content-Length: " + result.length());
-                printWriter.println("Server: ProPackDev");
+                printWriter.println("Content-Length: " + file.length());
+                printWriter.println("Server: ProPackDevServer");
                 printWriter.println();
                 printWriter.flush();
 
