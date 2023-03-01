@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProcessModelsTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
+    public static final TaskBootstrap BOOTSTRAP = ProcessModelsTask::new;
     public static final Extra<MeshMappingBuilder> EXTRA_MESH_MAPPING_BUILDER = new Extra<>(MeshMappingBuilder.class, "propack.process_models.mesh_mapping_builder");
 
     public ProcessModelsTask(@NotNull Project project) {

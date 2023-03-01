@@ -42,7 +42,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ObfuscateTask extends AbstractTask {
-    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
+    public static final TaskBootstrap BOOTSTRAP = ObfuscateTask::new;
 
     public ObfuscateTask(@NotNull Project project) {
         super("obfuscate", project);

@@ -35,7 +35,7 @@ import me.nelonn.propack.core.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class ProcessFontsTask extends AbstractTask {
-    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
+    public static final TaskBootstrap BOOTSTRAP = ProcessFontsTask::new;
 
     public ProcessFontsTask(@NotNull Project project) {
         super("processFonts", project);

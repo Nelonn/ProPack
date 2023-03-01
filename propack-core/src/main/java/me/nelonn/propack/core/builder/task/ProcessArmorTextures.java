@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ProcessArmorTextures extends AbstractTask {
-    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
+    public static final TaskBootstrap BOOTSTRAP = ProcessArmorTextures::new;
     public static final Extra<Integer> EXTRA_ARMOR_RESOLUTION = new Extra<>(Integer.class, "propack.process_armor_textures.armor_resolution");
     private static final String LEATHER_LAYER = "assets/minecraft/textures/models/armor/leather_layer_";
     private static final String INCLUDED_LEATHER_LAYER = "include/" + LEATHER_LAYER;

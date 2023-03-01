@@ -34,7 +34,7 @@ import java.io.File;
 
 public class UploadTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
+    public static final TaskBootstrap BOOTSTRAP = UploadTask::new;
     public static final Extra<UploadedPack> EXTRA_UPLOADED_PACK = new Extra<>(UploadedPack.class, "propack.upload.uploaded_pack");
 
     public UploadTask(@NotNull Project project) {

@@ -40,7 +40,7 @@ import java.util.zip.ZipOutputStream;
 
 public class PackageTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
+    public static final TaskBootstrap BOOTSTRAP = PackageTask::new;
     public static final Extra<File> EXTRA_ZIP = new Extra<>(File.class, "propack.package.zip");
     public static final Extra<File> EXTRA_SHA1_FILE = new Extra<>(File.class, "propack.package.sha1_file");
     public static final Extra<Sha1> EXTRA_SHA1 = new Extra<>(Sha1.class, "propack.package.sha1");

@@ -43,7 +43,7 @@ import java.util.Map;
 
 public class SerializeTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
+    public static final TaskBootstrap BOOTSTRAP = SerializeTask::new;
     public static final Extra<File> EXTRA_FILE = new Extra<>(File.class, "propack.serialize.file");
 
     public SerializeTask(@NotNull Project project) {

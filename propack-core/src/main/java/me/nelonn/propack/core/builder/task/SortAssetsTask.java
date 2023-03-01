@@ -27,7 +27,7 @@ import me.nelonn.propack.core.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class SortAssetsTask extends AbstractTask {
-    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
+    public static final TaskBootstrap BOOTSTRAP = SortAssetsTask::new;
 
     public SortAssetsTask(@NotNull Project project) {
         super("sortAssets", project);

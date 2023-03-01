@@ -51,7 +51,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class ProcessSoundsTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
+    public static final TaskBootstrap BOOTSTRAP = ProcessSoundsTask::new;
 
     public ProcessSoundsTask(@NotNull Project project) {
         super("processSounds", project);

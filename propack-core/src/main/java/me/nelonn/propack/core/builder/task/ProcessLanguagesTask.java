@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ProcessLanguagesTask extends AbstractTask {
-    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
+    public static final TaskBootstrap BOOTSTRAP = ProcessLanguagesTask::new;
 
     public ProcessLanguagesTask(@NotNull Project project) {
         super("processLanguages", project);
