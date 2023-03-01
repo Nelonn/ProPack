@@ -18,6 +18,7 @@
 
 package me.nelonn.propack.bukkit;
 
+import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.bukkit.command.ProPackCommand;
@@ -40,6 +41,7 @@ public final class ProPackPlugin extends JavaPlugin {
     }
 
     private BukkitAudiences adventure;
+    private ProPackCore proPackCore;
     private PackContainer packContainer;
     private Dispatcher dispatcher;
 
@@ -59,7 +61,9 @@ public final class ProPackPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         adventure = BukkitAudiences.create(this);
-        packContainer = new PackContainer(getDataFolder());
+        proPackCore = new ProPackCore();
+        proPackCore.getProjectLoader().getItemDefinitionLoaders().add(BukkitItemDefinitionLoader.INSTANCE);
+        packContainer = new PackContainer(proPackCore, getDataFolder());
         reloadConfigs();
 
         dispatcher = new Dispatcher(this);
@@ -93,7 +97,11 @@ public final class ProPackPlugin extends JavaPlugin {
         return this.adventure;
     }
 
-    public PackContainer getResourcePackContainer() {
+    public ProPackCore getProPackCore() {
+        return proPackCore;
+    }
+
+    public PackContainer getPackContainer() {
         return packContainer;
     }
 

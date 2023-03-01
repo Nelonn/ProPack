@@ -16,14 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package propack;
+package me.nelonn.propack.core;
 
+import me.nelonn.propack.Sha1;
 import me.nelonn.propack.UploadedPack;
-import me.nelonn.propack.builder.Hosting;
-import me.nelonn.propack.core.UploadedPackImpl;
+import me.nelonn.propack.builder.hosting.Hosting;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.NamedThreadFactory;
-import me.nelonn.propack.Sha1;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,28 +37,15 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class DevServer implements Hosting {
+public final class DevServer extends Hosting implements Closeable {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private HttpRunner runner;
-    private String returnUrl;
-    private Map<String, File> files;
+    private final Map<String, File> files = new HashMap<>();
+    private final String returnUrl;
+    private final HttpRunner runner;
 
-    public void enable(@NotNull Map<String, Object> options) {
-        if (runner != null) return;
-        int port;
-        Object portRaw = options.getOrDefault("port", 3000);
-        if (portRaw instanceof Number) {
-            port = ((Number) portRaw).intValue();
-        } else {
-            throw new IllegalArgumentException("Expected 'port' to be a number");
-        }
-        Object returnIpRaw = options.getOrDefault("return_ip", "127.0.0.1");
-        if (!(returnIpRaw instanceof String)) {
-            throw new IllegalArgumentException("Expected 'return_ip' to be a string");
-        }
-        String returnIp = (String) returnIpRaw;
+    public DevServer(@NotNull String name, String returnIp, int port) {
+        super(name);
         returnUrl = "http://" + returnIp + ":" + port;
-        files = new HashMap<>();
         try {
             runner = new HttpRunner(port);
             new Thread(runner, "devhttp-server").start();
@@ -68,20 +54,14 @@ public class DevServer implements Hosting {
         }
     }
 
-    public void disable() {
-        if (runner != null) {
-            try {
-                runner.close();
-                LOGGER.info("Server is turned off");
-            } catch (Exception ignored) {
-            }
-            runner = null;
-        }
-        returnUrl = null;
+    @Override
+    public void close() throws IOException {
+        runner.close();
+        LOGGER.info("Server is turned off");
     }
 
     @Override
-    public @Nullable UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1) {
+    public @NotNull UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1, @Nullable Map<String, Object> options) {
         files.put(sha1.toString(), file);
         return new UploadedPackImpl(returnUrl + '/' + sha1.asString() + ".zip", sha1.asBytes(), sha1.asString());
     }

@@ -46,7 +46,7 @@ public class BuildCommand extends Command {
             Util.send(sender, "<red>Usage: /" + s + " <project>");
             return;
         }
-        PackDefinition definition = ProPack.getResourcePackContainer().getDefinition(args[0]);
+        PackDefinition definition = ProPack.getPackContainer().getDefinition(args[0]);
         if (!(definition instanceof ProjectDefinition)) {
             Util.send(sender, "<red>Resource pack '" + args[0] + "' is not project");
         }

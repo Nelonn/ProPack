@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.task;
+package me.nelonn.propack.core.builder.task.provided;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -27,6 +27,8 @@ import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
 import me.nelonn.propack.core.builder.MeshMappingBuilder;
 import me.nelonn.propack.core.builder.asset.*;
+import me.nelonn.propack.core.builder.task.AbstractTask;
+import me.nelonn.propack.core.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.definition.Item;
 import org.apache.logging.log4j.Logger;
@@ -41,6 +43,7 @@ import java.util.Map;
 
 public class SerializeTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
     public static final Extra<File> EXTRA_FILE = new Extra<>(File.class, "propack.serialize.file");
 
     public SerializeTask(@NotNull Project project) {

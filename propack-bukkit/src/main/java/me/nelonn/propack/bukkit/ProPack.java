@@ -20,6 +20,7 @@ package me.nelonn.propack.bukkit;
 
 import com.google.common.base.Preconditions;
 import me.nelonn.flint.path.Identifier;
+import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.definition.Item;
 import me.nelonn.propack.bukkit.resourcepack.PackContainer;
 import org.bukkit.Material;
@@ -38,8 +39,12 @@ public final class ProPack {
         ProPack.plugin = plugin;
     }
 
-    public static @NotNull PackContainer getResourcePackContainer() {
-        return plugin.getResourcePackContainer();
+    public static @NotNull ProPackCore getCore() {
+        return plugin.getProPackCore();
+    }
+
+    public static @NotNull PackContainer getPackContainer() {
+        return plugin.getPackContainer();
     }
 
     public static @NotNull Dispatcher getDispatcher() {

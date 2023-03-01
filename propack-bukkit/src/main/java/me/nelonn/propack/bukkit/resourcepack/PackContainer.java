@@ -19,13 +19,11 @@
 package me.nelonn.propack.bukkit.resourcepack;
 
 import com.google.gson.JsonObject;
-import me.nelonn.propack.builder.loader.ItemDefinitionLoader;
+import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.core.builder.InternalProject;
 import me.nelonn.propack.core.loader.ProjectLoader;
-import me.nelonn.propack.core.loader.itemdefinition.JsonFileItemDefinitionLoader;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.LogManagerCompat;
-import me.nelonn.propack.bukkit.BukkitItemDefinitionLoader;
 import me.nelonn.propack.core.util.Util;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +32,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,12 +42,9 @@ public class PackContainer {
     private final ProjectLoader projectLoader;
     private final File directory;
 
-    public PackContainer(@NotNull File directory) {
+    public PackContainer(@NotNull ProPackCore core, @NotNull File directory) {
         this.directory = directory;
-        List<ItemDefinitionLoader> itemDefinitionLoaders = new ArrayList<>();
-        itemDefinitionLoaders.add(JsonFileItemDefinitionLoader.INSTANCE);
-        itemDefinitionLoaders.add(BukkitItemDefinitionLoader.INSTANCE);
-        projectLoader = new ProjectLoader(null, itemDefinitionLoaders);
+        projectLoader = core.getProjectLoader();
     }
 
     public void loadAll() {

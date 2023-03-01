@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.task;
+package me.nelonn.propack.core.builder.task.provided;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -37,6 +37,9 @@ import me.nelonn.propack.core.builder.asset.SlotItemModelBuilder;
 import me.nelonn.propack.core.builder.json.mesh.JsonModel;
 import me.nelonn.propack.core.builder.json.mesh.ModelElement;
 import me.nelonn.propack.core.builder.json.mesh.ModelElementFace;
+import me.nelonn.propack.core.builder.task.AbstractTask;
+import me.nelonn.propack.core.builder.task.FileProcessingException;
+import me.nelonn.propack.core.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.*;
 import me.nelonn.propack.definition.Item;
 import org.apache.logging.log4j.Logger;
@@ -47,6 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProcessModelsTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
     public static final Extra<MeshMappingBuilder> EXTRA_MESH_MAPPING_BUILDER = new Extra<>(MeshMappingBuilder.class, "propack.process_models.mesh_mapping_builder");
 
     public ProcessModelsTask(@NotNull Project project) {

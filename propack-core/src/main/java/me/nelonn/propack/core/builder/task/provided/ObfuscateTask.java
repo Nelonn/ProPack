@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.task;
+package me.nelonn.propack.core.builder.task.provided;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -30,6 +30,9 @@ import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.core.builder.ObfuscationConfiguration;
 import me.nelonn.propack.core.builder.asset.FontBuilder;
 import me.nelonn.propack.core.builder.asset.SoundAssetBuilder;
+import me.nelonn.propack.core.builder.task.AbstractTask;
+import me.nelonn.propack.core.builder.task.FileProcessingException;
+import me.nelonn.propack.core.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.PathUtil;
 import me.nelonn.propack.core.util.Util;
@@ -39,6 +42,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ObfuscateTask extends AbstractTask {
+    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
+
     public ObfuscateTask(@NotNull Project project) {
         super("obfuscate", project);
     }

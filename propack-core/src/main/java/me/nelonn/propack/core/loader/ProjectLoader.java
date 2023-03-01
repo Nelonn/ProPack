@@ -20,15 +20,17 @@ package me.nelonn.propack.core.loader;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.*;
+import me.nelonn.flint.path.Identifier;
 import me.nelonn.propack.ResourcePack;
-import me.nelonn.propack.builder.Hosting;
 import me.nelonn.propack.builder.StrictMode;
 import me.nelonn.propack.builder.file.ByteFile;
 import me.nelonn.propack.builder.file.VirtualFile;
+import me.nelonn.propack.builder.hosting.Hosting;
 import me.nelonn.propack.builder.loader.ItemDefinitionLoader;
 import me.nelonn.propack.builder.loader.TextLoader;
 import me.nelonn.propack.builder.util.Extra;
 import me.nelonn.propack.builder.util.Extras;
+import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.core.builder.BuildConfiguration;
 import me.nelonn.propack.core.builder.InternalProject;
 import me.nelonn.propack.core.builder.ObfuscationConfiguration;
@@ -50,7 +52,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -59,11 +60,14 @@ import java.util.zip.Deflater;
 public class ProjectLoader {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     public static final Extra<File> EXTRA_CONFIG_DIR = new Extra<>(File.class, "propack.project_loader.config_dir");
+    private final ProPackCore core;
     private final List<TextLoader> textLoaders;
     private final List<ItemDefinitionLoader> itemDefinitionLoaders;
 
-    public ProjectLoader(@Nullable List<TextLoader> textLoaders,
+    public ProjectLoader(@NotNull ProPackCore core,
+                         @Nullable List<TextLoader> textLoaders,
                          @Nullable List<ItemDefinitionLoader> itemDefinitionLoaders) {
+        this.core = core;
         if (textLoaders != null) {
             this.textLoaders = new ArrayList<>(textLoaders);
         } else {
@@ -80,8 +84,16 @@ public class ProjectLoader {
         }
     }
 
-    public ProjectLoader() {
-        this(null, null);
+    public ProjectLoader(@NotNull ProPackCore core) {
+        this(core, null, null);
+    }
+
+    public List<TextLoader> getTextLoaders() {
+        return textLoaders;
+    }
+
+    public List<ItemDefinitionLoader> getItemDefinitionLoaders() {
+        return itemDefinitionLoaders;
     }
 
     public @NotNull InternalProject load(@NotNull File projectFile, boolean loadBuilt) {
@@ -256,43 +268,26 @@ public class ProjectLoader {
         }
 
         Hosting hosting;
+        Map<String, Object> uploadOptions;
         try {
             File uploadConfigFile = new File(projectFile.getParentFile(), "config/upload.json5");
             String uploadConfigContent = IOUtil.readString(uploadConfigFile);
             JsonObject uploadConfigObject = GsonHelper.getGson().fromJson(uploadConfigContent, JsonObject.class);
             if (GsonHelper.getBoolean(uploadConfigObject, "Enabled")) {
-                try {
-                    String className = GsonHelper.getString(uploadConfigObject, "Class");
-                    Class<?> clazz = Class.forName(className);
-                    if (!Hosting.class.isAssignableFrom(clazz)) {
-                        throw new IllegalArgumentException("Class '" + className + "' must implement '" +
-                                Hosting.class.getName() + "'");
-                    }
-                    Constructor<?> constructor;
-                    try {
-                        constructor = clazz.getDeclaredConstructor();
-                    } catch (Exception e) {
-                        throw new IllegalArgumentException("Class '" + className +
-                                "' must have a constructor without parameters");
-                    }
-                    hosting = (Hosting) constructor.newInstance();
-                    JsonObject sharedOptionsObject = GsonHelper.getObject(uploadConfigObject, "SharedOptions");
-                    // TODO: separate SharedOptions and Options
-                    JsonObject optionsObject = GsonHelper.getObject(uploadConfigObject, "Options");
-                    hosting.enable(toOptions(sharedOptionsObject));
-                } catch (Exception e) {
-                    LOGGER.error("Unable to initialize upload system", e);
-                    hosting = null;
-                }
+                Identifier to = Identifier.ofWithFallback(GsonHelper.getString(uploadConfigObject, "To"), "propack");
+                hosting = core.getHostingMap().getHosting(to);
+                JsonObject optionsObject = GsonHelper.getObject(uploadConfigObject, "Options");
+                uploadOptions = toOptions(optionsObject);
             } else {
                 hosting = null;
+                uploadOptions = null;
             }
         } catch (Exception e) {
             throw new IllegalArgumentException("Something went wrong when loading 'config/upload.json5'", e);
         }
 
         BuildConfiguration buildConfiguration = new BuildConfiguration(strictMode, ignoredExtensions,
-                obfuscationConfiguration, allLangTranslations, languages, packageOptions, hosting);
+                obfuscationConfiguration, allLangTranslations, languages, packageOptions, hosting, uploadOptions);
 
         ResourcePack resourcePack = null;
         File builtResourcePack = new File(projectFile.getParentFile(), "build/" + name + ".propack");

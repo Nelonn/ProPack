@@ -16,16 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.builder;
+package me.nelonn.propack.core;
 
-import me.nelonn.propack.builder.task.FileCollection;
-import org.jetbrains.annotations.NotNull;
+import me.nelonn.propack.builder.hosting.HostingMap;
+import me.nelonn.propack.core.loader.ProjectLoader;
 
-import java.io.File;
-import java.util.Map;
+public class ProPackCore {
+    private final SimpleHostingMap hostingMap;
+    private final ProjectLoader projectLoader;
 
-public interface ZipPackager {
+    public ProPackCore() {
+        this.hostingMap = new SimpleHostingMap();
+        this.projectLoader = new ProjectLoader(this);
+    }
 
-    void packageFiles(@NotNull File output, @NotNull FileCollection input, @NotNull Map<String, Object> options);
+    public HostingMap getHostingMap() {
+        return hostingMap;
+    }
 
+    public ProjectLoader getProjectLoader() {
+        return projectLoader;
+    }
 }

@@ -16,22 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.builder;
+package me.nelonn.propack.module;
 
-import me.nelonn.propack.UploadedPack;
-import me.nelonn.propack.Sha1;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+public interface Module {
 
-import java.io.File;
-import java.util.Map;
-
-public interface Hosting {
-
-    void enable(@NotNull Map<String, Object> options);
+    void enable();
 
     void disable();
-
-    @Nullable UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1);
 
 }

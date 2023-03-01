@@ -18,13 +18,10 @@
 
 package me.nelonn.propack.builder;
 
-import me.nelonn.propack.builder.task.Task;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Set;
 
 public interface ProjectBuilder {
 
-    @NotNull Set<Task> getTasks();
+    @NotNull Project getProject();
 
 }

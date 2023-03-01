@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.task;
+package me.nelonn.propack.core.builder.task.provided;
 
 import com.google.gson.JsonObject;
 import me.nelonn.flint.path.PathImpl;
@@ -26,6 +26,8 @@ import me.nelonn.propack.builder.file.JsonFile;
 import me.nelonn.propack.builder.file.RealFile;
 import me.nelonn.propack.builder.file.TextFile;
 import me.nelonn.propack.builder.task.TaskIO;
+import me.nelonn.propack.core.builder.task.AbstractTask;
+import me.nelonn.propack.core.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.core.util.LogManagerCompat;
@@ -37,6 +39,7 @@ import java.io.File;
 
 public class GatherSourcesTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
 
     public GatherSourcesTask(@NotNull Project project) {
         super("gatherSources", project);

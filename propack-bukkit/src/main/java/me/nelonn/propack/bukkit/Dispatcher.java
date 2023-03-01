@@ -60,7 +60,7 @@ public class Dispatcher implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         if (!Settings.DISPATCH_ENABLED.asBoolean()) return;
-        PackDefinition definition = ProPack.getResourcePackContainer().getDefinition(Settings.DISPATCH_PACK.asString());
+        PackDefinition definition = ProPack.getPackContainer().getDefinition(Settings.DISPATCH_PACK.asString());
         if (definition == null) return;
         Optional<ResourcePack> resourcePack = definition.getResourcePack();
         if (resourcePack.isEmpty()) return;

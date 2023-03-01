@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.task;
+package me.nelonn.propack.core.builder.task.provided;
 
 import me.nelonn.propack.Sha1;
 import me.nelonn.propack.builder.Project;
@@ -24,6 +24,8 @@ import me.nelonn.propack.builder.task.FileCollection;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
 import me.nelonn.propack.core.builder.PackageOptions;
+import me.nelonn.propack.core.builder.task.AbstractTask;
+import me.nelonn.propack.core.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +40,7 @@ import java.util.zip.ZipOutputStream;
 
 public class PackageTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
     public static final Extra<File> EXTRA_ZIP = new Extra<>(File.class, "propack.package.zip");
     public static final Extra<File> EXTRA_SHA1_FILE = new Extra<>(File.class, "propack.package.sha1_file");
     public static final Extra<Sha1> EXTRA_SHA1 = new Extra<>(Sha1.class, "propack.package.sha1");

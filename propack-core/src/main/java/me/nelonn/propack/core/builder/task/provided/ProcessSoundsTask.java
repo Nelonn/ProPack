@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.task;
+package me.nelonn.propack.core.builder.task.provided;
 
 import com.google.gson.JsonObject;
 import me.nelonn.flint.path.Path;
@@ -29,6 +29,9 @@ import me.nelonn.propack.core.builder.asset.SoundAssetBuilder;
 import me.nelonn.propack.core.builder.json.sound.Sound;
 import me.nelonn.propack.core.builder.json.sound.SoundEntry;
 import me.nelonn.propack.core.builder.json.sound.SoundEntryDeserializer;
+import me.nelonn.propack.core.builder.task.AbstractTask;
+import me.nelonn.propack.core.builder.task.FileProcessingException;
+import me.nelonn.propack.core.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.PathUtil;
@@ -48,6 +51,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class ProcessSoundsTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
 
     public ProcessSoundsTask(@NotNull Project project) {
         super("processSounds", project);

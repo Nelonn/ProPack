@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.task;
+package me.nelonn.propack.core.builder.task.provided;
 
 import com.google.gson.JsonObject;
 import me.nelonn.flint.path.Path;
@@ -24,6 +24,9 @@ import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.file.File;
 import me.nelonn.propack.builder.file.JsonFile;
 import me.nelonn.propack.builder.task.TaskIO;
+import me.nelonn.propack.core.builder.task.AbstractTask;
+import me.nelonn.propack.core.builder.task.FileProcessingException;
+import me.nelonn.propack.core.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +35,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ProcessLanguagesTask extends AbstractTask {
+    public static final TaskBootstrap BOOTSTRAP = GatherSourcesTask::new;
+
     public ProcessLanguagesTask(@NotNull Project project) {
         super("processLanguages", project);
     }
