@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.task.provided;
+package me.nelonn.propack.core.builder.task;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -37,9 +37,9 @@ import me.nelonn.propack.core.builder.asset.SlotItemModelBuilder;
 import me.nelonn.propack.core.builder.json.mesh.JsonModel;
 import me.nelonn.propack.core.builder.json.mesh.ModelElement;
 import me.nelonn.propack.core.builder.json.mesh.ModelElementFace;
-import me.nelonn.propack.core.builder.task.AbstractTask;
-import me.nelonn.propack.core.builder.task.FileProcessingException;
-import me.nelonn.propack.core.builder.task.TaskBootstrap;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.FileProcessingException;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.*;
 import me.nelonn.propack.definition.Item;
 import org.apache.logging.log4j.Logger;

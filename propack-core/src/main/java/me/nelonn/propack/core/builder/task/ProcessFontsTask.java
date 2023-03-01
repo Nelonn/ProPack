@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.task.provided;
+package me.nelonn.propack.core.builder.task;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -27,9 +27,9 @@ import me.nelonn.propack.builder.file.File;
 import me.nelonn.propack.builder.file.JsonFile;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.core.builder.asset.FontBuilder;
-import me.nelonn.propack.core.builder.task.AbstractTask;
-import me.nelonn.propack.core.builder.task.FileProcessingException;
-import me.nelonn.propack.core.builder.task.TaskBootstrap;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.FileProcessingException;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.PathUtil;
 import org.jetbrains.annotations.NotNull;

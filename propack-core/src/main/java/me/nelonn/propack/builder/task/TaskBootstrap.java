@@ -1,4 +1,4 @@
-package me.nelonn.propack.core.builder.task;
+package me.nelonn.propack.builder.task;
 
 import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.task.Task;

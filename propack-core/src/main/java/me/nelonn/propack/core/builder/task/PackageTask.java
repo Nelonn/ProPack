@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.task.provided;
+package me.nelonn.propack.core.builder.task;
 
 import me.nelonn.propack.Sha1;
 import me.nelonn.propack.builder.Project;
@@ -24,8 +24,8 @@ import me.nelonn.propack.builder.task.FileCollection;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
 import me.nelonn.propack.core.builder.PackageOptions;
-import me.nelonn.propack.core.builder.task.AbstractTask;
-import me.nelonn.propack.core.builder.task.TaskBootstrap;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;

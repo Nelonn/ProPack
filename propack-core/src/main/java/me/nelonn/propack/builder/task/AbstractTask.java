@@ -16,10 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.task;
+package me.nelonn.propack.builder.task;
 
 import me.nelonn.propack.builder.Project;
-import me.nelonn.propack.builder.task.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;

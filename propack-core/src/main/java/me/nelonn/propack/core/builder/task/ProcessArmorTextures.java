@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.task.provided;
+package me.nelonn.propack.core.builder.task;
 
 import com.google.gson.JsonObject;
 import me.nelonn.flint.path.Path;
@@ -28,9 +28,9 @@ import me.nelonn.propack.builder.file.TextFile;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
 import me.nelonn.propack.core.builder.asset.ArmorTextureBuilder;
-import me.nelonn.propack.core.builder.task.AbstractTask;
-import me.nelonn.propack.core.builder.task.FileProcessingException;
-import me.nelonn.propack.core.builder.task.TaskBootstrap;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.FileProcessingException;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.PathUtil;
 import me.nelonn.propack.core.util.Util;

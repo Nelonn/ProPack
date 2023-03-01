@@ -20,8 +20,8 @@ package me.nelonn.propack.core.builder;
 
 import me.nelonn.propack.builder.StrictMode;
 import me.nelonn.propack.builder.hosting.Hosting;
-import me.nelonn.propack.core.builder.task.TaskBootstrap;
-import me.nelonn.propack.core.builder.task.provided.*;
+import me.nelonn.propack.builder.task.TaskBootstrap;
+import me.nelonn.propack.core.builder.task.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
