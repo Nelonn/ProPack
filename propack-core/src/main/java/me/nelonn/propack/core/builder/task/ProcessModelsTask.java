@@ -103,12 +103,14 @@ public class ProcessModelsTask extends AbstractTask {
                                 textureMap.put(combinationElement + '.' + textureEntry.getKey(), textureEntry.getValue());
                             }
                             for (ModelElement modelElement : combMesh.getElements()) {
-                                for (Map.Entry<Direction, ModelElementFace> faceEntry : modelElement.faces.entrySet()) {
+                                Map<Direction, ModelElementFace> faces = new EnumMap<>(modelElement.faces);
+                                for (Map.Entry<Direction, ModelElementFace> faceEntry : faces.entrySet()) {
                                     ModelElementFace face = faceEntry.getValue();
                                     String texture = '#' + combinationElement + '.' + face.textureId.substring(1);
                                     faceEntry.setValue(new ModelElementFace(face.cullFace, face.tintIndex, texture, face.textureData));
                                 }
-                                modelElements.add(modelElement);
+                                modelElements.add(new ModelElement(modelElement.from, modelElement.to, faces,
+                                        modelElement.rotation, modelElement.shade));
                             }
                         }
                         JsonModel generatedMesh = new JsonModel(baseMesh.getParent(), baseMesh.getTextureSize(),
@@ -165,12 +167,14 @@ public class ProcessModelsTask extends AbstractTask {
                                     textureMap.put(slotName + '.' + textureEntry.getKey(), textureEntry.getValue());
                                 }
                                 for (ModelElement modelElement : elementMesh.getElements()) {
-                                    for (Map.Entry<Direction, ModelElementFace> faceEntry : modelElement.faces.entrySet()) {
+                                    Map<Direction, ModelElementFace> faces = new EnumMap<>(modelElement.faces);
+                                    for (Map.Entry<Direction, ModelElementFace> faceEntry : faces.entrySet()) {
                                         ModelElementFace face = faceEntry.getValue();
                                         String texture = '#' + slotName + '.' + face.textureId.substring(1);
                                         faceEntry.setValue(new ModelElementFace(face.cullFace, face.tintIndex, texture, face.textureData));
                                     }
-                                    modelElements.add(modelElement);
+                                    modelElements.add(new ModelElement(modelElement.from, modelElement.to, faces,
+                                            modelElement.rotation, modelElement.shade));
                                 }
                             }
                         });
