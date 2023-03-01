@@ -23,7 +23,6 @@ import com.google.gson.*;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.builder.Hosting;
 import me.nelonn.propack.builder.StrictMode;
-import me.nelonn.propack.builder.ZipPackager;
 import me.nelonn.propack.builder.file.ByteFile;
 import me.nelonn.propack.builder.file.VirtualFile;
 import me.nelonn.propack.builder.loader.ItemDefinitionLoader;
@@ -33,6 +32,7 @@ import me.nelonn.propack.builder.util.Extras;
 import me.nelonn.propack.core.builder.BuildConfiguration;
 import me.nelonn.propack.core.builder.InternalProject;
 import me.nelonn.propack.core.builder.ObfuscationConfiguration;
+import me.nelonn.propack.core.builder.PackageOptions;
 import me.nelonn.propack.core.loader.itemdefinition.JsonFileItemDefinitionLoader;
 import me.nelonn.propack.core.loader.text.LegacyTextLoader;
 import me.nelonn.propack.core.loader.text.MiniMessageTextLoader;
@@ -54,6 +54,7 @@ import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.Deflater;
 
 public class ProjectLoader {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -224,30 +225,32 @@ public class ProjectLoader {
         }
         Set<String> languages = languagesBuilder.build();
 
-        ZipPackager zipPackager;
-        Map<String, Object> packageOptions;
+        PackageOptions packageOptions;
         try {
             File packageConfigFile = new File(projectFile.getParentFile(), "config/package.json5");
             String packageConfigContent = IOUtil.readString(packageConfigFile);
             JsonObject packageConfigObject = GsonHelper.deserialize(packageConfigContent, true);
-
-            String className = GsonHelper.getString(packageConfigObject, "Class");
-            Class<?> clazz = Class.forName(className);
-            if (!ZipPackager.class.isAssignableFrom(clazz)) {
-                throw new IllegalArgumentException("Class '" + className + "' must implement '" +
-                        ZipPackager.class.getName() + "'");
+            int compressionLevel;
+            if (packageConfigObject.has("compression")) {
+                JsonElement jsonElement = packageConfigObject.get("compression");
+                if (GsonHelper.isString(jsonElement)) {
+                    String string = jsonElement.getAsString();
+                    try {
+                        compressionLevel = Deflater.class.getDeclaredField(string).getInt(null);
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException("Compression level with name '" + string + "' not found");
+                    }
+                } else if (GsonHelper.isNumber(jsonElement)) {
+                    compressionLevel = GsonHelper.getInt(packageConfigObject, "compression");
+                } else {
+                    throw new IllegalArgumentException("Expected 'compression' to be a string or number");
+                }
+            } else {
+                compressionLevel = Deflater.BEST_COMPRESSION;
             }
-            Constructor<?> constructor;
-            try {
-                constructor = clazz.getDeclaredConstructor();
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Class '" + className +
-                        "' must have a constructor without parameters");
-            }
-            zipPackager = (ZipPackager) constructor.newInstance();
-
-            JsonObject optionsObject = GsonHelper.getObject(packageConfigObject, "Options");
-            packageOptions = toOptions(optionsObject);
+            boolean protection = GsonHelper.getBoolean(packageConfigObject, "protection", false);
+            String comment = GsonHelper.getString(packageConfigObject, "comment", "");
+            packageOptions = new PackageOptions(compressionLevel, protection, comment);
         } catch (Exception e) {
             throw new IllegalArgumentException("Something went wrong when loading 'config/package.json5'", e);
         }
@@ -289,7 +292,7 @@ public class ProjectLoader {
         }
 
         BuildConfiguration buildConfiguration = new BuildConfiguration(strictMode, ignoredExtensions,
-                obfuscationConfiguration, allLangTranslations, languages, zipPackager, packageOptions, hosting);
+                obfuscationConfiguration, allLangTranslations, languages, packageOptions, hosting);
 
         ResourcePack resourcePack = null;
         File builtResourcePack = new File(projectFile.getParentFile(), "build/" + name + ".propack");

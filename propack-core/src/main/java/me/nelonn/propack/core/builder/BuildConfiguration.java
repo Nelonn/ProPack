@@ -20,7 +20,6 @@ package me.nelonn.propack.core.builder;
 
 import me.nelonn.propack.builder.Hosting;
 import me.nelonn.propack.builder.StrictMode;
-import me.nelonn.propack.builder.ZipPackager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,8 +32,7 @@ public class BuildConfiguration {
     private final ObfuscationConfiguration obfuscationConfiguration;
     private final Map<String, String> allLangTranslations;
     private final Set<String> languages;
-    private final ZipPackager zipPackager;
-    private final Map<String, Object> packageOptions;
+    private final PackageOptions packageOptions;
     private final Hosting hosting;
 
     public BuildConfiguration(@NotNull StrictMode strictMode,
@@ -42,15 +40,13 @@ public class BuildConfiguration {
                               @NotNull ObfuscationConfiguration obfuscationConfiguration,
                               @NotNull Map<String, String> allLangTranslations,
                               @NotNull Set<String> languages,
-                              @NotNull ZipPackager zipPackager,
-                              @NotNull Map<String, Object> packageOptions,
+                              @NotNull PackageOptions packageOptions,
                               @Nullable Hosting hosting) {
         this.strictMode = strictMode;
         this.ignoredExtensions = ignoredExtensions;
         this.obfuscationConfiguration = obfuscationConfiguration;
         this.allLangTranslations = allLangTranslations;
         this.languages = languages;
-        this.zipPackager = zipPackager;
         this.packageOptions = packageOptions;
         this.hosting = hosting;
     }
@@ -75,11 +71,7 @@ public class BuildConfiguration {
         return languages;
     }
 
-    public @NotNull ZipPackager getZipPackager() {
-        return zipPackager;
-    }
-
-    public @NotNull Map<String, Object> getPackageOptions() {
+    public @NotNull PackageOptions getPackageOptions() {
         return packageOptions;
     }
 

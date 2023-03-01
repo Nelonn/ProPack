@@ -18,20 +18,23 @@
 
 package me.nelonn.propack.core.builder.task;
 
+import me.nelonn.propack.Sha1;
 import me.nelonn.propack.builder.Project;
+import me.nelonn.propack.builder.task.FileCollection;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
-import me.nelonn.propack.core.builder.BuildConfiguration;
+import me.nelonn.propack.core.builder.PackageOptions;
 import me.nelonn.propack.core.util.LogManagerCompat;
-import me.nelonn.propack.Sha1;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class PackageTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -65,8 +68,7 @@ public class PackageTask extends AbstractTask {
                 LOGGER.error("Unable to delete " + sha1File, e);
             }
         }
-        BuildConfiguration buildConfiguration = getProject().getBuildConfiguration();
-        buildConfiguration.getZipPackager().packageFiles(zip, io.getFiles(), buildConfiguration.getPackageOptions());
+        packageFiles(zip, io.getFiles(), getProject().getBuildConfiguration().getPackageOptions());
         io.getExtras().put(EXTRA_ZIP, zip);
         me.nelonn.propack.Sha1 sha1;
         try (InputStream inputStream = Files.newInputStream(zip.toPath())) {
@@ -80,6 +82,33 @@ public class PackageTask extends AbstractTask {
             io.getExtras().put(EXTRA_SHA1_FILE, sha1File);
         } catch (Exception e) {
             LOGGER.error("Unable to write " + sha1File.getName(), e);
+        }
+    }
+
+    private void packageFiles(@NotNull File output, @NotNull FileCollection input, @NotNull PackageOptions options) {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(output);
+             ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream, StandardCharsets.UTF_8)) {
+            zipOutputStream.setLevel(options.compressionLevel);
+            zipOutputStream.setComment(options.comment);
+            for (me.nelonn.propack.builder.file.File file : input) {
+                final ZipEntry zipEntry = new ZipEntry(file.getPath());
+                zipEntry.setLastModifiedTime(FileTime.fromMillis(0L));
+                zipOutputStream.putNextEntry(zipEntry);
+                try (InputStream inputStream = file.openInputStream()) {
+                    final byte[] buffer = new byte[1024];
+                    int read;
+                    while ((read = inputStream.read(buffer)) >= 0) {
+                        zipOutputStream.write(buffer, 0, read);
+                    }
+                    zipOutputStream.closeEntry();
+                    if (options.protection) {
+                        zipEntry.setCrc(buffer.length);
+                        zipEntry.setSize(new BigInteger(buffer).mod(BigInteger.valueOf(Long.MAX_VALUE)).longValue());
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot package files", e);
         }
     }
 }
