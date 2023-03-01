@@ -18,8 +18,8 @@
 
 package me.nelonn.propack.cli.command;
 
+import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.core.builder.InternalProject;
-import me.nelonn.propack.core.loader.ProjectLoader;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
@@ -44,8 +44,8 @@ public class BuildCommand implements Runnable {
         } else {
             projectFile = new File(dir, name + File.separator + "project.json5");
         }
-        ProjectLoader projectLoader = new ProjectLoader();
-        InternalProject internalProject = projectLoader.load(projectFile, false);
+        ProPackCore proPackCore = new ProPackCore();
+        InternalProject internalProject = proPackCore.getProjectLoader().load(projectFile, false);
         internalProject.build();
     }
 }
