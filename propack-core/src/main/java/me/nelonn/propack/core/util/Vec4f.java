@@ -22,23 +22,19 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public final class Vec3f {
-    public static final Vec3f NEGATIVE_X = new Vec3f(-1.0F, 0.0F, 0.0F);
-    public static final Vec3f POSITIVE_X = new Vec3f(1.0F, 0.0F, 0.0F);
-    public static final Vec3f NEGATIVE_Y = new Vec3f(0.0F, -1.0F, 0.0F);
-    public static final Vec3f POSITIVE_Y = new Vec3f(0.0F, 1.0F, 0.0F);
-    public static final Vec3f NEGATIVE_Z = new Vec3f(0.0F, 0.0F, -1.0F);
-    public static final Vec3f POSITIVE_Z = new Vec3f(0.0F, 0.0F, 1.0F);
-    public static final Vec3f ZERO = new Vec3f(0.0F, 0.0F, 0.0F);
+public final class Vec4f {
+    public static final Vec4f ZERO = new Vec4f(0.0F, 0.0F, 0.0F, 0.0F);
 
     private final float x;
     private final float y;
     private final float z;
+    private final float w;
 
-    public Vec3f(float x, float y, float z) {
+    public Vec4f(float x, float y, float z, float w) {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.w = w;
     }
 
     public float getX() {
@@ -53,41 +49,46 @@ public final class Vec3f {
         return z;
     }
 
-    public @NotNull Vec3f scale(float scale) {
-        return new Vec3f(x * scale, y * scale, z * scale);
+    public float getW() {
+        return w;
     }
 
-    public @NotNull Vec3f add(float x, float y, float z) {
-        return new Vec3f(this.x + x, this.y + y, this.z + z);
+    public @NotNull Vec4f scale(float scale) {
+        return new Vec4f(x * scale, y * scale, z * scale, w * scale);
     }
 
-    public @NotNull Vec3f add(@NotNull Vec3f vec) {
-        return add(vec.getX(), vec.getY(), vec.getZ());
+    public @NotNull Vec4f add(float x, float y, float z, float w) {
+        return new Vec4f(this.x + x, this.y + y, this.z + z, this.w + w);
     }
 
-    public @NotNull Vec3f subtract(float x, float y, float z) {
-        return new Vec3f(this.x - x, this.y - y, this.z - z);
+    public @NotNull Vec4f add(@NotNull Vec4f vec) {
+        return add(vec.getX(), vec.getY(), vec.getZ(), vec.getW());
     }
 
-    public @NotNull Vec3f subtract(@NotNull Vec3f vec) {
-        return subtract(vec.getX(), vec.getY(), vec.getZ());
+    public @NotNull Vec4f subtract(float x, float y, float z, float w) {
+        return new Vec4f(this.x - x, this.y - y, this.z - z, this.w - w);
+    }
+
+    public @NotNull Vec4f subtract(@NotNull Vec4f vec) {
+        return subtract(vec.getX(), vec.getY(), vec.getZ(), vec.getW());
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Vec3f vec3f = (Vec3f) o;
-        return Float.compare(vec3f.x, x) == 0 && Float.compare(vec3f.y, y) == 0 && Float.compare(vec3f.z, z) == 0;
+        Vec4f vec4f = (Vec4f) o;
+        return Float.compare(vec4f.x, x) == 0 && Float.compare(vec4f.y, y) == 0 &&
+                Float.compare(vec4f.z, z) == 0 && Float.compare(vec4f.w, w) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y, z);
+        return Objects.hash(x, y, z, w);
     }
 
     @Override
     public String toString() {
-        return '[' + this.x + ", " + this.y + ", " + this.z + ']';
+        return '[' + this.x + ", " + this.y + ", " + this.z + ", " + this.w + ']';
     }
 }

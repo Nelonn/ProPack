@@ -20,34 +20,36 @@ package me.nelonn.propack.core.builder.json.mesh;
 
 import com.google.gson.*;
 import me.nelonn.propack.core.util.GsonHelper;
+import me.nelonn.propack.core.util.Util;
+import me.nelonn.propack.core.util.Vec4f;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
 public class ModelElementTexture {
-    public float[] uvs;
+    private Vec4f uv;
     public final int rotation;
 
-    public ModelElementTexture(@Nullable float[] uvs, int rotation) {
-        this.uvs = uvs;
+    public ModelElementTexture(@Nullable Vec4f uv, int rotation) {
+        this.uv = uv;
         this.rotation = rotation;
     }
 
     public float getU(int rotation) {
-        if (this.uvs == null) {
-            throw new NullPointerException("uvs");
+        if (this.uv == null) {
+            throw new NullPointerException("uv");
         } else {
-            int i = this.getRotatedUVIndex(rotation);
-            return this.uvs[i != 0 && i != 1 ? 2 : 0];
+            int i = getRotatedUVIndex(rotation);
+            return i != 0 && i != 1 ? uv.getZ() : uv.getX();
         }
     }
 
     public float getV(int rotation) {
-        if (this.uvs == null) {
-            throw new NullPointerException("uvs");
+        if (this.uv == null) {
+            throw new NullPointerException("uv");
         } else {
-            int i = this.getRotatedUVIndex(rotation);
-            return this.uvs[i != 0 && i != 3 ? 3 : 1];
+            int i = getRotatedUVIndex(rotation);
+            return i != 0 && i != 3 ? uv.getW() : uv.getY();
         }
     }
 
@@ -56,27 +58,28 @@ public class ModelElementTexture {
     }
 
     public int getDirectionIndex(int offset) {
-        return (offset + 4 - this.rotation / 90) % 4;
+        return (offset + 4 - rotation / 90) % 4;
     }
 
-    public void setUvs(float[] uvs) {
-        if (this.uvs == null) {
-            this.uvs = uvs;
-        }
+    public Vec4f getUV() {
+        return uv;
+    }
 
+    public void setUV(Vec4f uv) {
+        if (this.uv == null) {
+            this.uv = uv;
+        }
     }
 
     protected static class Deserializer implements JsonDeserializer<ModelElementTexture>, JsonSerializer<ModelElementTexture> {
-        private static final int DEFAULT_ROTATION = 0;
-
         protected Deserializer() {
         }
 
         public ModelElementTexture deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            float[] fs = this.deserializeUVs(jsonObject);
-            int i = this.deserializeRotation(jsonObject);
-            return new ModelElementTexture(fs, i);
+            Vec4f uv = jsonObject.has("uv") ? Util.parseVec4f(jsonObject, "uv") : null;
+            int i = deserializeRotation(jsonObject);
+            return new ModelElementTexture(uv, i);
         }
 
         protected int deserializeRotation(JsonObject object) {
@@ -88,34 +91,9 @@ public class ModelElementTexture {
             }
         }
 
-        @Nullable
-        private float[] deserializeUVs(JsonObject object) {
-            if (!object.has("uv")) {
-                return null;
-            } else {
-                JsonArray jsonArray = GsonHelper.getArray(object, "uv");
-                if (jsonArray.size() != 4) {
-                    throw new JsonParseException("Expected 4 uv values, found: " + jsonArray.size());
-                } else {
-                    float[] fs = new float[4];
-
-                    for(int i = 0; i < fs.length; ++i) {
-                        fs[i] = GsonHelper.asFloat(jsonArray.get(i), "uv[" + i + "]");
-                    }
-
-                    return fs;
-                }
-            }
-        }
-
         public JsonElement serialize(ModelElementTexture modelElementTexture, Type type, JsonSerializationContext jsonSerializationContext) {
             JsonObject jsonObject = new JsonObject();
-            JsonArray jsonArray = new JsonArray();
-            jsonArray.add(modelElementTexture.uvs[0]);
-            jsonArray.add(modelElementTexture.uvs[1]);
-            jsonArray.add(modelElementTexture.uvs[2]);
-            jsonArray.add(modelElementTexture.uvs[3]);
-            jsonObject.add("uv", jsonArray);
+            jsonObject.add("uv", Util.serializeVec4f(modelElementTexture.getUV()));
             if (modelElementTexture.rotation != 0) {
                 jsonObject.addProperty("rotation", modelElementTexture.rotation);
             }

@@ -20,6 +20,7 @@ package me.nelonn.propack.core.builder.json.mesh;
 
 import me.nelonn.propack.core.util.Direction;
 import me.nelonn.propack.core.util.Vec3f;
+import org.jetbrains.annotations.NotNull;
 
 public class ModelRotation {
     public final Vec3f origin;
@@ -27,7 +28,7 @@ public class ModelRotation {
     public final float angle;
     public final boolean rescale;
 
-    public ModelRotation(Vec3f origin, Direction.Axis axis, float angle, boolean rescale) {
+    public ModelRotation(@NotNull Vec3f origin, @NotNull Direction.Axis axis, float angle, boolean rescale) {
         this.origin = origin;
         this.axis = axis;
         this.angle = angle;

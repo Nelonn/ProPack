@@ -174,7 +174,7 @@ public class JsonModel {
 
             String parent = GsonHelper.getString(jsonObject, "parent", "");
 
-            Vec2i textureSize = Util.parseVector2i(jsonObject, "texture_size", DEFAULT_TEXTURE_SIZE);
+            Vec2i textureSize = Util.parseVec2i(jsonObject, "texture_size", DEFAULT_TEXTURE_SIZE);
 
             Map<String, String> textures = texturesFromJson(jsonObject);
 
@@ -240,7 +240,7 @@ public class JsonModel {
                 jsonObject.addProperty("parent", model.parent);
             }
             if (model.textureSize != null) {
-                jsonObject.add("texture_size", Util.serializeVector2i(model.textureSize));
+                jsonObject.add("texture_size", Util.serializeVec2i(model.textureSize));
             }
             if (model.textureMap != null) {
                 JsonObject textures = new JsonObject();

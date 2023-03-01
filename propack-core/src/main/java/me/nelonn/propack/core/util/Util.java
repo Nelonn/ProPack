@@ -42,7 +42,7 @@ public final class Util {
                 Integer.valueOf(hex.substring(4, 6), 16));
     }
 
-    public static Vec2i parseVector2i(@NotNull JsonObject json, @NotNull String key, @Nullable Vec2i fallback) {
+    public static Vec2i parseVec2i(@NotNull JsonObject json, @NotNull String key, @Nullable Vec2i fallback) {
         if (!json.has(key)) return fallback;
         JsonArray jsonArray = GsonHelper.getArray(json, key);
         if (jsonArray.size() != 2) {
@@ -55,8 +55,7 @@ public final class Util {
         return new Vec2i(arr[0], arr[1]);
     }
 
-    public static Vec3f parseVector3f(@NotNull JsonObject json, @NotNull String key, @Nullable Vec3f fallback) {
-        if (!json.has(key)) return fallback;
+    public static Vec3f parseVec3f(@NotNull JsonObject json, @NotNull String key) {
         JsonArray jsonArray = GsonHelper.getArray(json, key);
         if (jsonArray.size() != 3) {
             throw new JsonParseException("Expected 3 '" + key + "' values, found: " + jsonArray.size());
@@ -68,18 +67,44 @@ public final class Util {
         return new Vec3f(arr[0], arr[1], arr[2]);
     }
 
-    public static @NotNull JsonArray serializeVector2i(@NotNull Vec2i vec2i) {
+    public static Vec3f parseVec3f(@NotNull JsonObject json, @NotNull String key, @Nullable Vec3f fallback) {
+        if (!json.has(key)) return fallback;
+        return parseVec3f(json, key);
+    }
+
+    public static Vec4f parseVec4f(@NotNull JsonObject json, @NotNull String key) {
+        JsonArray jsonArray = GsonHelper.getArray(json, key);
+        if (jsonArray.size() != 4) {
+            throw new JsonParseException("Expected 4 '" + key + "' values, found: " + jsonArray.size());
+        }
+        float[] arr = new float[4];
+        for (int i = 0; i < arr.length; ++i) {
+            arr[i] = GsonHelper.asFloat(jsonArray.get(i), key + '[' + i + ']');
+        }
+        return new Vec4f(arr[0], arr[1], arr[2], arr[3]);
+    }
+
+    public static @NotNull JsonArray serializeVec2i(@NotNull Vec2i vec2i) {
         JsonArray jsonArray = new JsonArray();
         jsonArray.add(vec2i.getX());
         jsonArray.add(vec2i.getY());
         return jsonArray;
     }
 
-    public static @NotNull JsonArray serializeVector3f(@NotNull Vec3f vec3f) {
+    public static @NotNull JsonArray serializeVec3f(@NotNull Vec3f vec3f) {
         JsonArray jsonArray = new JsonArray();
         jsonArray.add(vec3f.getX());
         jsonArray.add(vec3f.getY());
         jsonArray.add(vec3f.getZ());
+        return jsonArray;
+    }
+
+    public static @NotNull JsonArray serializeVec4f(@NotNull Vec4f vec4f) {
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add(vec4f.getX());
+        jsonArray.add(vec4f.getY());
+        jsonArray.add(vec4f.getZ());
+        jsonArray.add(vec4f.getW());
         return jsonArray;
     }
 

@@ -23,9 +23,10 @@ import me.nelonn.propack.core.util.Util;
 import me.nelonn.propack.core.util.Vec3f;
 
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 public class Transformation {
-    public static final Transformation IDENTITY = new Transformation(new Vec3f(), new Vec3f(), new Vec3f(1.0F, 1.0F, 1.0F));
+    public static final Transformation IDENTITY = new Transformation(Vec3f.ZERO, Vec3f.ZERO, new Vec3f(1.0F, 1.0F, 1.0F));
     public final Vec3f rotation;
     public final Vec3f translation;
     public final Vec3f scale;
@@ -36,22 +37,17 @@ public class Transformation {
         this.scale = scale;
     }
 
+    @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (this.getClass() != o.getClass()) {
-            return false;
-        } else {
-            Transformation transformation = (Transformation)o;
-            return this.rotation.equals(transformation.rotation) && this.scale.equals(transformation.scale) && this.translation.equals(transformation.translation);
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transformation that = (Transformation) o;
+        return Objects.equals(rotation, that.rotation) && Objects.equals(translation, that.translation) && Objects.equals(scale, that.scale);
     }
 
+    @Override
     public int hashCode() {
-        int i = this.rotation.hashCode();
-        i = 31 * i + this.translation.hashCode();
-        i = 31 * i + this.scale.hashCode();
-        return i;
+        return Objects.hash(rotation, translation, scale);
     }
 
     protected static class Deserializer implements JsonDeserializer<Transformation>, JsonSerializer<Transformation> {
@@ -64,25 +60,22 @@ public class Transformation {
 
         public Transformation deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            Vec3f rotationVec = Util.parseVector3f(jsonObject, "rotation", DEFAULT_ROTATION);
-            Vec3f translationVec = Util.parseVector3f(jsonObject, "translation", DEFAULT_TRANSLATION);
-            //translationVec.scale(0.0625F);
-            //translationVec.clamp(-5.0F, 5.0F);
-            Vec3f scaleVec = Util.parseVector3f(jsonObject, "scale", DEFAULT_SCALE);
-            //scaleVec.clamp(-4.0F, 4.0F);
+            Vec3f rotationVec = Util.parseVec3f(jsonObject, "rotation", DEFAULT_ROTATION);
+            Vec3f translationVec = Util.parseVec3f(jsonObject, "translation", DEFAULT_TRANSLATION);
+            Vec3f scaleVec = Util.parseVec3f(jsonObject, "scale", DEFAULT_SCALE);
             return new Transformation(rotationVec, translationVec, scaleVec);
         }
 
         public JsonElement serialize(Transformation transformation, Type type, JsonSerializationContext jsonSerializationContext) {
             JsonObject jsonObject = new JsonObject();
             if (transformation.rotation != DEFAULT_ROTATION) {
-                jsonObject.add("rotation", Util.serializeVector3f(transformation.rotation));
+                jsonObject.add("rotation", Util.serializeVec3f(transformation.rotation));
             }
             if (transformation.translation != DEFAULT_TRANSLATION) {
-                jsonObject.add("translation", Util.serializeVector3f(transformation.translation));
+                jsonObject.add("translation", Util.serializeVec3f(transformation.translation));
             }
             if (transformation.scale != DEFAULT_SCALE) {
-                jsonObject.add("scale", Util.serializeVector3f(transformation.scale));
+                jsonObject.add("scale", Util.serializeVec3f(transformation.scale));
             }
             return jsonObject;
         }

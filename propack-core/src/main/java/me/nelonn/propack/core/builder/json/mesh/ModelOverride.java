@@ -23,39 +23,40 @@ import com.google.common.collect.Maps;
 import com.google.gson.*;
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.propack.core.util.GsonHelper;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class ModelOverride {
-    private final Identifier modelId;
+    private final String model;
     private final List<Condition> conditions;
 
-    public ModelOverride(Identifier modelId, List<Condition> conditions) {
-        this.modelId = modelId;
+    public ModelOverride(@NotNull String model, @NotNull List<Condition> conditions) {
+        this.model = model;
         this.conditions = ImmutableList.copyOf(conditions);
     }
 
-    public Identifier getModelId() {
-        return this.modelId;
+    public @NotNull String getModel() {
+        return model;
     }
 
-    public Stream<Condition> streamConditions() {
-        return this.conditions.stream();
+    public @NotNull List<Condition> getConditions() {
+        return new ArrayList<>(conditions);
     }
 
     public static class Condition {
         private final Identifier type;
         private final float threshold;
 
-        public Condition(Identifier type, float threshold) {
+        public Condition(@NotNull Identifier type, float threshold) {
             this.type = type;
             this.threshold = threshold;
         }
 
-        public Identifier getType() {
+        public @NotNull Identifier getType() {
             return this.type;
         }
 
@@ -70,20 +71,18 @@ public class ModelOverride {
 
         public ModelOverride deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            Identifier identifier = Identifier.of(GsonHelper.getString(jsonObject, "model"));
-            List<Condition> list = this.deserializeMinPropertyValues(jsonObject);
-            return new ModelOverride(identifier, list);
+            String model = GsonHelper.getString(jsonObject, "model");
+            List<Condition> list = deserializeMinPropertyValues(jsonObject);
+            return new ModelOverride(model, list);
         }
 
         protected List<Condition> deserializeMinPropertyValues(JsonObject object) {
             Map<Identifier, Float> map = Maps.newLinkedHashMap();
             JsonObject jsonObject = GsonHelper.getObject(object, "predicate");
-
             for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                 map.put(Identifier.of(entry.getKey()), GsonHelper.asFloat(entry.getValue(), entry.getKey()));
             }
-
-            return map.entrySet().stream().map((entry) -> new Condition(entry.getKey(), entry.getValue())).collect(ImmutableList.toImmutableList());
+            return map.entrySet().stream().map(entry -> new Condition(entry.getKey(), entry.getValue())).collect(ImmutableList.toImmutableList());
         }
     }
 }

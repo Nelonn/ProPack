@@ -23,11 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public final class Vec2i {
-    private int x;
-    private int y;
+    public static final Vec2i ZERO = new Vec2i(0, 0);
 
-    public Vec2i() {
-    }
+    private final int x;
+    private final int y;
 
     public Vec2i(int x, int y) {
         this.x = x;
@@ -42,23 +41,23 @@ public final class Vec2i {
         return y;
     }
 
-    public Vec2i scale(int scale) {
+    public @NotNull Vec2i scale(int scale) {
         return new Vec2i(x * scale, y * scale);
     }
 
-    public Vec2i add(int x, int y) {
+    public @NotNull Vec2i add(int x, int y) {
         return new Vec2i(this.x + x, this.y + y);
     }
 
-    public Vec2i add(@NotNull Vec2i vec) {
+    public @NotNull Vec2i add(@NotNull Vec2i vec) {
         return add(vec.getX(), vec.getY());
     }
 
-    public Vec2i subtract(int x, int y) {
+    public @NotNull Vec2i subtract(int x, int y) {
         return new Vec2i(this.x - x, this.y - y);
     }
 
-    public Vec2i subtract(@NotNull Vec2i vec) {
+    public @NotNull Vec2i subtract(@NotNull Vec2i vec) {
         return subtract(vec.getX(), vec.getY());
     }
 

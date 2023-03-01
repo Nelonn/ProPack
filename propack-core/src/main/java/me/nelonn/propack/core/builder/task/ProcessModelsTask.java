@@ -285,7 +285,7 @@ public class ProcessModelsTask extends AbstractTask {
         } else {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
             elementMeshPath = PathUtil.resolve(GsonHelper.getString(jsonObject, "Mesh"), resourcePath);
-            offset = Util.parseVector3f(jsonObject, "Offset", Vec3f.ZERO);
+            offset = Util.parseVec3f(jsonObject, "Offset", Vec3f.ZERO);
         }
         File elementMeshFile = io.getFiles().getFile(PathUtil.contentPath(elementMeshPath) + ".mesh.json");
         if (!(elementMeshFile instanceof JsonFile)) {
