@@ -21,7 +21,7 @@ package me.nelonn.propack.bukkit;
 import com.google.common.base.Preconditions;
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.propack.definition.Item;
-import me.nelonn.propack.bukkit.resourcepack.ResourcePackContainer;
+import me.nelonn.propack.bukkit.resourcepack.PackContainer;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +38,7 @@ public final class ProPack {
         ProPack.plugin = plugin;
     }
 
-    public static @NotNull ResourcePackContainer getResourcePackContainer() {
+    public static @NotNull PackContainer getResourcePackContainer() {
         return plugin.getResourcePackContainer();
     }
 

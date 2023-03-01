@@ -19,12 +19,29 @@
 package me.nelonn.propack.bukkit.resourcepack;
 
 import me.nelonn.propack.ResourcePack;
+import me.nelonn.propack.builder.Project;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public interface ResourcePackDefinition {
-    @NotNull String getName();
+public class ProjectDefinition implements PackDefinition {
+    private final Project project;
 
-    @NotNull Optional<ResourcePack> getResourcePack();
+    public ProjectDefinition(@NotNull Project project) {
+        this.project = project;
+    }
+
+    @Override
+    public @NotNull String getName() {
+        return project.getName();
+    }
+
+    @Override
+    public @NotNull Optional<ResourcePack> getResourcePack() {
+        return project.getResourcePack();
+    }
+
+    public @NotNull Project getProject() {
+        return project;
+    }
 }

@@ -39,13 +39,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ResourcePackContainer {
+public class PackContainer {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private final Map<String, ResourcePackDefinition> definitions = new HashMap<>();
+    private final Map<String, PackDefinition> definitions = new HashMap<>();
     private final ProjectLoader projectLoader;
     private final File directory;
 
-    public ResourcePackContainer(@NotNull File directory) {
+    public PackContainer(@NotNull File directory) {
         this.directory = directory;
         List<ItemDefinitionLoader> itemDefinitionLoaders = new ArrayList<>();
         itemDefinitionLoaders.add(JsonFileItemDefinitionLoader.INSTANCE);
@@ -75,7 +75,7 @@ public class ResourcePackContainer {
                     if (buildAtStartup || internalProject.getResourcePack().isEmpty()) {
                         internalProject.build(); // TODO: improve
                     }
-                    ProjectResourcePackDefinition resourcePackDefinition = new ProjectResourcePackDefinition(internalProject);
+                    ProjectDefinition resourcePackDefinition = new ProjectDefinition(internalProject);
                     definitions.put(name, resourcePackDefinition);
                 } else if (type.equalsIgnoreCase("File")) {
                     throw new UnsupportedOperationException("Resource pack definition type 'File' currently not supported");
@@ -87,11 +87,11 @@ public class ResourcePackContainer {
         }
     }
 
-    public @Nullable ResourcePackDefinition getDefinition(@NotNull String name) {
+    public @Nullable PackDefinition getDefinition(@NotNull String name) {
         return definitions.get(name);
     }
 
-    public List<ResourcePackDefinition> getDefinitions() {
+    public List<PackDefinition> getDefinitions() {
         return definitions.values().stream().toList();
     }
 

@@ -22,7 +22,7 @@ import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
-import me.nelonn.propack.bukkit.resourcepack.ResourcePackContainer;
+import me.nelonn.propack.bukkit.resourcepack.PackContainer;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -40,7 +40,7 @@ public final class ProPackPlugin extends JavaPlugin {
     }
 
     private BukkitAudiences adventure;
-    private ResourcePackContainer resourcePackContainer;
+    private PackContainer packContainer;
     private Dispatcher dispatcher;
 
     @Override
@@ -59,7 +59,7 @@ public final class ProPackPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         adventure = BukkitAudiences.create(this);
-        resourcePackContainer = new ResourcePackContainer(getDataFolder());
+        packContainer = new PackContainer(getDataFolder());
         reloadConfigs();
 
         dispatcher = new Dispatcher(this);
@@ -83,7 +83,7 @@ public final class ProPackPlugin extends JavaPlugin {
 
     public void reloadConfigs() {
         reloadConfig();
-        resourcePackContainer.loadAll();
+        packContainer.loadAll();
     }
 
     public @NotNull BukkitAudiences adventure() {
@@ -93,8 +93,8 @@ public final class ProPackPlugin extends JavaPlugin {
         return this.adventure;
     }
 
-    public ResourcePackContainer getResourcePackContainer() {
-        return resourcePackContainer;
+    public PackContainer getResourcePackContainer() {
+        return packContainer;
     }
 
     public Dispatcher getDispatcher() {

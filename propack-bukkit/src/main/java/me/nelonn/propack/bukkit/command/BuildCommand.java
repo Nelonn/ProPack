@@ -22,8 +22,8 @@ import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.Util;
-import me.nelonn.propack.bukkit.resourcepack.ProjectResourcePackDefinition;
-import me.nelonn.propack.bukkit.resourcepack.ResourcePackDefinition;
+import me.nelonn.propack.bukkit.resourcepack.ProjectDefinition;
+import me.nelonn.propack.bukkit.resourcepack.PackDefinition;
 import me.nelonn.propack.core.builder.InternalProject;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -46,11 +46,11 @@ public class BuildCommand extends Command {
             Util.send(sender, "<red>Usage: /" + s + " <project>");
             return;
         }
-        ResourcePackDefinition definition = ProPack.getResourcePackContainer().getDefinition(args[0]);
-        if (!(definition instanceof ProjectResourcePackDefinition)) {
+        PackDefinition definition = ProPack.getResourcePackContainer().getDefinition(args[0]);
+        if (!(definition instanceof ProjectDefinition)) {
             Util.send(sender, "<red>Resource pack '" + args[0] + "' is not project");
         }
-        ProjectResourcePackDefinition projectDefinition = (ProjectResourcePackDefinition) definition;
+        ProjectDefinition projectDefinition = (ProjectDefinition) definition;
         new Thread(() -> {
             try {
                 InternalProject internalProject = (InternalProject) projectDefinition.getProject();
