@@ -49,6 +49,14 @@ public abstract class Hosting {
         return false;
     }
 
+    public final boolean unregister(@NotNull HostingMap hostingMap) {
+        if (allowChangesFrom(hostingMap)) {
+            this.hostingMap = null;
+            return true;
+        }
+        return false;
+    }
+
     private boolean allowChangesFrom(@NotNull HostingMap hostingMap) {
         return this.hostingMap == null || this.hostingMap == hostingMap;
     }

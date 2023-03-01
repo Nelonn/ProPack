@@ -29,6 +29,8 @@ public interface HostingMap {
 
     void registerAll(@NotNull String namespace, @NotNull List<Hosting> hostings);
 
+    boolean unregister(@NotNull String namespace, @NotNull Hosting hosting);
+
     @NotNull Hosting getHosting(@NotNull Identifier id);
 
     @NotNull Map<Identifier, Hosting> getKnownHostings();

@@ -6,6 +6,11 @@ dispatch:
   pack: example
   prompt: "&#fa4943Accept the pack to enjoy a full experience"
 
+dev_server:
+  enabled: false
+  return_ip: '127.0.0.1'
+  port: 3000
+
 patch_packets:
   items: true
   sounds: true

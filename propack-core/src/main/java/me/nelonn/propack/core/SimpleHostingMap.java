@@ -31,11 +31,6 @@ public class SimpleHostingMap implements HostingMap {
     protected final Map<Identifier, Hosting> knownHostings = new HashMap<>();
 
     public SimpleHostingMap() {
-        setDefaultHosting();
-    }
-
-    private void setDefaultHosting() {
-        register("propack", new DevServer("dev_server", "127.0.0.1", 3000));
     }
 
     @Override
@@ -52,6 +47,15 @@ public class SimpleHostingMap implements HostingMap {
         for (Hosting hosting : hostings) {
             register(namespace, hosting);
         }
+    }
+
+    @Override
+    public boolean unregister(@NotNull String namespace, @NotNull Hosting hosting) {
+        if (hosting.unregister(this)) {
+            knownHostings.remove(Identifier.of(namespace, hosting.getName()));
+            return true;
+        }
+        return false;
     }
 
     @Override

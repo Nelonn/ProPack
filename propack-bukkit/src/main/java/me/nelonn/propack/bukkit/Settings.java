@@ -31,6 +31,10 @@ public enum Settings {
     DISPATCH_PACK("dispatch.pack"),
     DISPATCH_PROMPT("dispatch.prompt", "&#fa4943Accept the pack to enjoy a full experience"),
 
+    DEV_SERVER_ENABLED("dev_server.enabled", false),
+    DEV_SERVER_RETURN_IP("dev_server.return_ip", "127.0.0.1"),
+    DEV_SERVER_PORT("dev_server.port", 3000),
+
     PATCH_PACKETS_ITEMS("patch_packets.items", true),
     PATCH_PACKETS_SOUNDS("patch_packets.sounds", true);
 
@@ -60,6 +64,10 @@ public enum Settings {
 
     public Boolean asBoolean() {
         return (Boolean) getValue();
+    }
+
+    public Integer asInteger() {
+        return (Integer) getValue();
     }
 
     public List<String> asStringList() {
