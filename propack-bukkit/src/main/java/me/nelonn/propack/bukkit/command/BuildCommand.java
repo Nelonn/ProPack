@@ -22,14 +22,17 @@ import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.Util;
-import me.nelonn.propack.bukkit.resourcepack.ProjectDefinition;
 import me.nelonn.propack.bukkit.resourcepack.PackDefinition;
+import me.nelonn.propack.bukkit.resourcepack.ProjectDefinition;
 import me.nelonn.propack.core.builder.InternalProject;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 public class BuildCommand extends Command {
@@ -46,11 +49,11 @@ public class BuildCommand extends Command {
             Util.send(sender, "<red>Usage: /" + s + " <project>");
             return;
         }
-        PackDefinition definition = ProPack.getPackContainer().getDefinition(args[0]);
-        if (!(definition instanceof ProjectDefinition)) {
+        PackDefinition definition = plugin.getPackContainer().getDefinition(args[0]);
+        if (!(definition instanceof ProjectDefinition projectDefinition)) {
             Util.send(sender, "<red>Resource pack '" + args[0] + "' is not project");
+            return;
         }
-        ProjectDefinition projectDefinition = (ProjectDefinition) definition;
         new Thread(() -> {
             try {
                 InternalProject internalProject = (InternalProject) projectDefinition.getProject();
@@ -59,7 +62,7 @@ public class BuildCommand extends Command {
                 if (resourcePack.isUploaded()) {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         Optional<ResourcePack> playerPack = ProPack.getDispatcher().getResourcePack(player);
-                        if (playerPack.isPresent() && playerPack.get().equals(resourcePack)) {
+                        if (playerPack.isPresent() && playerPack.get().getName().equals(resourcePack.getName())) {
                             ProPack.getDispatcher().sendPack(player, resourcePack);
                         }
                     }
@@ -70,5 +73,14 @@ public class BuildCommand extends Command {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    @Override
+    protected List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
+        if (args.length > 1) return Collections.emptyList();
+        String lower = args.length == 0 ? "" : args[0].toLowerCase(Locale.ROOT);
+        return plugin.getPackContainer().getDefinitions().stream().filter(packDefinition -> {
+            return packDefinition instanceof ProjectDefinition && packDefinition.getName().startsWith(lower);
+        }).map(PackDefinition::getName).toList();
     }
 }
