@@ -92,7 +92,7 @@ public class ProcessModelsTask extends AbstractTask {
                         combinationElements.put(elementEntry.getKey(), elementMesh);
                     }
                     for (List<String> combination : CombinationUtil.generateAllCombinations(combinationElements.keySet())) {
-                        String combinationStr = String.join("&", combination.toArray(new String[0]));
+                        String combinationStr = String.join("&", combination.stream().sorted().toArray(String[]::new));
                         String hex = Integer.toHexString(combinationStr.hashCode());
                         Path generatedPath = PathUtil.append(resourcePath, '-' + hex);
                         Map<String, String> textureMap = new HashMap<>(baseTextureMap);

@@ -38,15 +38,18 @@ public class CombinedItemModel extends MultiItemModel {
 
     public @NotNull Path getMesh(String... elements) {
         if (elements.length == 0) return baseMesh;
-        for (String element : elements) {
-            if (!this.elements.contains(element)) {
-                throw new IllegalArgumentException(this + " does not contain element '" + element + "'");
-            }
-        }
         StringBuilder sb = new StringBuilder();
-        Arrays.stream(elements).sorted().forEach(s -> sb.append('&').append(s));
-        String hex = Integer.toHexString(sb.substring(1).hashCode());
-        return Path.of(baseMesh.getNamespace(), baseMesh.getValue() + '-' + hex);
+        Arrays.stream(elements).sorted().forEach(s -> {
+            if (!this.elements.contains(s)) {
+                throw new IllegalArgumentException(this + " does not contain element '" + s + "'");
+            }
+            if (sb.length() > 0) {
+                sb.append('&');
+            }
+            sb.append(s);
+        });
+        String hex = Integer.toHexString(sb.toString().hashCode());
+        return Path.of(path.getNamespace(), path.getValue() + '-' + hex);
     }
 
     public @NotNull Set<String> getElements() {
