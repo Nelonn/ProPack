@@ -18,22 +18,46 @@
 
 package me.nelonn.propack.module;
 
-public class JavaModule implements Module { // TODO: module loading system
+import me.nelonn.propack.core.ProPackCore;
+
+public abstract class JavaModule implements Module { // TODO: module loading system
+    private boolean enabled = false;
+    private ProPackCore core = null;
+
     @Override
     public final void enable() {
-
+        if (enabled) return;
+        enabled = true;
+        onEnable();
     }
 
     protected void onEnable() {
-
     }
 
     @Override
     public final void disable() {
-
+        if (!enabled) return;
+        enabled = false;
+        onDisable();
     }
 
     protected void onDisable() {
+    }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        if (this.enabled != enabled) {
+            this.enabled = enabled;
+            if (this.enabled) {
+                onEnable();
+            } else {
+                onDisable();
+            }
+        }
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 }

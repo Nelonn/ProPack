@@ -24,4 +24,8 @@ public interface Module {
 
     void disable();
 
+    void setEnabled(final boolean enabled);
+
+    boolean isEnabled();
+
 }
