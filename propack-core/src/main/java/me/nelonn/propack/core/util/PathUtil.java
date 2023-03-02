@@ -32,8 +32,8 @@ public final class PathUtil {
         if (!input.startsWith("./") && !input.startsWith("../")) {
             return Path.ofWithFallback(input, curNamespace);
         }
-        List<String> path = new ArrayList<>(Arrays.asList(curPath.split("\\/")));
-        String[] relative = input.split("\\/");
+        List<String> path = new ArrayList<>(Arrays.asList(curPath.split("/")));
+        String[] relative = input.split("/");
         for (String s : relative) {
             if (s.equals("..")) {
                 path.remove(path.size() - 1);
