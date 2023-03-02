@@ -21,6 +21,7 @@ package me.nelonn.propack.core.builder.task;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.asset.SlotItemModel;
@@ -266,20 +267,23 @@ public class ProcessModelsTask extends AbstractTask {
             String target = GsonHelper.getString(model, "Target");
             Item item = getProject().getItemDefinition().getItem(Identifier.of(target));
             if (item == null) {
-                throw new IllegalArgumentException("Item not found:" + target);
+                throw new JsonParseException("Item not found: " + target);
             }
             output.add(item);
         } else if (GsonHelper.hasArray(model, "Target")) {
             JsonArray targets = GsonHelper.getArray(model, "Target");
+            if (targets.isEmpty()) {
+                throw new JsonParseException("Target cannot be empty");
+            }
             for (JsonElement target : targets) {
                 Item item = getProject().getItemDefinition().getItem(Identifier.of(target.getAsString()));
                 if (item == null) {
-                    throw new IllegalArgumentException("Item not found:" + target.getAsString());
+                    throw new JsonParseException("Item not found: " + target.getAsString());
                 }
                 output.add(item);
             }
         } else {
-            throw new IllegalArgumentException("Missing 'Target'");
+            throw new JsonParseException("Missing 'Target'");
         }
         return output;
     }
