@@ -18,14 +18,16 @@
 
 package me.nelonn.propack.bukkit;
 
-import me.nelonn.propack.bukkit.dispatcher.Dispatcher;
-import me.nelonn.propack.core.DevServer;
-import me.nelonn.propack.core.ProPackCore;
-import me.nelonn.propack.core.util.LogManagerCompat;
-import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
 import me.nelonn.propack.bukkit.definition.PackContainer;
+import me.nelonn.propack.bukkit.dispatcher.Dispatcher;
+import me.nelonn.propack.bukkit.dispatcher.MemoryStore;
+import me.nelonn.propack.bukkit.dispatcher.StoreMap;
+import me.nelonn.propack.core.DevServer;
+import me.nelonn.propack.core.ProPackCore;
+import me.nelonn.propack.core.util.IOUtil;
+import me.nelonn.propack.core.util.LogManagerCompat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -45,6 +47,7 @@ public final class ProPackPlugin extends JavaPlugin {
     private BukkitAudiences adventure;
     private ProPackCore proPackCore;
     private PackContainer packContainer;
+    private StoreMap storeMap;
     private Dispatcher dispatcher;
     private DevServer devServer;
 
@@ -65,6 +68,9 @@ public final class ProPackPlugin extends JavaPlugin {
     public void onEnable() {
         adventure = BukkitAudiences.create(this);
         reloadConfigs();
+
+        storeMap = new StoreMap();
+        storeMap.register("memory_store", new MemoryStore(this));
 
         dispatcher = new Dispatcher(this);
         Bukkit.getPluginManager().registerEvents(dispatcher, this);
@@ -124,6 +130,10 @@ public final class ProPackPlugin extends JavaPlugin {
 
     public PackContainer getPackContainer() {
         return packContainer;
+    }
+
+    public StoreMap getStoreMap() {
+        return storeMap;
     }
 
     public Dispatcher getDispatcher() {
