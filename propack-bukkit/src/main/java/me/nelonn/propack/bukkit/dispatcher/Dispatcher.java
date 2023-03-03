@@ -16,15 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit;
+package me.nelonn.propack.bukkit.dispatcher;
 
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.UploadedPack;
+import me.nelonn.propack.bukkit.Config;
+import me.nelonn.propack.bukkit.ProPack;
+import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
 import me.nelonn.propack.bukkit.resourcepack.PackDefinition;
-import me.nelonn.propack.bukkit.sender.BukkitPackSender;
-import me.nelonn.propack.bukkit.sender.PackSender;
-import me.nelonn.propack.bukkit.sender.ProtocolPackSender;
+import me.nelonn.propack.bukkit.dispatcher.sender.BukkitPackSender;
+import me.nelonn.propack.bukkit.dispatcher.sender.PackSender;
+import me.nelonn.propack.bukkit.dispatcher.sender.ProtocolPackSender;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

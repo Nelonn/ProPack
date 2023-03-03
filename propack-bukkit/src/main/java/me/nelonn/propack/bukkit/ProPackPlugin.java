@@ -18,6 +18,7 @@
 
 package me.nelonn.propack.bukkit;
 
+import me.nelonn.propack.bukkit.dispatcher.Dispatcher;
 import me.nelonn.propack.core.DevServer;
 import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.core.util.LogManagerCompat;

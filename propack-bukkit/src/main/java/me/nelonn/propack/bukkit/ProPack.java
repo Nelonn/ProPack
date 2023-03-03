@@ -20,6 +20,7 @@ package me.nelonn.propack.bukkit;
 
 import com.google.common.base.Preconditions;
 import me.nelonn.flint.path.Identifier;
+import me.nelonn.propack.bukkit.dispatcher.Dispatcher;
 import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.definition.Item;
 import me.nelonn.propack.bukkit.resourcepack.PackContainer;

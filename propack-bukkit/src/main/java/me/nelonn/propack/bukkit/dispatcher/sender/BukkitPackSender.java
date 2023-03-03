@@ -16,24 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.sender;
+package me.nelonn.propack.bukkit.dispatcher.sender;
 
 import me.nelonn.propack.UploadedPack;
-import me.nelonn.propack.bukkit.Config;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class PaperPackSender implements PackSender {
-    private final Component component;
-
-    public PaperPackSender() {
-        component = LegacyComponentSerializer.legacyAmpersand().deserialize(Config.DISPATCHER_PROMPT.asString());
-    }
+public class BukkitPackSender implements PackSender {
 
     public void sendPack(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
-        player.setResourcePack(uploadedPack.getUrl(), uploadedPack.getSha1String(), Config.DISPATCHER_REQUIRED.asBoolean(), component);
+        player.setResourcePack(uploadedPack.getUrl(), uploadedPack.getSha1Bytes());
     }
 
 }

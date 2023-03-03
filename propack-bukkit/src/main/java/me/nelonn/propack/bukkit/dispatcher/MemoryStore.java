@@ -1,4 +1,4 @@
-package me.nelonn.propack.bukkit;
+package me.nelonn.propack.bukkit.dispatcher;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.sender;
+package me.nelonn.propack.bukkit.dispatcher.sender;
 
 import me.nelonn.propack.UploadedPack;
 import org.bukkit.entity.Player;

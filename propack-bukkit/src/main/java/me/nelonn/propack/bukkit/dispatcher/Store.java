@@ -1,4 +1,4 @@
-package me.nelonn.propack.bukkit;
+package me.nelonn.propack.bukkit.dispatcher;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
