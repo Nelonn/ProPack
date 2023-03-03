@@ -64,12 +64,20 @@ public enum Config {
         return (String) getValue();
     }
 
-    public Boolean asBoolean() {
+    public boolean asBoolean() {
+        Boolean value = (Boolean) getValue();
+        if (value == null) {
+            throw new NullPointerException("Config option '" + path + "' is null");
+        }
         return (Boolean) getValue();
     }
 
-    public Integer asInteger() {
-        return (Integer) getValue();
+    public int asInt() {
+        Integer value = (Integer) getValue();
+        if (value == null) {
+            throw new NullPointerException("Config option '" + path + "' is null");
+        }
+        return (int) getValue();
     }
 
     public List<String> asStringList() {
