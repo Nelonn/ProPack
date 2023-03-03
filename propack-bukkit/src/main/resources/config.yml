@@ -8,7 +8,7 @@ dispatcher:
   replace: false
   # pack to send
   pack: example
-  # player joins -> delay -> sending pack
+  # player joins -> delay seconds -> sending pack
   delay: 0
 
   # options below requires ProtocolLib
