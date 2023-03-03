@@ -19,6 +19,7 @@
 package me.nelonn.propack.bukkit;
 
 import me.nelonn.propack.ResourcePack;
+import me.nelonn.propack.UploadedPack;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
 import me.nelonn.propack.bukkit.resourcepack.PackDefinition;
 import me.nelonn.propack.bukkit.sender.BukkitPackSender;
@@ -29,32 +30,31 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class Dispatcher implements Listener {
-    private final Plugin plugin;
+    private final ProPackPlugin plugin;
     private final PackSender packSender;
-    private final Map<Player, ResourcePack> sent = new HashMap<>();
+    private final Store store;
 
-    public Dispatcher(@NotNull Plugin plugin) {
+    public Dispatcher(@NotNull ProPackPlugin plugin) {
         this.plugin = plugin;
         packSender = /*Util.isPaper() ? new PaperPackSender() :*/
                 CompatibilitiesManager.hasPlugin("ProtocolLib") ? new ProtocolPackSender() :
                         new BukkitPackSender();
+        store = new LocalStore();
+        Bukkit.getPluginManager().registerEvents((Listener) store, plugin);
     }
 
     public void sendPack(Player player, ResourcePack resourcePack) {
-        if (!resourcePack.isUploaded()) {
+        Optional<UploadedPack> uploadedPack = resourcePack.getUpload();
+        if (uploadedPack.isEmpty()) {
             throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not upload");
         }
-        packSender.sendPack(player, resourcePack.getUpload().get());
-        sent.put(player, resourcePack);
+        packSender.sendPack(player, uploadedPack.get());
+        store.setActiveResourcePack(player.getUniqueId(), resourcePack.getName());
     }
 
     @EventHandler
@@ -72,12 +72,11 @@ public class Dispatcher implements Listener {
         }
     }
 
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        sent.remove(event.getPlayer());
-    }
-
     public @NotNull Optional<ResourcePack> getResourcePack(@NotNull Player player) {
-        return Optional.ofNullable(sent.get(player));
+        String rpName = store.getActiveResourcePack(player.getUniqueId());
+        if (rpName == null) return Optional.empty();
+        PackDefinition definition = plugin.getPackContainer().getDefinition(rpName);
+        if (definition == null) return Optional.empty();
+        return definition.getResourcePack();
     }
 }
