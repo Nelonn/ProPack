@@ -25,7 +25,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class PaperPackSender implements PackSender {
+public class PaperPackSender implements PackSender { // TODO: not working
     private final Component component;
 
     public PaperPackSender() {
