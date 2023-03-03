@@ -24,6 +24,6 @@ import org.jetbrains.annotations.NotNull;
 
 public interface PackSender {
 
-    void sendPack(@NotNull Player player, @NotNull UploadedPack uploadedPack);
+    void send(@NotNull Player player, @NotNull UploadedPack uploadedPack);
 
 }

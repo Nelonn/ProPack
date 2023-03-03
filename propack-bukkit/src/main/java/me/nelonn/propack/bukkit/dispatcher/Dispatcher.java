@@ -56,7 +56,7 @@ public class Dispatcher implements Listener {
         if (uploadedPack.isEmpty()) {
             throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not upload");
         }
-        packSender.sendPack(player, uploadedPack.get());
+        packSender.send(player, uploadedPack.get());
         store.setActiveResourcePack(player.getUniqueId(), resourcePack.getName());
     }
 

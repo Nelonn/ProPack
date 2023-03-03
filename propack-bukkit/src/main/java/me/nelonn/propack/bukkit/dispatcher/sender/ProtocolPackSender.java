@@ -39,7 +39,7 @@ public class ProtocolPackSender implements PackSender {
         component = WrappedChatComponent.fromJson(GsonComponentSerializer.gson().serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(Config.DISPATCHER_PROMPT.asString())));
     }
 
-    public void sendPack(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
+    public void send(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.RESOURCE_PACK_SEND);
         packet.getStrings().write(0, uploadedPack.getUrl());
         packet.getStrings().write(1, uploadedPack.getSha1String());

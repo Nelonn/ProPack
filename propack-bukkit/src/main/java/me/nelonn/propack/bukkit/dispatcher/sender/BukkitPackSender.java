@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class BukkitPackSender implements PackSender {
 
-    public void sendPack(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
+    public void send(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
         player.setResourcePack(uploadedPack.getUrl(), uploadedPack.getSha1Bytes());
     }
 

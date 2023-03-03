@@ -32,7 +32,7 @@ public class PaperPackSender implements PackSender { // TODO: not working
         component = LegacyComponentSerializer.legacyAmpersand().deserialize(Config.DISPATCHER_PROMPT.asString());
     }
 
-    public void sendPack(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
+    public void send(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
         player.setResourcePack(uploadedPack.getUrl(), uploadedPack.getSha1String(), Config.DISPATCHER_REQUIRED.asBoolean(), component);
     }
 
