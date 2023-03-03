@@ -20,7 +20,7 @@ package me.nelonn.propack.bukkit;
 
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
-import me.nelonn.propack.bukkit.definition.PackContainer;
+import me.nelonn.propack.bukkit.definition.PackManager;
 import me.nelonn.propack.bukkit.dispatcher.Dispatcher;
 import me.nelonn.propack.bukkit.dispatcher.MemoryStore;
 import me.nelonn.propack.bukkit.dispatcher.StoreMap;
@@ -46,7 +46,7 @@ public final class ProPackPlugin extends JavaPlugin {
 
     private BukkitAudiences adventure;
     private ProPackCore proPackCore;
-    private PackContainer packContainer;
+    private PackManager packManager;
     private StoreMap storeMap;
     private Dispatcher dispatcher;
     private DevServer devServer;
@@ -55,12 +55,19 @@ public final class ProPackPlugin extends JavaPlugin {
     public void onLoad() {
         ProPack.setPlugin(this);
 
+        File modulesDir = new File(getDataFolder(), "modules");
         if (!getDataFolder().exists()) {
             IOUtil.extractResources(ProPackPlugin.class, "example/", new File(getDataFolder(), "example"));
             saveResource("example.json", false);
             saveResource("config.yml", false);
-        } else if (!new File(getDataFolder(), "config.yml").exists()) {
-            saveResource("config.yml", false);
+            modulesDir.mkdirs();
+        } else {
+            if (!new File(getDataFolder(), "config.yml").exists()) {
+                saveResource("config.yml", false);
+            }
+            if (!modulesDir.exists()) {
+                modulesDir.mkdirs();
+            }
         }
     }
 
@@ -68,10 +75,11 @@ public final class ProPackPlugin extends JavaPlugin {
     public void onEnable() {
         adventure = BukkitAudiences.create(this);
 
-        proPackCore = new ProPackCore();
+        proPackCore = new ProPackCore(getDataFolder());
         reloadConfig();
+        proPackCore.getModuleManager().fullReload();
 
-        packContainer = new PackContainer(proPackCore, getDataFolder());
+        packManager = new PackManager(proPackCore, getDataFolder());
         reloadPacks();
 
         storeMap = new StoreMap();
@@ -93,7 +101,9 @@ public final class ProPackPlugin extends JavaPlugin {
         CompatibilitiesManager.disableCompatibilities();
         adventure.close();
         adventure = null;
+        proPackCore.getModuleManager().disableAllAndClear();
         if (devServer != null) {
+            proPackCore.getHostingMap().unregister(devServer);
             try {
                 devServer.close();
             } catch (Exception ignored) {
@@ -106,6 +116,7 @@ public final class ProPackPlugin extends JavaPlugin {
     @Override
     public void reloadConfig() {
         super.reloadConfig();
+        proPackCore.getModuleManager().fullReload();
         if (devServer != null) {
             proPackCore.getHostingMap().unregister(devServer);
             try {
@@ -119,11 +130,10 @@ public final class ProPackPlugin extends JavaPlugin {
             devServer = new DevServer(Config.DEV_SERVER_RETURN_IP.asString(), Config.DEV_SERVER_PORT.asInt());
             proPackCore.getHostingMap().register("dev_server", devServer);
         }
-        packContainer.loadAll();
     }
 
     public void reloadPacks() {
-        packContainer.loadAll();
+        packManager.loadAll();
     }
 
     public @NotNull BukkitAudiences adventure() {
@@ -133,12 +143,12 @@ public final class ProPackPlugin extends JavaPlugin {
         return this.adventure;
     }
 
-    public ProPackCore getProPackCore() {
+    public ProPackCore getCore() {
         return proPackCore;
     }
 
-    public PackContainer getPackContainer() {
-        return packContainer;
+    public PackManager getPackManager() {
+        return packManager;
     }
 
     public StoreMap getStoreMap() {

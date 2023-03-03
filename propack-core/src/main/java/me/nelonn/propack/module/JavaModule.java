@@ -19,10 +19,50 @@
 package me.nelonn.propack.module;
 
 import me.nelonn.propack.core.ProPackCore;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 
 public abstract class JavaModule implements Module { // TODO: module loading system
     private boolean enabled = false;
     private ProPackCore core = null;
+    private ModuleMeta meta = null;
+    private File dataFolder = null;
+    private File file = null;
+    private Logger logger = null;
+
+    @NotNull
+    @Override
+    public ModuleMeta getMeta() {
+        return meta;
+    }
+
+    @NotNull
+    @Override
+    public File getDataFolder() {
+        return dataFolder;
+    }
+
+    @Override
+    public @Nullable InputStream getResource(@NotNull String file) {
+        try {
+            URL url = getClass().getClassLoader().getResource(file);
+            if (url == null) {
+                return null;
+            }
+            URLConnection connection = url.openConnection();
+            connection.setUseCaches(false);
+            return connection.getInputStream();
+        } catch (IOException ex) {
+            return null;
+        }
+    }
 
     @Override
     public final void enable() {
@@ -45,7 +85,7 @@ public abstract class JavaModule implements Module { // TODO: module loading sys
     }
 
     @Override
-    public void setEnabled(boolean enabled) {
+    public final void setEnabled(boolean enabled) {
         if (this.enabled != enabled) {
             this.enabled = enabled;
             if (this.enabled) {
@@ -57,7 +97,35 @@ public abstract class JavaModule implements Module { // TODO: module loading sys
     }
 
     @Override
-    public boolean isEnabled() {
+    public final boolean isEnabled() {
         return enabled;
+    }
+
+    @Override
+    public @NotNull ProPackCore getCore() {
+        return core;
+    }
+
+    @Override
+    public @NotNull Logger getLogger() {
+        return logger;
+    }
+
+    protected final @Nullable Reader getTextResource(@NotNull String file) {
+        final InputStream in = getResource(file);
+        return in == null ? null : new InputStreamReader(in, StandardCharsets.UTF_8);
+    }
+
+    @NotNull
+    protected final File getFile() {
+        return file;
+    }
+
+    public final void init(@NotNull ProPackCore core, @NotNull ModuleMeta meta, @NotNull File dataFolder, @NotNull File file) {
+        this.core = core;
+        this.meta = meta;
+        this.dataFolder = dataFolder;
+        this.file = file;
+        this.logger = LogManager.getLogger(meta.getLoggerPrefix());
     }
 }

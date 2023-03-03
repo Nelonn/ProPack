@@ -19,20 +19,25 @@
 package me.nelonn.propack.bukkit.command.reload;
 
 import me.nelonn.propack.bukkit.ProPackPlugin;
-import me.nelonn.propack.bukkit.command.Command;
+import me.nelonn.propack.bukkit.Util;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-public class ReloadCommand extends Command {
-    public ReloadCommand(@NotNull ProPackPlugin plugin) {
-        super("reload");
-        setPermission("propack.admin");
-        addChildren(new ReloadConfigCommand(plugin), new ReloadPacksCommand(plugin), new ReloadModulesCommand(plugin));
+public class ReloadModulesCommand extends BaseReloadCommand {
+    private final ProPackPlugin plugin;
+
+    protected ReloadModulesCommand(@NotNull ProPackPlugin plugin) {
+        super("modules");
+        this.plugin = plugin;
     }
 
-    protected void onCommand(@NotNull CommandSender sender, @NotNull String s, @NotNull String[] args) {
-        for (Command command : getChildren()) {
-            ((BaseReloadCommand) command).execute(sender);
-        }
+    @Override
+    public void execute(@NotNull CommandSender sender) {
+        plugin.getCore().getModuleManager().fullReload();
+        TagResolver.Single placeholder = Placeholder.component("modules", Component.text(plugin.getCore().getModuleManager().getModules().length));
+        Util.send(sender, "<white><modules> ProPack <gray>modules loaded", placeholder);
     }
 }

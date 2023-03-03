@@ -16,31 +16,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.command.reload;
+package me.nelonn.propack.module;
 
-import me.nelonn.propack.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.nio.file.Path;
 
-public abstract class BaseReloadCommand extends Command {
-    protected BaseReloadCommand(@NotNull String name, String permission, String description, String usageMessage, @NotNull List<String> aliases) {
-        super(name, permission, description, usageMessage, aliases);
-    }
+public class CraftModuleProviderContext implements ModuleProviderContext {
+    private final ModuleMeta moduleMeta;
+    private final Path dataDirectory;
+    private final Logger logger;
 
-    protected BaseReloadCommand(@NotNull String name, String... aliases) {
-        super(name, aliases);
-    }
-
-    protected BaseReloadCommand(@NotNull String name) {
-        super(name);
+    public CraftModuleProviderContext(@NotNull ModuleMeta moduleMeta, @NotNull Path dataDirectory) {
+        this.moduleMeta = moduleMeta;
+        this.dataDirectory = dataDirectory;
+        this.logger = LogManager.getLogger(moduleMeta.getLoggerPrefix());
     }
 
     @Override
-    protected void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
-        execute(sender);
+    public @NotNull ModuleMeta getMeta() {
+        return moduleMeta;
     }
 
-    public abstract void execute(@NotNull CommandSender sender);
+    @Override
+    public @NotNull Path getDataDirectory() {
+        return dataDirectory;
+    }
+
+    @Override
+    public @NotNull Logger getLogger() {
+        return logger;
+    }
 }

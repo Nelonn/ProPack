@@ -16,23 +16,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.command.reload;
+package me.nelonn.propack.module;
 
-import me.nelonn.propack.bukkit.ProPackPlugin;
-import me.nelonn.propack.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ReloadCommand extends Command {
-    public ReloadCommand(@NotNull ProPackPlugin plugin) {
-        super("reload");
-        setPermission("propack.admin");
-        addChildren(new ReloadConfigCommand(plugin), new ReloadPacksCommand(plugin), new ReloadModulesCommand(plugin));
+import java.util.List;
+
+public interface ModuleMeta {
+
+    @NotNull String getName();
+
+    default @NotNull String getDisplayName() {
+        return getName() + " v" + getVersion();
     }
 
-    protected void onCommand(@NotNull CommandSender sender, @NotNull String s, @NotNull String[] args) {
-        for (Command command : getChildren()) {
-            ((BaseReloadCommand) command).execute(sender);
-        }
-    }
+    @NotNull String getBootstrapper();
+
+    @NotNull String getVersion();
+
+    @Nullable String getDescription();
+
+    @NotNull List<String> getAuthors();
+
+    @NotNull List<String> getContributors();
+
+    @Nullable String getWebsite();
+
+    @Nullable String getLoggerPrefix();
+
 }

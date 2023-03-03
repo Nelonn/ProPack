@@ -106,7 +106,7 @@ public class Dispatcher implements Listener {
     public @NotNull Optional<ResourcePack> getResourcePack(@NotNull Player player) {
         SentPack sentPack = store.getActiveResourcePack(player.getUniqueId());
         if (sentPack == null) return Optional.empty();
-        PackDefinition definition = plugin.getPackContainer().getDefinition(sentPack.name);
+        PackDefinition definition = plugin.getPackManager().getDefinition(sentPack.name);
         if (definition == null) return Optional.empty();
         return definition.getResourcePack();
     }

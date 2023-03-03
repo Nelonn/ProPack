@@ -18,7 +18,25 @@
 
 package me.nelonn.propack.module;
 
+import me.nelonn.propack.core.ProPackCore;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.io.InputStream;
+
 public interface Module {
+
+    default @NotNull String getName() {
+        return getMeta().getName();
+    }
+
+    @NotNull ModuleMeta getMeta();
+
+    @NotNull File getDataFolder();
+
+    @Nullable InputStream getResource(@NotNull String file);
 
     void enable();
 
@@ -27,5 +45,9 @@ public interface Module {
     void setEnabled(final boolean enabled);
 
     boolean isEnabled();
+
+    @NotNull ProPackCore getCore();
+
+    @NotNull Logger getLogger();
 
 }
