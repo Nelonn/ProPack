@@ -25,7 +25,7 @@ import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
-import me.nelonn.propack.bukkit.resourcepack.PackContainer;
+import me.nelonn.propack.bukkit.definition.PackContainer;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;

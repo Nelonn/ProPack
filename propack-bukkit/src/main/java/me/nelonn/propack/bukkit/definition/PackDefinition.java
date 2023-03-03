@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.resourcepack;
+package me.nelonn.propack.bukkit.definition;
 
 import me.nelonn.propack.ResourcePack;
 import org.jetbrains.annotations.NotNull;

@@ -24,7 +24,7 @@ import me.nelonn.propack.bukkit.Config;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
-import me.nelonn.propack.bukkit.resourcepack.PackDefinition;
+import me.nelonn.propack.bukkit.definition.PackDefinition;
 import me.nelonn.propack.bukkit.dispatcher.sender.BukkitPackSender;
 import me.nelonn.propack.bukkit.dispatcher.sender.PackSender;
 import me.nelonn.propack.bukkit.dispatcher.sender.ProtocolPackSender;
