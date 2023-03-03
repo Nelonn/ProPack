@@ -67,7 +67,12 @@ public final class ProPackPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         adventure = BukkitAudiences.create(this);
-        reloadConfigs();
+
+        proPackCore = new ProPackCore();
+        reloadConfig();
+
+        packContainer = new PackContainer(proPackCore, getDataFolder());
+        reloadPacks();
 
         storeMap = new StoreMap();
         storeMap.register("memory_store", new MemoryStore(this));
@@ -98,22 +103,26 @@ public final class ProPackPlugin extends JavaPlugin {
         LOGGER.info("ProPack {} is now disabled", getDescription().getVersion());
     }
 
-    public void reloadConfigs() {
-        reloadConfig();
+    @Override
+    public void reloadConfig() {
+        super.reloadConfig();
         if (devServer != null) {
+            proPackCore.getHostingMap().unregister(devServer);
             try {
                 devServer.close();
             } catch (Exception ignored) {
             }
             devServer = null;
         }
-        proPackCore = new ProPackCore();
         proPackCore.getProjectLoader().getItemDefinitionLoaders().add(BukkitItemDefinitionLoader.INSTANCE);
         if (Config.DEV_SERVER_ENABLED.asBoolean()) {
-            devServer = new DevServer(Config.DEV_SERVER_RETURN_IP.asString(), Config.DEV_SERVER_PORT.asInteger());
+            devServer = new DevServer(Config.DEV_SERVER_RETURN_IP.asString(), Config.DEV_SERVER_PORT.asInt());
             proPackCore.getHostingMap().register("dev_server", devServer);
         }
-        packContainer = new PackContainer(proPackCore, getDataFolder());
+        packContainer.loadAll();
+    }
+
+    public void reloadPacks() {
         packContainer.loadAll();
     }
 

@@ -16,24 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.command;
+package me.nelonn.propack.bukkit.command.reload;
 
 import me.nelonn.propack.bukkit.ProPackPlugin;
-import me.nelonn.propack.bukkit.Util;
+import me.nelonn.propack.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 public class ReloadCommand extends Command {
-    private final ProPackPlugin plugin;
-
     public ReloadCommand(@NotNull ProPackPlugin plugin) {
         super("reload");
         setPermission("propack.admin");
-        this.plugin = plugin;
+        addChildren(new ReloadConfigCommand(plugin), new ReloadPacksCommand(plugin));
     }
 
     protected void onCommand(@NotNull CommandSender sender, @NotNull String s, @NotNull String[] args) {
-        plugin.reloadConfigs();
-        Util.send(sender, "<white>ProPack <gray>reloaded successfully");
+        for (Command command : getChildren()) {
+            ((BaseReloadCommand) command).execute(sender);
+        }
     }
 }

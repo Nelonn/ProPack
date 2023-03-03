@@ -18,6 +18,7 @@
 
 package me.nelonn.propack.builder.hosting;
 
+import me.nelonn.flint.path.Identifier;
 import me.nelonn.propack.Sha1;
 import me.nelonn.propack.UploadedPack;
 import org.jetbrains.annotations.NotNull;
@@ -29,12 +30,14 @@ import java.util.Map;
 
 public abstract class Hosting {
     private HostingMap hostingMap;
+    private Identifier id;
 
     public abstract @NotNull UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1, @NotNull String name, @Nullable Map<String, Object> options) throws IOException;
 
-    public final boolean register(@NotNull HostingMap hostingMap) {
+    public final boolean register(@NotNull HostingMap hostingMap, @NotNull Identifier id) {
         if (allowChangesFrom(hostingMap)) {
             this.hostingMap = hostingMap;
+            this.id = id;
             return true;
         }
         return false;
@@ -43,6 +46,7 @@ public abstract class Hosting {
     public final boolean unregister(@NotNull HostingMap hostingMap) {
         if (allowChangesFrom(hostingMap)) {
             this.hostingMap = null;
+            this.id = null;
             return true;
         }
         return false;
@@ -56,4 +60,10 @@ public abstract class Hosting {
         return this.hostingMap != null;
     }
 
+    public @NotNull Identifier getId() {
+        if (id == null) {
+            throw new IllegalStateException("Hosting not registered");
+        }
+        return id;
+    }
 }

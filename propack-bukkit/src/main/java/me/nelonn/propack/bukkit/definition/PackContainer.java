@@ -81,6 +81,10 @@ public class PackContainer {
         }
     }
 
+    public void clear() {
+        definitions.clear();
+    }
+
     public @Nullable PackDefinition getDefinition(@NotNull String name) {
         return definitions.get(name);
     }

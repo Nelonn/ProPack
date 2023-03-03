@@ -36,6 +36,10 @@ public interface HostingMap {
         return unregister(Identifier.ofWithFallback(id, "propack"));
     }
 
+    default boolean unregister(@NotNull Hosting hosting) {
+        return unregister(hosting.getId());
+    }
+
     @NotNull Hosting getHosting(@NotNull Identifier id);
 
     @NotNull Map<Identifier, Hosting> getKnownHostings();

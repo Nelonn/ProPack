@@ -34,7 +34,7 @@ public class SimpleHostingMap implements HostingMap {
 
     @Override
     public boolean register(@NotNull Identifier id, @NotNull Hosting hosting) {
-        if (hosting.register(this)) {
+        if (hosting.register(this, id)) {
             knownHostings.put(id, hosting);
             return true;
         }

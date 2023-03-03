@@ -20,6 +20,7 @@ package me.nelonn.propack.bukkit.command;
 
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.Util;
+import me.nelonn.propack.bukkit.command.reload.ReloadCommand;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
