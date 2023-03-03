@@ -22,6 +22,8 @@ import org.jetbrains.annotations.NotNull;
 
 public interface UploadedPack {
 
+    @NotNull String getName();
+
     @NotNull String getUrl();
 
     byte @NotNull [] getSha1Bytes();

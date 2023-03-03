@@ -61,9 +61,9 @@ public final class DevServer extends Hosting implements Closeable {
     }
 
     @Override
-    public @NotNull UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1, @Nullable Map<String, Object> options) {
+    public @NotNull UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1, @NotNull String name, @Nullable Map<String, Object> options) {
         files.put(sha1.toString(), file);
-        return new UploadedPackImpl(returnUrl + '/' + sha1.asString() + ".zip", sha1.asBytes(), sha1.asString());
+        return new UploadedPackImpl(name, returnUrl + '/' + sha1.asString() + ".zip", sha1.asBytes(), sha1.asString());
     }
 
     public class HttpRunner implements Runnable, Closeable {

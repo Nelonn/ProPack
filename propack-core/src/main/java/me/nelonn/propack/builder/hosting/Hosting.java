@@ -35,7 +35,7 @@ public abstract class Hosting {
         this.name = name;
     }
 
-    public abstract @NotNull UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1, @Nullable Map<String, Object> options) throws IOException;
+    public abstract @NotNull UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1, @NotNull String name, @Nullable Map<String, Object> options) throws IOException;
 
     public @NotNull String getName() {
         return name;
