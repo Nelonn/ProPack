@@ -27,6 +27,7 @@ import java.util.List;
 public enum Config {
     DISPATCHER_STORE("dispatcher.store", "propack:memory_store"),
     DISPATCHER_ENABLED("dispatcher.enabled", true),
+    DISPATCHER_REPLACE("dispatcher.replace", false),
     DISPATCHER_PACK("dispatcher.pack"),
     DISPATCHER_DELAY("dispatcher.delay", 0),
     DISPATCHER_REQUIRED("dispatcher.required", false),

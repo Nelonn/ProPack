@@ -4,6 +4,8 @@ dispatcher:
   store: 'propack:memory_store'
   # if disabled, you can access the store anyway.
   enabled: true
+  # send if player has active resource pack
+  replace: false
   # pack to send
   pack: example
   # player joins -> delay -> sending pack
