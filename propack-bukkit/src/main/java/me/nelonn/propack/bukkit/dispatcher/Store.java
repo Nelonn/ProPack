@@ -7,8 +7,8 @@ import java.util.UUID;
 
 public interface Store {
 
-    @Nullable String getActiveResourcePack(@NotNull UUID uuid);
+    @Nullable SentPack getActiveResourcePack(@NotNull UUID uuid);
 
-    void setActiveResourcePack(@NotNull UUID uuid, @Nullable String rpName);
+    void setActiveResourcePack(@NotNull UUID uuid, @Nullable SentPack sentPack);
 
 }

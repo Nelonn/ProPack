@@ -11,16 +11,16 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MemoryStore implements Store, Listener {
-    private final Map<UUID, String> map = new ConcurrentHashMap<>();
+    private final Map<UUID, SentPack> map = new ConcurrentHashMap<>();
 
     @Override
-    public @Nullable String getActiveResourcePack(@NotNull UUID uuid) {
+    public @Nullable SentPack getActiveResourcePack(@NotNull UUID uuid) {
         return map.get(uuid);
     }
 
     @Override
-    public void setActiveResourcePack(@NotNull UUID uuid, @Nullable String rpName) {
-        map.put(uuid, rpName);
+    public void setActiveResourcePack(@NotNull UUID uuid, @Nullable SentPack sentPack) {
+        map.put(uuid, sentPack);
     }
 
     @EventHandler
