@@ -16,14 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.sender;
+package me.nelonn.propack.bukkit.command.reload;
 
-import me.nelonn.propack.UploadedPack;
-import org.bukkit.entity.Player;
+import me.nelonn.propack.bukkit.ProPackPlugin;
+import me.nelonn.propack.bukkit.Util;
+import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-public interface PackSender {
+public class ReloadPacksCommand extends BaseReloadCommand {
+    private final ProPackPlugin plugin;
 
-    void sendPack(@NotNull Player player, @NotNull UploadedPack uploadedPack);
+    protected ReloadPacksCommand(@NotNull ProPackPlugin plugin) {
+        super("packs");
+        this.plugin = plugin;
+    }
 
+    @Override
+    public void execute(@NotNull CommandSender sender) {
+        plugin.reloadPacks();
+        Util.send(sender, "<white>ProPack <gray>resource packs reloaded successfully");
+    }
 }

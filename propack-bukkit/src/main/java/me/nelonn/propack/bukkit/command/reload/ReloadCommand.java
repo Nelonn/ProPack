@@ -16,15 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.resourcepack;
+package me.nelonn.propack.bukkit.command.reload;
 
-import me.nelonn.propack.ResourcePack;
+import me.nelonn.propack.bukkit.ProPackPlugin;
+import me.nelonn.propack.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
+public class ReloadCommand extends Command {
+    public ReloadCommand(@NotNull ProPackPlugin plugin) {
+        super("reload");
+        setPermission("propack.admin");
+        addChildren(new ReloadConfigCommand(plugin), new ReloadPacksCommand(plugin), new ReloadModulesCommand(plugin));
+    }
 
-public interface PackDefinition {
-    @NotNull String getName();
-
-    @NotNull Optional<ResourcePack> getResourcePack();
+    protected void onCommand(@NotNull CommandSender sender, @NotNull String s, @NotNull String[] args) {
+        for (Command command : getChildren()) {
+            ((BaseReloadCommand) command).execute(sender);
+        }
+    }
 }

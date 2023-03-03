@@ -16,31 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.builder.hosting;
+package me.nelonn.propack.bukkit.dispatcher.sender;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.propack.UploadedPack;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
+public class BukkitPackSender implements PackSender {
 
-public interface HostingMap {
-    boolean register(@NotNull Identifier id, @NotNull Hosting hosting);
-
-    default boolean register(@NotNull String id, @NotNull Hosting hosting) {
-        return register(Identifier.ofWithFallback(id, "propack"), hosting);
+    public void send(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
+        player.setResourcePack(uploadedPack.getUrl(), uploadedPack.getSha1Bytes());
     }
 
-    boolean unregister(@NotNull Identifier id);
-
-    default boolean unregister(@NotNull String id) {
-        return unregister(Identifier.ofWithFallback(id, "propack"));
-    }
-
-    default boolean unregister(@NotNull Hosting hosting) {
-        return unregister(hosting.getId());
-    }
-
-    @NotNull Hosting getHosting(@NotNull Identifier id);
-
-    @NotNull Map<Identifier, Hosting> getKnownHostings();
 }

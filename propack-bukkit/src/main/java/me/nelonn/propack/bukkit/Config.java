@@ -24,12 +24,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public enum Settings {
-    DISPATCH_ENABLED("dispatch.enabled", true),
-    DISPATCH_DELAY("dispatch.delay", -1),
-    DISPATCH_REQUIRED("dispatch.required", true),
-    DISPATCH_PACK("dispatch.pack"),
-    DISPATCH_PROMPT("dispatch.prompt", "&#fa4943Accept the pack to enjoy a full experience"),
+public enum Config {
+    DISPATCHER_STORE("dispatcher.store", "propack:memory_store"),
+    DISPATCHER_ENABLED("dispatcher.enabled", true),
+    DISPATCHER_REPLACE("dispatcher.replace", false),
+    DISPATCHER_PACK("dispatcher.pack"),
+    DISPATCHER_DELAY("dispatcher.delay", 0),
+    DISPATCHER_REQUIRED("dispatcher.required", false),
+    DISPATCHER_PROMPT("dispatcher.prompt", "&#fa4943Accept the pack to enjoy a full experience"),
 
     DEV_SERVER_ENABLED("dev_server.enabled", false),
     DEV_SERVER_RETURN_IP("dev_server.return_ip", "127.0.0.1"),
@@ -41,12 +43,12 @@ public enum Settings {
     private final String path;
     private final Object def;
 
-    Settings(@NotNull String path, @Nullable Object def) {
+    Config(@NotNull String path, @Nullable Object def) {
         this.path = path;
         this.def = def;
     }
 
-    Settings(@NotNull String path) {
+    Config(@NotNull String path) {
         this(path, null);
     }
 
@@ -62,12 +64,20 @@ public enum Settings {
         return (String) getValue();
     }
 
-    public Boolean asBoolean() {
+    public boolean asBoolean() {
+        Boolean value = (Boolean) getValue();
+        if (value == null) {
+            throw new NullPointerException("Config option '" + path + "' is null");
+        }
         return (Boolean) getValue();
     }
 
-    public Integer asInteger() {
-        return (Integer) getValue();
+    public int asInt() {
+        Integer value = (Integer) getValue();
+        if (value == null) {
+            throw new NullPointerException("Config option '" + path + "' is null");
+        }
+        return (int) getValue();
     }
 
     public List<String> asStringList() {

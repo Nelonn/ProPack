@@ -20,9 +20,10 @@ package me.nelonn.propack.bukkit;
 
 import com.google.common.base.Preconditions;
 import me.nelonn.flint.path.Identifier;
+import me.nelonn.propack.bukkit.dispatcher.Dispatcher;
 import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.definition.Item;
-import me.nelonn.propack.bukkit.resourcepack.PackContainer;
+import me.nelonn.propack.bukkit.definition.PackManager;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,11 +41,11 @@ public final class ProPack {
     }
 
     public static @NotNull ProPackCore getCore() {
-        return plugin.getProPackCore();
+        return plugin.getCore();
     }
 
-    public static @NotNull PackContainer getPackContainer() {
-        return plugin.getPackContainer();
+    public static @NotNull PackManager getPackContainer() {
+        return plugin.getPackManager();
     }
 
     public static @NotNull Dispatcher getDispatcher() {

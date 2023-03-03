@@ -16,32 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.resourcepack;
+package me.nelonn.propack.module;
 
-import me.nelonn.propack.ResourcePack;
-import me.nelonn.propack.builder.Project;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
+import java.nio.file.Path;
 
-public class ProjectDefinition implements PackDefinition {
-    private final Project project;
+public interface ModuleProviderContext {
 
-    public ProjectDefinition(@NotNull Project project) {
-        this.project = project;
-    }
+    @NotNull ModuleMeta getMeta();
 
-    @Override
-    public @NotNull String getName() {
-        return project.getName();
-    }
+    @NotNull Path getDataDirectory();
 
-    @Override
-    public @NotNull Optional<ResourcePack> getResourcePack() {
-        return project.getResourcePack();
-    }
+    @NotNull Logger getLogger();
 
-    public @NotNull Project getProject() {
-        return project;
-    }
 }

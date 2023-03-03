@@ -1,16 +1,32 @@
-dispatch:
+dispatcher:
+  # memory store included out of box
+  # additional stores can be added by other plugins/modules
+  store: 'propack:memory_store'
+  # if disabled, you can access the store anyway.
   enabled: true
-  delay: -1
-  # options below requires ProtocolLib or Paper (or fork) core
-  required: true
+  # send if player has active resource pack
+  replace: false
+  # pack to send
   pack: example
-  prompt: "&#fa4943Accept the pack to enjoy a full experience"
+  # player joins -> delay seconds -> sending pack
+  delay: 0
+
+  # options below requires ProtocolLib
+
+  # kick player if he declined pack
+  required: true
+  # MiniMessage https://docs.advntr.dev/minimessage
+  # placeholders: <player> and <pack_name>
+  prompt: "<#fa4943>Accept the pack to enjoy a full experience"
 
 dev_server:
+  # if enabled, 'propack:dev_server' will be added to the hostings map
   enabled: false
+  # example: https://return_ip:port/pack_sha1.zip
   return_ip: '127.0.0.1'
   port: 3000
 
+# requires ProtocolLib
 patch_packets:
   items: true
   sounds: true

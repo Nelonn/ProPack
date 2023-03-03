@@ -16,31 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.builder.hosting;
+package me.nelonn.propack.bukkit.dispatcher;
 
-import me.nelonn.flint.path.Identifier;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
+import java.util.UUID;
 
-public interface HostingMap {
-    boolean register(@NotNull Identifier id, @NotNull Hosting hosting);
+public interface Store {
 
-    default boolean register(@NotNull String id, @NotNull Hosting hosting) {
-        return register(Identifier.ofWithFallback(id, "propack"), hosting);
-    }
+    @Nullable SentPack getActiveResourcePack(@NotNull UUID uuid);
 
-    boolean unregister(@NotNull Identifier id);
+    void setActiveResourcePack(@NotNull UUID uuid, @Nullable SentPack sentPack);
 
-    default boolean unregister(@NotNull String id) {
-        return unregister(Identifier.ofWithFallback(id, "propack"));
-    }
-
-    default boolean unregister(@NotNull Hosting hosting) {
-        return unregister(hosting.getId());
-    }
-
-    @NotNull Hosting getHosting(@NotNull Identifier id);
-
-    @NotNull Map<Identifier, Hosting> getKnownHostings();
 }

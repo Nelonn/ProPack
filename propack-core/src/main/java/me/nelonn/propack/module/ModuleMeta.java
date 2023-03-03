@@ -16,31 +16,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.builder.hosting;
+package me.nelonn.propack.module;
 
-import me.nelonn.flint.path.Identifier;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
+import java.util.List;
 
-public interface HostingMap {
-    boolean register(@NotNull Identifier id, @NotNull Hosting hosting);
+public interface ModuleMeta {
 
-    default boolean register(@NotNull String id, @NotNull Hosting hosting) {
-        return register(Identifier.ofWithFallback(id, "propack"), hosting);
+    @NotNull String getName();
+
+    default @NotNull String getDisplayName() {
+        return getName() + " v" + getVersion();
     }
 
-    boolean unregister(@NotNull Identifier id);
+    @NotNull String getBootstrapper();
 
-    default boolean unregister(@NotNull String id) {
-        return unregister(Identifier.ofWithFallback(id, "propack"));
-    }
+    @NotNull String getVersion();
 
-    default boolean unregister(@NotNull Hosting hosting) {
-        return unregister(hosting.getId());
-    }
+    @Nullable String getDescription();
 
-    @NotNull Hosting getHosting(@NotNull Identifier id);
+    @NotNull List<String> getAuthors();
 
-    @NotNull Map<Identifier, Hosting> getKnownHostings();
+    @NotNull List<String> getContributors();
+
+    @Nullable String getWebsite();
+
+    @Nullable String getLoggerPrefix();
+
 }

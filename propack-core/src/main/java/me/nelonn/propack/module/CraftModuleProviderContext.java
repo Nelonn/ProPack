@@ -18,36 +18,35 @@
 
 package me.nelonn.propack.module;
 
-import me.nelonn.propack.core.ProPackCore;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.InputStream;
+import java.nio.file.Path;
 
-public interface Module {
+public class CraftModuleProviderContext implements ModuleProviderContext {
+    private final ModuleMeta moduleMeta;
+    private final Path dataDirectory;
+    private final Logger logger;
 
-    default @NotNull String getName() {
-        return getMeta().getName();
+    public CraftModuleProviderContext(@NotNull ModuleMeta moduleMeta, @NotNull Path dataDirectory) {
+        this.moduleMeta = moduleMeta;
+        this.dataDirectory = dataDirectory;
+        this.logger = LogManager.getLogger(moduleMeta.getLoggerPrefix());
     }
 
-    @NotNull ModuleMeta getMeta();
+    @Override
+    public @NotNull ModuleMeta getMeta() {
+        return moduleMeta;
+    }
 
-    @NotNull File getDataFolder();
+    @Override
+    public @NotNull Path getDataDirectory() {
+        return dataDirectory;
+    }
 
-    @Nullable InputStream getResource(@NotNull String file);
-
-    void enable();
-
-    void disable();
-
-    void setEnabled(final boolean enabled);
-
-    boolean isEnabled();
-
-    @NotNull ProPackCore getCore();
-
-    @NotNull Logger getLogger();
-
+    @Override
+    public @NotNull Logger getLogger() {
+        return logger;
+    }
 }

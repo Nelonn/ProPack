@@ -16,38 +16,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.builder.asset;
+package me.nelonn.propack.bukkit.definition;
 
-import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
-import me.nelonn.propack.asset.DefaultItemModel;
-import me.nelonn.propack.definition.Item;
+import me.nelonn.propack.builder.Project;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.Optional;
 
-public class DefaultItemModelBuilder extends ItemModelBuilder {
-    private Path mesh;
+public class ProjectDefinition implements PackDefinition {
+    private final Project project;
 
-    public DefaultItemModelBuilder(@NotNull Path path) {
-        super(path);
+    public ProjectDefinition(@NotNull Project project) {
+        this.project = project;
     }
 
     @Override
-    public DefaultItemModelBuilder setTargetItems(Set<Item> targetItems) {
-        return (DefaultItemModelBuilder) super.setTargetItems(targetItems);
+    public @NotNull String getName() {
+        return project.getName();
     }
 
-    public Path getMesh() {
-        return mesh;
+    @Override
+    public @NotNull Optional<ResourcePack> getResourcePack() {
+        return project.getResourcePack();
     }
 
-    public DefaultItemModelBuilder setMesh(Path mesh) {
-        this.mesh = mesh;
-        return this;
-    }
-
-    public @NotNull DefaultItemModel build(@NotNull ResourcePack resourcePack) {
-        return new DefaultItemModel(resourcePack, path, targetItems, mesh);
+    public @NotNull Project getProject() {
+        return project;
     }
 }

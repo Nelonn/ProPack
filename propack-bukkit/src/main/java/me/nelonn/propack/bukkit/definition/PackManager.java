@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.resourcepack;
+package me.nelonn.propack.bukkit.definition;
 
 import com.google.gson.JsonObject;
 import me.nelonn.propack.core.ProPackCore;
@@ -36,13 +36,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PackContainer {
+public class PackManager {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final Map<String, PackDefinition> definitions = new HashMap<>();
     private final ProjectLoader projectLoader;
     private final File directory;
 
-    public PackContainer(@NotNull ProPackCore core, @NotNull File directory) {
+    public PackManager(@NotNull ProPackCore core, @NotNull File directory) {
         this.directory = directory;
         projectLoader = core.getProjectLoader();
     }
@@ -79,6 +79,10 @@ public class PackContainer {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void clear() {
+        definitions.clear();
     }
 
     public @Nullable PackDefinition getDefinition(@NotNull String name) {

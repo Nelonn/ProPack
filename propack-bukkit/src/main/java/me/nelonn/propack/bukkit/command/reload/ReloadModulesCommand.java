@@ -16,27 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.command;
+package me.nelonn.propack.bukkit.command.reload;
 
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.Util;
-import me.nelonn.propack.bukkit.command.reload.ReloadCommand;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-public class ProPackCommand extends Command {
+public class ReloadModulesCommand extends BaseReloadCommand {
     private final ProPackPlugin plugin;
 
-    public ProPackCommand(@NotNull ProPackPlugin plugin) {
-        super("propack");
-        addChildren(new HelpCommand(plugin), new ReloadCommand(plugin), new BuildCommand(plugin));
+    protected ReloadModulesCommand(@NotNull ProPackPlugin plugin) {
+        super("modules");
         this.plugin = plugin;
     }
 
-    protected void onCommand(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args) {
-        Util.send(sender, "<white>" + plugin.getDescription().getName() + " <gray>v" + plugin.getDescription().getVersion());
-        if (sender.hasPermission("propack.admin")) {
-            Util.send(sender, "<gray>Run <white>/propack help <gray>to view usage information.");
-        }
+    @Override
+    public void execute(@NotNull CommandSender sender) {
+        plugin.getCore().getModuleManager().fullReload();
+        TagResolver.Single placeholder = Placeholder.component("modules", Component.text(plugin.getCore().getModuleManager().getModules().length));
+        Util.send(sender, "<white><modules> ProPack <gray>modules loaded", placeholder);
     }
 }

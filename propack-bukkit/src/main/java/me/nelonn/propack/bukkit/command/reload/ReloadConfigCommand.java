@@ -16,31 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.builder.hosting;
+package me.nelonn.propack.bukkit.command.reload;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.propack.bukkit.ProPackPlugin;
+import me.nelonn.propack.bukkit.Util;
+import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
+public class ReloadConfigCommand extends BaseReloadCommand {
+    private final ProPackPlugin plugin;
 
-public interface HostingMap {
-    boolean register(@NotNull Identifier id, @NotNull Hosting hosting);
-
-    default boolean register(@NotNull String id, @NotNull Hosting hosting) {
-        return register(Identifier.ofWithFallback(id, "propack"), hosting);
+    protected ReloadConfigCommand(@NotNull ProPackPlugin plugin) {
+        super("config", "conf");
+        this.plugin = plugin;
     }
 
-    boolean unregister(@NotNull Identifier id);
-
-    default boolean unregister(@NotNull String id) {
-        return unregister(Identifier.ofWithFallback(id, "propack"));
+    @Override
+    public void execute(@NotNull CommandSender sender) {
+        plugin.reloadConfig();
+        Util.send(sender, "<white>ProPack <gray>config reloaded successfully");
     }
-
-    default boolean unregister(@NotNull Hosting hosting) {
-        return unregister(hosting.getId());
-    }
-
-    @NotNull Hosting getHosting(@NotNull Identifier id);
-
-    @NotNull Map<Identifier, Hosting> getKnownHostings();
 }

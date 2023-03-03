@@ -44,7 +44,7 @@ public class BuildCommand implements Runnable {
         } else {
             projectFile = new File(dir, name + File.separator + "project.json5");
         }
-        ProPackCore proPackCore = new ProPackCore();
+        ProPackCore proPackCore = new ProPackCore(new File("./"));
         InternalProject internalProject = proPackCore.getProjectLoader().load(projectFile, false);
         internalProject.build();
     }

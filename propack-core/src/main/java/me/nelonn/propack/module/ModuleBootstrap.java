@@ -16,31 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.builder.hosting;
+package me.nelonn.propack.module;
 
-import me.nelonn.flint.path.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
+public interface ModuleBootstrap {
 
-public interface HostingMap {
-    boolean register(@NotNull Identifier id, @NotNull Hosting hosting);
+    void bootstrap(@NotNull ModuleProviderContext context);
 
-    default boolean register(@NotNull String id, @NotNull Hosting hosting) {
-        return register(Identifier.ofWithFallback(id, "propack"), hosting);
-    }
+    @NotNull JavaModule createModule(@NotNull ModuleProviderContext context);
 
-    boolean unregister(@NotNull Identifier id);
-
-    default boolean unregister(@NotNull String id) {
-        return unregister(Identifier.ofWithFallback(id, "propack"));
-    }
-
-    default boolean unregister(@NotNull Hosting hosting) {
-        return unregister(hosting.getId());
-    }
-
-    @NotNull Hosting getHosting(@NotNull Identifier id);
-
-    @NotNull Map<Identifier, Hosting> getKnownHostings();
 }

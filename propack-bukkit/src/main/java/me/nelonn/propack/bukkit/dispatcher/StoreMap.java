@@ -16,46 +16,41 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core;
+package me.nelonn.propack.bukkit.dispatcher;
 
 import me.nelonn.flint.path.Identifier;
-import me.nelonn.propack.builder.hosting.Hosting;
-import me.nelonn.propack.builder.hosting.HostingMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleHostingMap implements HostingMap {
-    protected final Map<Identifier, Hosting> knownHostings = new HashMap<>();
+public class StoreMap {
+    private final Map<Identifier, Store> knownStores = new HashMap<>();
 
-    public SimpleHostingMap() {
-    }
-
-    @Override
-    public boolean register(@NotNull Identifier id, @NotNull Hosting hosting) {
-        if (hosting.register(this, id)) {
-            knownHostings.put(id, hosting);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean unregister(@NotNull Identifier id) {
-        Hosting hosting = knownHostings.get(id);
-        if (hosting == null || !hosting.unregister(this)) return false;
-        knownHostings.remove(id);
+    public boolean register(@NotNull Identifier id, @NotNull Store store) {
+        if (knownStores.containsKey(id)) return false;
+        knownStores.put(id, store);
         return true;
     }
 
-    @Override
-    public @NotNull Hosting getHosting(@NotNull Identifier id) {
-        return knownHostings.get(id);
+    public boolean register(@NotNull String id, @NotNull Store store) {
+        return register(Identifier.ofWithFallback(id, "propack"), store);
     }
 
-    @Override
-    public @NotNull Map<Identifier, Hosting> getKnownHostings() {
-        return knownHostings;
+    public boolean unregister(@NotNull Identifier id) {
+        return knownStores.remove(id) != null;
+    }
+
+    public boolean unregister(@NotNull String id) {
+        return unregister(Identifier.ofWithFallback(id, "propack"));
+    }
+
+    public @Nullable Store get(@NotNull Identifier id) {
+        return knownStores.get(id);
+    }
+
+    public @Nullable Store get(@NotNull String id) {
+        return get(Identifier.ofWithFallback(id, "propack"));
     }
 }

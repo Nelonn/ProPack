@@ -22,8 +22,8 @@ import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.Util;
-import me.nelonn.propack.bukkit.resourcepack.PackDefinition;
-import me.nelonn.propack.bukkit.resourcepack.ProjectDefinition;
+import me.nelonn.propack.bukkit.definition.PackDefinition;
+import me.nelonn.propack.bukkit.definition.ProjectDefinition;
 import me.nelonn.propack.core.builder.InternalProject;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -49,7 +49,7 @@ public class BuildCommand extends Command {
             Util.send(sender, "<red>Usage: /" + s + " <project>");
             return;
         }
-        PackDefinition definition = plugin.getPackContainer().getDefinition(args[0]);
+        PackDefinition definition = plugin.getPackManager().getDefinition(args[0]);
         if (!(definition instanceof ProjectDefinition projectDefinition)) {
             Util.send(sender, "<red>Resource pack '" + args[0] + "' is not project");
             return;
@@ -79,7 +79,7 @@ public class BuildCommand extends Command {
     protected List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
         if (args.length > 1) return Collections.emptyList();
         String lower = args.length == 0 ? "" : args[0].toLowerCase(Locale.ROOT);
-        return plugin.getPackContainer().getDefinitions().stream().filter(packDefinition -> {
+        return plugin.getPackManager().getDefinitions().stream().filter(packDefinition -> {
             return packDefinition instanceof ProjectDefinition && packDefinition.getName().startsWith(lower);
         }).map(PackDefinition::getName).toList();
     }

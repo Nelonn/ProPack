@@ -16,16 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.sender;
+package me.nelonn.propack.bukkit.definition;
 
-import me.nelonn.propack.UploadedPack;
-import org.bukkit.entity.Player;
+import me.nelonn.propack.ResourcePack;
 import org.jetbrains.annotations.NotNull;
 
-public class BukkitPackSender implements PackSender {
+import java.util.Optional;
 
-    public void sendPack(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
-        player.setResourcePack(uploadedPack.getUrl(), uploadedPack.getSha1Bytes());
-    }
+public interface PackDefinition {
+    @NotNull String getName();
 
+    @NotNull Optional<ResourcePack> getResourcePack();
 }

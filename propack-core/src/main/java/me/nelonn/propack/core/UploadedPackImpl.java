@@ -23,28 +23,38 @@ import me.nelonn.propack.Sha1;
 import org.jetbrains.annotations.NotNull;
 
 public class UploadedPackImpl implements UploadedPack {
+    private final String name;
     private final String url;
     private final byte [] sha1Bytes;
     private final String sha1String;
 
-    public UploadedPackImpl(@NotNull String url, byte @NotNull [] sha1Bytes, @NotNull String sha1String) {
+    public UploadedPackImpl(@NotNull String name, @NotNull String url, byte @NotNull [] sha1Bytes, @NotNull String sha1String) {
+        this.name = name;
         this.url = url;
         this.sha1Bytes = sha1Bytes;
         this.sha1String = sha1String;
     }
 
-    public UploadedPackImpl(@NotNull String url, @NotNull Sha1 sha1) {
-        this(url, sha1.asBytes(), sha1.asString());
+    public UploadedPackImpl(@NotNull String name, @NotNull String url, @NotNull Sha1 sha1) {
+        this(name, url, sha1.asBytes(), sha1.asString());
     }
 
+    @Override
+    public @NotNull String getName() {
+        return name;
+    }
+
+    @Override
     public @NotNull String getUrl() {
         return url;
     }
 
+    @Override
     public byte @NotNull [] getSha1Bytes() {
         return sha1Bytes;
     }
 
+    @Override
     public @NotNull String getSha1String() {
         return sha1String;
     }
