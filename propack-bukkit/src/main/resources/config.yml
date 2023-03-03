@@ -1,4 +1,4 @@
-dispatch:
+dispatcher:
   # local store included out of box
   # additional stores can be added by other plugins/modules
   store: 'propack:local_store'
