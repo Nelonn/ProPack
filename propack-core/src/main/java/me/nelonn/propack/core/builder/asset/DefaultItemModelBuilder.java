@@ -33,6 +33,7 @@ public class DefaultItemModelBuilder extends ItemModelBuilder {
         super(path);
     }
 
+    @Override
     public DefaultItemModelBuilder setTargetItems(Set<Item> targetItems) {
         return (DefaultItemModelBuilder) super.setTargetItems(targetItems);
     }
