@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class LocalStore implements Store, Listener {
+public class MemoryStore implements Store, Listener {
     private final Map<UUID, String> map = new ConcurrentHashMap<>();
 
     @Override

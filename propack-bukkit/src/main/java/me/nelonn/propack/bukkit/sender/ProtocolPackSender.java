@@ -24,7 +24,7 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import me.nelonn.propack.UploadedPack;
-import me.nelonn.propack.bukkit.Settings;
+import me.nelonn.propack.bukkit.Config;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
@@ -36,14 +36,14 @@ public class ProtocolPackSender implements PackSender {
 
     public ProtocolPackSender() {
         protocolManager = ProtocolLibrary.getProtocolManager();
-        component = WrappedChatComponent.fromJson(GsonComponentSerializer.gson().serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(Settings.DISPATCH_PROMPT.asString())));
+        component = WrappedChatComponent.fromJson(GsonComponentSerializer.gson().serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(Config.DISPATCHER_PROMPT.asString())));
     }
 
     public void sendPack(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.RESOURCE_PACK_SEND);
         packet.getStrings().write(0, uploadedPack.getUrl());
         packet.getStrings().write(1, uploadedPack.getSha1String());
-        packet.getBooleans().write(0, Settings.DISPATCH_REQUIRED.asBoolean());
+        packet.getBooleans().write(0, Config.DISPATCHER_REQUIRED.asBoolean());
         packet.getChatComponents().write(0, component);
         try {
             protocolManager.sendServerPacket(player, packet);

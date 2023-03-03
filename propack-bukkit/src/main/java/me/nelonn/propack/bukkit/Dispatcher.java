@@ -44,7 +44,7 @@ public class Dispatcher implements Listener {
         packSender = /*Util.isPaper() ? new PaperPackSender() :*/
                 CompatibilitiesManager.hasPlugin("ProtocolLib") ? new ProtocolPackSender() :
                         new BukkitPackSender();
-        store = new LocalStore();
+        store = new MemoryStore();
         Bukkit.getPluginManager().registerEvents((Listener) store, plugin);
     }
 
@@ -59,12 +59,12 @@ public class Dispatcher implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        if (!Settings.DISPATCH_ENABLED.asBoolean()) return;
-        PackDefinition definition = ProPack.getPackContainer().getDefinition(Settings.DISPATCH_PACK.asString());
+        if (!Config.DISPATCHER_ENABLED.asBoolean()) return;
+        PackDefinition definition = ProPack.getPackContainer().getDefinition(Config.DISPATCHER_PACK.asString());
         if (definition == null) return;
         Optional<ResourcePack> resourcePack = definition.getResourcePack();
         if (resourcePack.isEmpty()) return;
-        int delay = (int) Settings.DISPATCH_DELAY.getValue();
+        int delay = (int) Config.DISPATCHER_DELAY.getValue();
         if (delay > 0) {
             Bukkit.getScheduler().runTaskLater(plugin, () -> sendPack(event.getPlayer(), resourcePack.get()), delay * 20L);
         } else {

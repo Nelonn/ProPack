@@ -29,7 +29,7 @@ import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.asset.*;
 import me.nelonn.propack.bukkit.ProPack;
-import me.nelonn.propack.bukkit.Settings;
+import me.nelonn.propack.bukkit.Config;
 import me.nelonn.propack.bukkit.adapter.Adapter;
 import me.nelonn.propack.bukkit.adapter.WrappedCompoundTag;
 import me.nelonn.propack.bukkit.adapter.WrappedItemStack;
@@ -87,7 +87,7 @@ public class PacketListener extends PacketAdapter {
     public void onPacketReceiving(PacketEvent event) {
         PacketType type = event.getPacketType();
         Object packet = event.getPacket().getHandle();
-        if (type == PacketType.Play.Client.SET_CREATIVE_SLOT && Settings.PATCH_PACKETS_ITEMS.asBoolean()) {
+        if (type == PacketType.Play.Client.SET_CREATIVE_SLOT && Config.PATCH_PACKETS_ITEMS.asBoolean()) {
             adapter.patchSetCreativeSlot(packet, this::patchInItems);
         }
     }
@@ -98,7 +98,7 @@ public class PacketListener extends PacketAdapter {
         Object packet = event.getPacket().getHandle();
         Optional<ResourcePack> resourcePack = ProPack.getDispatcher().getResourcePack(event.getPlayer());
         if (resourcePack.isEmpty()) return;
-        if (Settings.PATCH_PACKETS_ITEMS.asBoolean()) {
+        if (Config.PATCH_PACKETS_ITEMS.asBoolean()) {
             BiConsumer<Object, Consumer<WrappedItemStack>> method;
             if (type == PacketType.Play.Server.SET_SLOT) {
                 method = adapter::patchSetSlot;
@@ -113,7 +113,7 @@ public class PacketListener extends PacketAdapter {
             }
             method.accept(packet, stack -> patchOutItems(stack, resourcePack.get()));
         }
-        if (Settings.PATCH_PACKETS_SOUNDS.asBoolean() && type == PacketType.Play.Server.CUSTOM_SOUND_EFFECT) {
+        if (Config.PATCH_PACKETS_SOUNDS.asBoolean() && type == PacketType.Play.Server.CUSTOM_SOUND_EFFECT) {
             MinecraftKey minecraftKey = event.getPacket().getMinecraftKeys().read(0);
             Path path = Path.of(minecraftKey.getPrefix(), minecraftKey.getKey());
             SoundAsset soundAsset = resourcePack.get().getSound(path);

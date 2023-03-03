@@ -1,7 +1,7 @@
 dispatcher:
-  # local store included out of box
+  # memory store included out of box
   # additional stores can be added by other plugins/modules
-  store: 'propack:local_store'
+  store: 'propack:memory_store'
   # if disabled, you can access the store anyway.
   enabled: true
   # pack to send

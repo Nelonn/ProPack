@@ -19,7 +19,7 @@
 package me.nelonn.propack.bukkit.sender;
 
 import me.nelonn.propack.UploadedPack;
-import me.nelonn.propack.bukkit.Settings;
+import me.nelonn.propack.bukkit.Config;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
@@ -29,11 +29,11 @@ public class PaperPackSender implements PackSender {
     private final Component component;
 
     public PaperPackSender() {
-        component = LegacyComponentSerializer.legacyAmpersand().deserialize(Settings.DISPATCH_PROMPT.asString());
+        component = LegacyComponentSerializer.legacyAmpersand().deserialize(Config.DISPATCHER_PROMPT.asString());
     }
 
     public void sendPack(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
-        player.setResourcePack(uploadedPack.getUrl(), uploadedPack.getSha1String(), Settings.DISPATCH_REQUIRED.asBoolean(), component);
+        player.setResourcePack(uploadedPack.getUrl(), uploadedPack.getSha1String(), Config.DISPATCHER_REQUIRED.asBoolean(), component);
     }
 
 }

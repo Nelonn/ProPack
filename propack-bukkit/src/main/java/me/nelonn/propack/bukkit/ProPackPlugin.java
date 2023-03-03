@@ -102,8 +102,8 @@ public final class ProPackPlugin extends JavaPlugin {
         }
         proPackCore = new ProPackCore();
         proPackCore.getProjectLoader().getItemDefinitionLoaders().add(BukkitItemDefinitionLoader.INSTANCE);
-        if (Settings.DEV_SERVER_ENABLED.asBoolean()) {
-            devServer = new DevServer(Settings.DEV_SERVER_RETURN_IP.asString(), Settings.DEV_SERVER_PORT.asInteger());
+        if (Config.DEV_SERVER_ENABLED.asBoolean()) {
+            devServer = new DevServer(Config.DEV_SERVER_RETURN_IP.asString(), Config.DEV_SERVER_PORT.asInteger());
             proPackCore.getHostingMap().register("propack", devServer);
         }
         packContainer = new PackContainer(proPackCore, getDataFolder());
