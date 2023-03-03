@@ -24,7 +24,6 @@ import me.nelonn.propack.builder.hosting.HostingMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class SimpleHostingMap implements HostingMap {
@@ -34,28 +33,20 @@ public class SimpleHostingMap implements HostingMap {
     }
 
     @Override
-    public boolean register(@NotNull String namespace, @NotNull Hosting hosting) {
+    public boolean register(@NotNull Identifier id, @NotNull Hosting hosting) {
         if (hosting.register(this)) {
-            knownHostings.put(Identifier.of(namespace, hosting.getName()), hosting);
+            knownHostings.put(id, hosting);
             return true;
         }
         return false;
     }
 
     @Override
-    public void registerAll(@NotNull String namespace, @NotNull List<Hosting> hostings) {
-        for (Hosting hosting : hostings) {
-            register(namespace, hosting);
-        }
-    }
-
-    @Override
-    public boolean unregister(@NotNull String namespace, @NotNull Hosting hosting) {
-        if (hosting.unregister(this)) {
-            knownHostings.remove(Identifier.of(namespace, hosting.getName()));
-            return true;
-        }
-        return false;
+    public boolean unregister(@NotNull Identifier id) {
+        Hosting hosting = knownHostings.get(id);
+        if (hosting == null || !hosting.unregister(this)) return false;
+        knownHostings.remove(id);
+        return true;
     }
 
     @Override

@@ -21,15 +21,20 @@ package me.nelonn.propack.builder.hosting;
 import me.nelonn.flint.path.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Map;
 
 public interface HostingMap {
-    boolean register(@NotNull String namespace, @NotNull Hosting hosting);
+    boolean register(@NotNull Identifier id, @NotNull Hosting hosting);
 
-    void registerAll(@NotNull String namespace, @NotNull List<Hosting> hostings);
+    default boolean register(@NotNull String id, @NotNull Hosting hosting) {
+        return register(Identifier.ofWithFallback(id, "propack"), hosting);
+    }
 
-    boolean unregister(@NotNull String namespace, @NotNull Hosting hosting);
+    boolean unregister(@NotNull Identifier id);
+
+    default boolean unregister(@NotNull String id) {
+        return unregister(Identifier.ofWithFallback(id, "propack"));
+    }
 
     @NotNull Hosting getHosting(@NotNull Identifier id);
 

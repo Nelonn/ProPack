@@ -44,7 +44,6 @@ public final class DevServer extends Hosting implements Closeable {
     private final HttpRunner runner;
 
     public DevServer(@NotNull String returnIp, int port) {
-        super("dev_server");
         returnUrl = "http://" + returnIp + ":" + port;
         try {
             runner = new HttpRunner(port);

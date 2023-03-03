@@ -28,18 +28,9 @@ import java.io.IOException;
 import java.util.Map;
 
 public abstract class Hosting {
-    private final String name;
     private HostingMap hostingMap;
 
-    protected Hosting(@NotNull String name) {
-        this.name = name;
-    }
-
     public abstract @NotNull UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1, @NotNull String name, @Nullable Map<String, Object> options) throws IOException;
-
-    public @NotNull String getName() {
-        return name;
-    }
 
     public final boolean register(@NotNull HostingMap hostingMap) {
         if (allowChangesFrom(hostingMap)) {
