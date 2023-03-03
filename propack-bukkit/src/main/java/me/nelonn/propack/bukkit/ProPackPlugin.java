@@ -116,6 +116,7 @@ public final class ProPackPlugin extends JavaPlugin {
     @Override
     public void reloadConfig() {
         super.reloadConfig();
+        Config.setFileConfiguration(getConfig());
         proPackCore.getModuleManager().fullReload();
         if (devServer != null) {
             proPackCore.getHostingMap().unregister(devServer);
