@@ -15,8 +15,9 @@ dispatcher:
 
   # kick player if he declined pack
   required: true
-  # message on screen
-  prompt: "&#fa4943Accept the pack to enjoy a full experience"
+  # MiniMessage https://docs.advntr.dev/minimessage
+  # placeholders: <player> and <pack_name>
+  prompt: "<#fa4943>Accept the pack to enjoy a full experience"
 
 dev_server:
   # if enabled, 'propack:dev_server' will be added to the hostings map

@@ -25,31 +25,38 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import me.nelonn.propack.UploadedPack;
 import me.nelonn.propack.bukkit.Config;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ProtocolPackSender implements PackSender {
     private final ProtocolManager protocolManager;
-    private final WrappedChatComponent component;
 
     public ProtocolPackSender() {
         protocolManager = ProtocolLibrary.getProtocolManager();
-        component = WrappedChatComponent.fromJson(GsonComponentSerializer.gson().serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(Config.DISPATCHER_PROMPT.asString())));
     }
 
     public void send(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
+        Component component = MiniMessage.miniMessage().deserialize(Config.DISPATCHER_PROMPT.asString(),
+                Placeholder.component("player", Component.text(player.getName())),
+                Placeholder.component("pack_name", Component.text(uploadedPack.getName())));
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.RESOURCE_PACK_SEND);
         packet.getStrings().write(0, uploadedPack.getUrl());
         packet.getStrings().write(1, uploadedPack.getSha1String());
         packet.getBooleans().write(0, Config.DISPATCHER_REQUIRED.asBoolean());
-        packet.getChatComponents().write(0, component);
+        packet.getChatComponents().write(0, toProtocolLike(component));
         try {
             protocolManager.sendServerPacket(player, packet);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private WrappedChatComponent toProtocolLike(Component component) {
+        return WrappedChatComponent.fromJson(GsonComponentSerializer.gson().serialize(component));
     }
 
 }
