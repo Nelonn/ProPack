@@ -39,15 +39,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public class Dispatcher implements Listener {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final ProPackPlugin plugin;
     private final PackSender packSender;
     private final Store store;
+    private final Map<UUID, SentPack> pending = new HashMap<>();
 
     public Dispatcher(@NotNull ProPackPlugin plugin) {
         this.plugin = plugin;
@@ -61,10 +67,9 @@ public class Dispatcher implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public void sendPack(@NotNull Player player, @NotNull ResourcePackInfo packInfo) {
+    public void sendOffer(@NotNull Player player, @NotNull ResourcePackInfo packInfo) {
         packSender.send(player, packInfo);
-        // TODO: set only when player downloaded pack
-        store.setActiveResourcePack(player.getUniqueId(), new SentPack(packInfo.getUpload().getName(), packInfo.getUpload().getSha1String()));
+        pending.put(player.getUniqueId(), new SentPack(packInfo.getUpload().getName(), packInfo.getUpload().getSha1String()));
     }
 
     /**
@@ -72,12 +77,12 @@ public class Dispatcher implements Listener {
      * @param player receiver
      * @param uploadedPack uploaded resource pack
      */
-    public void sendPackAsDefault(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
+    public void sendOfferAsDefault(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
         Component prompt = MiniMessage.miniMessage().deserialize(Config.DISPATCHER_PROMPT.asString(),
                 Placeholder.component("player", Component.text(player.getName())),
                 Placeholder.component("pack_name", Component.text(uploadedPack.getName())));
         ResourcePackInfo packInfo = new ResourcePackInfo(uploadedPack, prompt, Config.DISPATCHER_REQUIRED.asBoolean());
-        sendPack(player, packInfo);
+        sendOffer(player, packInfo);
     }
 
     /**
@@ -85,12 +90,12 @@ public class Dispatcher implements Listener {
      * @param player receiver
      * @param resourcePack resource pack
      */
-    public void sendPackAsDefault(@NotNull Player player, @NotNull ResourcePack resourcePack) {
+    public void sendOfferAsDefault(@NotNull Player player, @NotNull ResourcePack resourcePack) {
         Optional<UploadedPack> uploadedPack = resourcePack.getUpload();
         if (uploadedPack.isEmpty()) {
             throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not upload");
         }
-        sendPackAsDefault(player, uploadedPack.get());
+        sendOfferAsDefault(player, uploadedPack.get());
     }
 
     @EventHandler
@@ -119,13 +124,25 @@ public class Dispatcher implements Listener {
         }
         int delay = Config.DISPATCHER_DELAY.asInt();
         if (delay > 0) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> sendPackAsDefault(player, uploadedPack), delay * 20L);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> sendOfferAsDefault(player, uploadedPack), delay * 20L);
         } else {
-            sendPackAsDefault(player, uploadedPack);
+            sendOfferAsDefault(player, uploadedPack);
         }
     }
 
-    public @NotNull Optional<ResourcePack> getResourcePack(@NotNull Player player) {
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        pending.remove(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
+    public void onStatus(PlayerResourcePackStatusEvent event) {
+        if (event.getStatus() == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) {
+            store.setActiveResourcePack(event.getPlayer().getUniqueId(), pending.remove(event.getPlayer().getUniqueId()));
+        }
+    }
+
+    public @NotNull Optional<ResourcePack> getAppliedResourcePack(@NotNull Player player) {
         SentPack sentPack = store.getActiveResourcePack(player.getUniqueId());
         if (sentPack == null) return Optional.empty();
         PackDefinition definition = plugin.getCore().getPackManager().getDefinition(sentPack.name);

@@ -61,9 +61,9 @@ public class BuildCommand extends Command {
                 ResourcePack resourcePack = internalProject.getResourcePack().orElseThrow();
                 if (resourcePack.isUploaded()) {
                     for (Player player : Bukkit.getOnlinePlayers()) {
-                        Optional<ResourcePack> playerPack = ProPack.getCore().getDispatcher().getResourcePack(player);
+                        Optional<ResourcePack> playerPack = ProPack.getCore().getDispatcher().getAppliedResourcePack(player);
                         if (playerPack.isPresent() && playerPack.get().getName().equals(resourcePack.getName())) {
-                            ProPack.getCore().getDispatcher().sendPackAsDefault(player, resourcePack);
+                            ProPack.getCore().getDispatcher().sendOfferAsDefault(player, resourcePack);
                         }
                     }
                 }
