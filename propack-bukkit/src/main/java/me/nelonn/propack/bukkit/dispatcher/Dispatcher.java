@@ -23,12 +23,16 @@ import me.nelonn.propack.UploadedPack;
 import me.nelonn.propack.bukkit.Config;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
+import me.nelonn.propack.bukkit.ResourcePackInfo;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
 import me.nelonn.propack.bukkit.definition.PackDefinition;
 import me.nelonn.propack.bukkit.dispatcher.sender.BukkitPackSender;
 import me.nelonn.propack.bukkit.dispatcher.sender.PackSender;
 import me.nelonn.propack.bukkit.dispatcher.sender.ProtocolPackSender;
 import me.nelonn.propack.core.util.LogManagerCompat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -57,18 +61,36 @@ public class Dispatcher implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public void sendPack(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
-        packSender.send(player, uploadedPack);
+    public void sendPack(@NotNull Player player, @NotNull ResourcePackInfo packInfo) {
+        packSender.send(player, packInfo);
         // TODO: set only when player downloaded pack
-        store.setActiveResourcePack(player.getUniqueId(), new SentPack(uploadedPack.getName(), uploadedPack.getSha1String()));
+        store.setActiveResourcePack(player.getUniqueId(), new SentPack(packInfo.getUpload().getName(), packInfo.getUpload().getSha1String()));
     }
 
-    public void sendPack(@NotNull Player player, @NotNull ResourcePack resourcePack) {
+    /**
+     * This method uses dispatcher configuration as ResourcePackInfo
+     * @param player receiver
+     * @param uploadedPack uploaded resource pack
+     */
+    public void sendPackAsDefault(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
+        Component prompt = MiniMessage.miniMessage().deserialize(Config.DISPATCHER_PROMPT.asString(),
+                Placeholder.component("player", Component.text(player.getName())),
+                Placeholder.component("pack_name", Component.text(uploadedPack.getName())));
+        ResourcePackInfo packInfo = new ResourcePackInfo(uploadedPack, prompt, Config.DISPATCHER_REQUIRED.asBoolean());
+        sendPack(player, packInfo);
+    }
+
+    /**
+     * This method uses dispatcher configuration as ResourcePackInfo
+     * @param player receiver
+     * @param resourcePack resource pack
+     */
+    public void sendPackAsDefault(@NotNull Player player, @NotNull ResourcePack resourcePack) {
         Optional<UploadedPack> uploadedPack = resourcePack.getUpload();
         if (uploadedPack.isEmpty()) {
             throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not upload");
         }
-        sendPack(player, uploadedPack.get());
+        sendPackAsDefault(player, uploadedPack.get());
     }
 
     @EventHandler
@@ -95,12 +117,11 @@ public class Dispatcher implements Listener {
                 if (active.name.equals(resourcePack.getName()) && active.sha1.equals(uploadedPack.getSha1String())) return;
             } else return;
         }
-
-        int delay = (int) Config.DISPATCHER_DELAY.getValue();
+        int delay = Config.DISPATCHER_DELAY.asInt();
         if (delay > 0) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> sendPack(player, uploadedPack), delay * 20L);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> sendPackAsDefault(player, uploadedPack), delay * 20L);
         } else {
-            sendPack(player, uploadedPack);
+            sendPackAsDefault(player, uploadedPack);
         }
     }
 

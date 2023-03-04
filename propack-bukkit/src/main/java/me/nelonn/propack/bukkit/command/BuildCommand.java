@@ -63,7 +63,7 @@ public class BuildCommand extends Command {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         Optional<ResourcePack> playerPack = ProPack.getCore().getDispatcher().getResourcePack(player);
                         if (playerPack.isPresent() && playerPack.get().getName().equals(resourcePack.getName())) {
-                            ProPack.getCore().getDispatcher().sendPack(player, resourcePack);
+                            ProPack.getCore().getDispatcher().sendPackAsDefault(player, resourcePack);
                         }
                     }
                 }

@@ -18,14 +18,14 @@
 
 package me.nelonn.propack.bukkit.dispatcher.sender;
 
-import me.nelonn.propack.UploadedPack;
+import me.nelonn.propack.bukkit.ResourcePackInfo;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class BukkitPackSender implements PackSender {
 
-    public void send(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
-        player.setResourcePack(uploadedPack.getUrl(), uploadedPack.getSha1Bytes());
+    public void send(@NotNull Player player, @NotNull ResourcePackInfo info) {
+        player.setResourcePack(info.getUpload().getUrl(), info.getUpload().getSha1Bytes());
     }
 
 }

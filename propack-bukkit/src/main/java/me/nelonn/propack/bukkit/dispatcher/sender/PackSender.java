@@ -18,12 +18,12 @@
 
 package me.nelonn.propack.bukkit.dispatcher.sender;
 
-import me.nelonn.propack.UploadedPack;
+import me.nelonn.propack.bukkit.ResourcePackInfo;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public interface PackSender {
 
-    void send(@NotNull Player player, @NotNull UploadedPack uploadedPack);
+    void send(@NotNull Player player, @NotNull ResourcePackInfo packInfo);
 
 }

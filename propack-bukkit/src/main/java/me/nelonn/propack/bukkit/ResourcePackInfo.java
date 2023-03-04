@@ -16,19 +16,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.dispatcher.sender;
+package me.nelonn.propack.bukkit;
 
-import me.nelonn.propack.bukkit.ResourcePackInfo;
-import org.bukkit.entity.Player;
+import me.nelonn.propack.UploadedPack;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class PaperPackSender implements PackSender { // TODO: not working
-    public PaperPackSender() {
+public class ResourcePackInfo {
+    private final UploadedPack upload;
+    private final Component prompt;
+    private final boolean shouldForce;
+
+    public ResourcePackInfo(@NotNull UploadedPack upload, @Nullable Component prompt, boolean shouldForce) {
+        this.upload = upload;
+        this.prompt = prompt;
+        this.shouldForce = shouldForce;
     }
 
-    public void send(@NotNull Player player, @NotNull ResourcePackInfo packInfo) {
-        player.setResourcePack(packInfo.getUpload().getUrl(), packInfo.getUpload().getSha1String(),
-                packInfo.getShouldForce(), packInfo.getPrompt());
+    public @NotNull UploadedPack getUpload() {
+        return upload;
     }
 
+    public @Nullable Component getPrompt() {
+        return prompt;
+    }
+
+    public boolean getShouldForce() {
+        return shouldForce;
+    }
 }
