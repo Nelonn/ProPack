@@ -42,6 +42,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -140,6 +141,10 @@ public class Dispatcher implements Listener {
         if (event.getStatus() == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) {
             store.setActiveResourcePack(event.getPlayer().getUniqueId(), pending.remove(event.getPlayer().getUniqueId()));
         }
+    }
+
+    public @Nullable SentPack getPendingResourcePack(@NotNull Player player) {
+        return pending.get(player.getUniqueId());
     }
 
     public @NotNull Optional<ResourcePack> getAppliedResourcePack(@NotNull Player player) {
