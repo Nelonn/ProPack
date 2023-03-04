@@ -50,10 +50,11 @@ public class Dispatcher implements Listener {
         packSender = /*Util.isPaper() ? new PaperPackSender() :*/
                 CompatibilitiesManager.hasPlugin("ProtocolLib") ? new ProtocolPackSender() :
                         new BukkitPackSender();
-        store = plugin.getStoreMap().get(Config.DISPATCHER_STORE.asString());
+        store = plugin.getCore().getStoreMap().get(Config.DISPATCHER_STORE.asString());
         if (store == null) {
             throw new IllegalArgumentException("Store '" + Config.DISPATCHER_STORE.asString() + "' not found");
         }
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     public void sendPack(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
@@ -73,7 +74,7 @@ public class Dispatcher implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         if (!Config.DISPATCHER_ENABLED.asBoolean()) return;
-        PackDefinition definition = ProPack.getPackContainer().getDefinition(Config.DISPATCHER_PACK.asString());
+        PackDefinition definition = ProPack.getCore().getPackManager().getDefinition(Config.DISPATCHER_PACK.asString());
         if (definition == null) {
             LOGGER.warn("Resource pack '" + Config.DISPATCHER_PACK.asString() + "' not found");
             return;
@@ -106,7 +107,7 @@ public class Dispatcher implements Listener {
     public @NotNull Optional<ResourcePack> getResourcePack(@NotNull Player player) {
         SentPack sentPack = store.getActiveResourcePack(player.getUniqueId());
         if (sentPack == null) return Optional.empty();
-        PackDefinition definition = plugin.getPackManager().getDefinition(sentPack.name);
+        PackDefinition definition = plugin.getCore().getPackManager().getDefinition(sentPack.name);
         if (definition == null) return Optional.empty();
         return definition.getResourcePack();
     }

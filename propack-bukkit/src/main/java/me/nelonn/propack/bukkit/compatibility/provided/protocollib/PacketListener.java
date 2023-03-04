@@ -96,7 +96,7 @@ public class PacketListener extends PacketAdapter {
     public void onPacketSending(PacketEvent event) {
         PacketType type = event.getPacketType();
         Object packet = event.getPacket().getHandle();
-        Optional<ResourcePack> resourcePack = ProPack.getDispatcher().getResourcePack(event.getPlayer());
+        Optional<ResourcePack> resourcePack = ProPack.getCore().getDispatcher().getResourcePack(event.getPlayer());
         if (resourcePack.isEmpty()) return;
         if (Config.PATCH_PACKETS_ITEMS.asBoolean()) {
             BiConsumer<Object, Consumer<WrappedItemStack>> method;

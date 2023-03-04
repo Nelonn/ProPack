@@ -20,36 +20,21 @@ package me.nelonn.propack.bukkit;
 
 import com.google.common.base.Preconditions;
 import me.nelonn.flint.path.Identifier;
-import me.nelonn.propack.bukkit.dispatcher.Dispatcher;
-import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.definition.Item;
-import me.nelonn.propack.bukkit.definition.PackManager;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
 public final class ProPack {
-    private static ProPackPlugin plugin;
+    private static BukkitProPackCore core;
 
-    public static ProPackPlugin getPlugin() {
-        Preconditions.checkNotNull(plugin, "ProPack is not enabled, unable to access the api.");
-        return plugin;
+    public static BukkitProPackCore getCore() {
+        Preconditions.checkNotNull(core, "ProPack is not enabled, unable to access the api.");
+        return core;
     }
 
-    public static void setPlugin(ProPackPlugin plugin) {
-        Preconditions.checkNotNull(plugin);
-        ProPack.plugin = plugin;
-    }
-
-    public static @NotNull ProPackCore getCore() {
-        return plugin.getCore();
-    }
-
-    public static @NotNull PackManager getPackContainer() {
-        return plugin.getPackManager();
-    }
-
-    public static @NotNull Dispatcher getDispatcher() {
-        return plugin.getDispatcher();
+    public static void setCore(@NotNull BukkitProPackCore core) {
+        Preconditions.checkNotNull(core);
+        ProPack.core = core;
     }
 
     public static @NotNull Item adapt(@NotNull Material material) {
