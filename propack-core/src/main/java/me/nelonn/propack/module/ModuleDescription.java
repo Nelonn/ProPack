@@ -22,8 +22,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
-public interface ModuleMeta {
+public interface ModuleDescription {
+    Pattern NAME_PATTERN = Pattern.compile("^[A-Za-z0-9_-]+$");
 
     @NotNull String getName();
 

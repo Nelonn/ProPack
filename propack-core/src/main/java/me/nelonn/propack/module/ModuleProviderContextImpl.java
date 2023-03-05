@@ -24,20 +24,20 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 
-public class CraftModuleProviderContext implements ModuleProviderContext {
-    private final ModuleMeta moduleMeta;
+public class ModuleProviderContextImpl implements ModuleProviderContext {
+    private final ModuleDescription description;
     private final Path dataDirectory;
     private final Logger logger;
 
-    public CraftModuleProviderContext(@NotNull ModuleMeta moduleMeta, @NotNull Path dataDirectory) {
-        this.moduleMeta = moduleMeta;
+    public ModuleProviderContextImpl(@NotNull ModuleDescription description, @NotNull Path dataDirectory) {
+        this.description = description;
         this.dataDirectory = dataDirectory;
-        this.logger = LogManager.getLogger(moduleMeta.getLoggerPrefix());
+        this.logger = LogManager.getLogger(description.getLoggerPrefix());
     }
 
     @Override
-    public @NotNull ModuleMeta getMeta() {
-        return moduleMeta;
+    public @NotNull ModuleDescription getDescription() {
+        return description;
     }
 
     @Override

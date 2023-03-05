@@ -84,7 +84,7 @@ public final class ProPackPlugin extends JavaPlugin {
         CompatibilitiesManager.disableCompatibilities();
         adventure.close();
         adventure = null;
-        core.getModuleManager().disableAllAndClear();
+        core.getModuleManager().disableAll();
         if (devServer != null) {
             core.getHostingMap().unregister(devServer);
             try {
@@ -100,7 +100,7 @@ public final class ProPackPlugin extends JavaPlugin {
     public void reloadConfig() {
         super.reloadConfig();
         Config.setFileConfiguration(getConfig());
-        core.getModuleManager().fullReload();
+        core.getModuleManager().loadAll();
         if (devServer != null) {
             core.getHostingMap().unregister(devServer);
             try {
@@ -117,7 +117,7 @@ public final class ProPackPlugin extends JavaPlugin {
     }
 
     public void reloadModules() {
-        core.getModuleManager().fullReload();
+        core.getModuleManager().loadAll();
     }
 
     public void reloadPacks() {

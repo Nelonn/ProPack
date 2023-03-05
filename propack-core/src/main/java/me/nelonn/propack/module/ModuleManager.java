@@ -21,14 +21,16 @@ package me.nelonn.propack.module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+
 public interface ModuleManager {
 
     @Nullable Module getModule(@NotNull String name);
 
     @NotNull Module[] getModules();
 
-    void fullReload();
+    void loadAll() throws IOException;
 
-    void disableAllAndClear();
+    void disableAll();
 
 }

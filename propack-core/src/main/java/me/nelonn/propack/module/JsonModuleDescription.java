@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * <table border=1>
@@ -70,8 +69,7 @@ import java.util.regex.Pattern;
  * </tr>
  * </table>
  */
-public class JsonModuleMeta implements ModuleMeta {
-    public static final Pattern VALID_NAME = Pattern.compile("^[A-Za-z0-9_-]+$");
+public class JsonModuleDescription implements ModuleDescription {
     private final String name;
     private final String bootstraper;
     private final String version;
@@ -81,7 +79,7 @@ public class JsonModuleMeta implements ModuleMeta {
     private final String website;
     private final String loggerPrefix;
 
-    private JsonModuleMeta(String name, String bootstraper, String version, String description, List<String> authors, List<String> contributors, String website, String loggerPrefix) {
+    private JsonModuleDescription(String name, String bootstraper, String version, String description, List<String> authors, List<String> contributors, String website, String loggerPrefix) {
         this.name = name;
         this.bootstraper = bootstraper;
         this.version = version;
@@ -132,9 +130,9 @@ public class JsonModuleMeta implements ModuleMeta {
         return loggerPrefix;
     }
 
-    public static JsonModuleMeta deserialize(JsonObject jsonObject) throws InvalidDescriptionException {
+    public static JsonModuleDescription deserialize(JsonObject jsonObject) throws InvalidDescriptionException {
         String name = GsonHelper.getString(jsonObject, "name");
-        if (!VALID_NAME.matcher(name).matches()) {
+        if (!NAME_PATTERN.matcher(name).matches()) {
             throw new InvalidDescriptionException("name '" + name + "' contains invalid characters.");
         }
         String bootstrapper = GsonHelper.getString(jsonObject, "bootstrapper");
@@ -178,6 +176,6 @@ public class JsonModuleMeta implements ModuleMeta {
         } else {
             loggerPrefix = name;
         }
-        return new JsonModuleMeta(name, bootstrapper, version, description, authors, contributors, website, loggerPrefix);
+        return new JsonModuleDescription(name, bootstrapper, version, description, authors, contributors, website, loggerPrefix);
     }
 }
