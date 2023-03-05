@@ -29,4 +29,9 @@ public class CLI {
         new CommandLine(new CLI()).execute(args);
     }
 
+    static {
+        System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
+        System.setProperty("java.awt.headless", "true");
+    }
+
 }
