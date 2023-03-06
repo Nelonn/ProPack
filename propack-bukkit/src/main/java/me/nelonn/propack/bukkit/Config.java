@@ -18,12 +18,9 @@
 
 package me.nelonn.propack.bukkit;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public enum Config {
     DISPATCHER_STORE("dispatcher.store", "propack:memory_store"),
@@ -80,14 +77,6 @@ public enum Config {
             throw new NullPointerException("Config option '" + path + "' is null");
         }
         return (int) getValue();
-    }
-
-    public List<String> asStringList() {
-        return fileConfiguration.getStringList(path);
-    }
-
-    public ConfigurationSection asSection() {
-        return fileConfiguration.getConfigurationSection(path);
     }
 
     @Override
