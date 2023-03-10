@@ -35,7 +35,7 @@ public class BukkitProPackCore extends ProPackCore {
         packManager = new PackManager(this, plugin.getDataFolder());
         storeMap = new StoreMap();
         storeMap.register("memory_store", new MemoryStore(plugin));
-        dispatcher = new Dispatcher(plugin);
+        dispatcher = new Dispatcher(plugin, storeMap);
     }
 
     public PackManager getPackManager() {

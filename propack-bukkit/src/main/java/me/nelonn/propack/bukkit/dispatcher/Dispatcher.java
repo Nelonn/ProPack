@@ -56,12 +56,12 @@ public class Dispatcher implements Listener {
     private final Store store;
     private final Map<UUID, SentPack> pending = new HashMap<>();
 
-    public Dispatcher(@NotNull ProPackPlugin plugin) {
+    public Dispatcher(@NotNull ProPackPlugin plugin, @NotNull StoreMap storeMap) {
         this.plugin = plugin;
         packSender = /*Util.isPaper() ? new PaperPackSender() :*/
                 CompatibilitiesManager.hasPlugin("ProtocolLib") ? new ProtocolPackSender() :
                         new BukkitPackSender();
-        store = plugin.getCore().getStoreMap().get(Config.DISPATCHER_STORE.asString());
+        store = storeMap.get(Config.DISPATCHER_STORE.asString());
         if (store == null) {
             throw new IllegalArgumentException("Store '" + Config.DISPATCHER_STORE.asString() + "' not found");
         }
