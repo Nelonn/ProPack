@@ -100,7 +100,6 @@ public final class ProPackPlugin extends JavaPlugin {
     public void reloadConfig() {
         super.reloadConfig();
         Config.setFileConfiguration(getConfig());
-        core.getModuleManager().loadAll();
         if (devServer != null) {
             core.getHostingMap().unregister(devServer);
             try {
@@ -117,7 +116,11 @@ public final class ProPackPlugin extends JavaPlugin {
     }
 
     public void reloadModules() {
-        core.getModuleManager().loadAll();
+        try {
+            core.getModuleManager().loadAll();
+        } catch (Exception e) {
+            LOGGER.error("Unable to load modules", e);
+        }
     }
 
     public void reloadPacks() {
