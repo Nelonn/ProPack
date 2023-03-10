@@ -53,19 +53,27 @@ public class Dispatcher implements Listener {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final ProPackPlugin plugin;
     private final PackSender packSender;
-    private final Store store;
     private final Map<UUID, SentPack> pending = new HashMap<>();
+    private Store store;
 
-    public Dispatcher(@NotNull ProPackPlugin plugin, @NotNull StoreMap storeMap) {
+    public Dispatcher(@NotNull ProPackPlugin plugin) {
         this.plugin = plugin;
         packSender = /*Util.isPaper() ? new PaperPackSender() :*/
                 CompatibilitiesManager.hasPlugin("ProtocolLib") ? new ProtocolPackSender() :
                         new BukkitPackSender();
-        store = storeMap.get(Config.DISPATCHER_STORE.asString());
-        if (store == null) {
-            throw new IllegalArgumentException("Store '" + Config.DISPATCHER_STORE.asString() + "' not found");
-        }
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        store = new MemoryStore(plugin);
+    }
+
+    public Store getStore() {
+        return store;
+    }
+
+    public void setStore(Store store) {
+        this.store = store;
+        if (this.store == null) {
+            this.store = new MemoryStore(plugin);
+        }
     }
 
     public void sendOffer(@NotNull Player player, @NotNull ResourcePackInfo packInfo) {

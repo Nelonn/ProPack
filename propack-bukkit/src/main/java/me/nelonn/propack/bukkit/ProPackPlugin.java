@@ -20,6 +20,7 @@ package me.nelonn.propack.bukkit;
 
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
+import me.nelonn.propack.bukkit.dispatcher.Store;
 import me.nelonn.propack.core.DevServer;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.core.util.LogManagerCompat;
@@ -116,6 +117,11 @@ public final class ProPackPlugin extends JavaPlugin {
             devServer = new DevServer(Config.DEV_SERVER_RETURN_IP.asString(), Config.DEV_SERVER_PORT.asInt());
             core.getHostingMap().register("dev_server", devServer);
         }
+        Store store = core.getStoreMap().get(Config.DISPATCHER_STORE.asString());
+        if (store == null) {
+            LOGGER.error("Store '{}' not found", Config.DISPATCHER_STORE.asString());
+        }
+        core.getDispatcher().setStore(store);
     }
 
     public void reloadModules() {
