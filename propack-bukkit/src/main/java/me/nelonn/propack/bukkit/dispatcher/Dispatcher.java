@@ -148,6 +148,9 @@ public class Dispatcher implements Listener {
     public void onStatus(PlayerResourcePackStatusEvent event) {
         if (event.getStatus() == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) {
             store.setActiveResourcePack(event.getPlayer().getUniqueId(), pending.remove(event.getPlayer().getUniqueId()));
+            if (Config.PATCH_PACKETS_ITEMS.asBoolean()) {
+                // TODO: resend player's inventory
+            }
         }
     }
 
