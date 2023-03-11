@@ -17,6 +17,14 @@ dependencies {
     "compileOnly"("org.jetbrains:annotations:23.1.0")
 }
 
+tasks.withType<Javadoc> {
+    options {
+        this as StandardJavadocDocletOptions
+        addBooleanOption("Xdoclint:none", true)
+        addStringOption("Xmaxwarns", "1")
+    }
+}
+
 java {
     withSourcesJar()
     withJavadocJar()

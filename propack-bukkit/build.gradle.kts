@@ -110,6 +110,14 @@ tasks.named("assemble").configure {
     dependsOn("shadowJar")
 }
 
+tasks.withType<Javadoc> {
+    options {
+        this as StandardJavadocDocletOptions
+        addBooleanOption("Xdoclint:none", true)
+        addStringOption("Xmaxwarns", "1")
+    }
+}
+
 java {
     withSourcesJar()
     withJavadocJar()
