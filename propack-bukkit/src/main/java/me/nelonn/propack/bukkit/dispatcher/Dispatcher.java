@@ -54,26 +54,25 @@ public class Dispatcher implements Listener {
     private final ProPackPlugin plugin;
     private final PackSender packSender;
     private final Map<UUID, SentPack> pending = new HashMap<>();
+    private final Store fallbackStore;
     private Store store;
 
-    public Dispatcher(@NotNull ProPackPlugin plugin) {
+    public Dispatcher(@NotNull ProPackPlugin plugin, @NotNull MemoryStore memoryStore) {
         this.plugin = plugin;
         packSender = /*Util.isPaper() ? new PaperPackSender() :*/
                 CompatibilitiesManager.hasPlugin("ProtocolLib") ? new ProtocolPackSender() :
                         new BukkitPackSender();
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        store = new MemoryStore(plugin);
+        fallbackStore = memoryStore;
+        store = fallbackStore;
     }
 
-    public Store getStore() {
+    public @NotNull Store getStore() {
         return store;
     }
 
-    public void setStore(Store store) {
-        this.store = store;
-        if (this.store == null) {
-            this.store = new MemoryStore(plugin);
-        }
+    public void setStore(@Nullable Store store) {
+        this.store = store != null ? store : fallbackStore;
     }
 
     public void sendOffer(@NotNull Player player, @NotNull ResourcePackInfo packInfo) {
