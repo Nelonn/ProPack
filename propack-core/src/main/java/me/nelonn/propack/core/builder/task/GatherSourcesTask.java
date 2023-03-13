@@ -36,6 +36,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 public class GatherSourcesTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -61,16 +62,9 @@ public class GatherSourcesTask extends AbstractTask {
         if (files == null) return;
         for (File file : files) {
             String fileName = file.getName().toLowerCase();
-            if (file.isFile()) {
-                boolean isContinue = false;
-                for (String extension : getProject().getBuildConfiguration().getIgnoredExtensions()) {
-                    if (fileName.endsWith("." + extension)) {
-                        isContinue = true;
-                        break;
-                    }
-                }
-                if (isContinue) continue;
-            }
+            Pattern pattern = file.isFile() ? getProject().getBuildConfiguration().getFileIgnore() :
+                    getProject().getBuildConfiguration().getDirIgnore();
+            if (pattern != null && pattern.matcher(fileName).matches()) continue;
             if (!PathImpl.isValidNamespace(fileName)) {
                 String message = to + '/' + fileName + ": Non [a-z0-9._-] character in file name";
                 if (getProject().getBuildConfiguration().getStrictMode() == StrictMode.ENABLED) {
@@ -96,9 +90,8 @@ public class GatherSourcesTask extends AbstractTask {
         if (!PathImpl.isValidNamespace(fileName)) {
             throw new IllegalArgumentException("Non [a-z0-9._-] character in file '" + to + "/" + fileName + "'");
         }
-        for (String extension : getProject().getBuildConfiguration().getIgnoredExtensions()) {
-            if (fileName.endsWith("." + extension)) return;
-        }
+        Pattern pattern = getProject().getBuildConfiguration().getFileIgnore();
+        if (pattern != null && pattern.matcher(fileName).matches()) return;
         String path = PathUtil.join(to, fileName);
         try {
             if (fileName.endsWith(".json") || fileName.endsWith(".json5") || fileName.endsWith(".jsonc")) {

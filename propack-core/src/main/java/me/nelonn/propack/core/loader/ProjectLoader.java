@@ -54,6 +54,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 
@@ -159,7 +160,8 @@ public class ProjectLoader {
 
         ItemDefinition itemDefinition;
         StrictMode strictMode;
-        ImmutableSet.Builder<String> ignoredExtensionsBuilder = ImmutableSet.builder();
+        Pattern fileIgnore = null;
+        Pattern dirIgnore = null;
         ObfuscationConfiguration obfuscationConfiguration;
         try {
             File buildConfigFile = new File(projectFile.getParentFile(), "config/build.json5");
@@ -193,9 +195,34 @@ public class ProjectLoader {
                 strictMode = StrictMode.ENABLED;
             }
 
-            if (buildConfigObject.has("IgnoredExtensions")) {
-                JsonArray ignoredExtensionsArray = GsonHelper.getArray(buildConfigObject, "IgnoredExtensions");
-                Util.forEachStringArray(ignoredExtensionsArray, "IgnoredExtensions", ignoredExtensionsBuilder::add);
+            if (buildConfigObject.has("DirIgnore")) {
+                JsonArray dirIgnoreArray = GsonHelper.getArray(buildConfigObject, "DirIgnore");
+                if (!dirIgnoreArray.isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    Util.forEachStringArray(dirIgnoreArray, "DirIgnore", s -> {
+                        if (s.isEmpty()) return;
+                        if (sb.length() > 0) {
+                            sb.append('|');
+                        }
+                        sb.append('(').append(s).append(')');
+                    });
+                    dirIgnore = Pattern.compile(sb.toString());
+                }
+            }
+
+            if (buildConfigObject.has("FileIgnore")) {
+                JsonArray fileIgnoreArray = GsonHelper.getArray(buildConfigObject, "FileIgnore");
+                if (!fileIgnoreArray.isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    Util.forEachStringArray(fileIgnoreArray, "FileIgnore", s -> {
+                        if (s.isEmpty()) return;
+                        if (sb.length() > 0) {
+                            sb.append('|');
+                        }
+                        sb.append('(').append(s).append(')');
+                    });
+                    fileIgnore = Pattern.compile(sb.toString());
+                }
             }
 
             JsonObject obfuscationObject = GsonHelper.getObject(buildConfigObject, "Obfuscation");
@@ -214,7 +241,6 @@ public class ProjectLoader {
         } catch (Exception e) {
             throw new IllegalArgumentException("Something went wrong when loading 'config/build.json5'", e);
         }
-        Set<String> ignoredExtensions = ignoredExtensionsBuilder.build();
 
         Map<String, String> allLangTranslations = new HashMap<>();
         ImmutableSet.Builder<String> languagesBuilder = ImmutableSet.builder();
@@ -286,7 +312,7 @@ public class ProjectLoader {
             throw new IllegalArgumentException("Something went wrong when loading 'config/upload.json5'", e);
         }
 
-        BuildConfiguration buildConfiguration = new BuildConfiguration(strictMode, ignoredExtensions,
+        BuildConfiguration buildConfiguration = new BuildConfiguration(strictMode, dirIgnore, fileIgnore,
                 obfuscationConfiguration, allLangTranslations, languages, packageOptions, hosting, uploadOptions);
 
         ResourcePack resourcePack = null;
