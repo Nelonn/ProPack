@@ -18,11 +18,7 @@
 
 package me.nelonn.propack.bukkit.dispatcher.sender;
 
-import me.nelonn.propack.UploadedPack;
-import me.nelonn.propack.bukkit.Config;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import me.nelonn.propack.bukkit.ResourcePackInfo;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,11 +26,9 @@ public class PaperPackSender implements PackSender { // TODO: not working
     public PaperPackSender() {
     }
 
-    public void send(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
-        Component component = MiniMessage.miniMessage().deserialize(Config.DISPATCHER_PROMPT.asString(),
-                Placeholder.component("player", Component.text(player.getName())),
-                Placeholder.component("pack_name", Component.text(uploadedPack.getName())));
-        player.setResourcePack(uploadedPack.getUrl(), uploadedPack.getSha1String(), Config.DISPATCHER_REQUIRED.asBoolean(), component);
+    public void send(@NotNull Player player, @NotNull ResourcePackInfo packInfo) {
+        player.setResourcePack(packInfo.getUpload().getUrl(), packInfo.getUpload().getSha1String(),
+                packInfo.getShouldForce(), packInfo.getPrompt());
     }
 
 }

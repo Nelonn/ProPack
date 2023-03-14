@@ -16,40 +16,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.definition;
+package me.nelonn.propack.bukkit;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.propack.UploadedPack;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
+public class ResourcePackInfo {
+    private final UploadedPack upload;
+    private final Component prompt;
+    private final boolean shouldForce;
 
-public class Item {
-    private final Identifier id;
-    private final boolean isBlock;
-
-    public Item(@NotNull Identifier id, boolean isBlock) {
-        this.id = id;
-        this.isBlock = isBlock;
+    public ResourcePackInfo(@NotNull UploadedPack upload, @Nullable Component prompt, boolean shouldForce) {
+        this.upload = upload;
+        this.prompt = prompt;
+        this.shouldForce = shouldForce;
     }
 
-    public @NotNull Identifier getId() {
-        return id;
+    public @NotNull UploadedPack getUpload() {
+        return upload;
     }
 
-    public boolean isBlock() {
-        return isBlock;
+    public @Nullable Component getPrompt() {
+        return prompt;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Item item = (Item) o;
-        return isBlock == item.isBlock && Objects.equals(id, item.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, isBlock);
+    public boolean getShouldForce() {
+        return shouldForce;
     }
 }

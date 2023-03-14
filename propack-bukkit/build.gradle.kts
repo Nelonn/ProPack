@@ -37,7 +37,7 @@ dependencies {
     "implementation"(project(":propack-core")) {
         exclude(group = "net.kyori")
     }
-    "implementation"(files("../libs/flint-path-0.0.1.jar"))
+    "compileOnly"(files("../libs/flint-path-0.0.1.jar"))
 
     /*"compileOnly"("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
@@ -108,6 +108,14 @@ tasks.named<ShadowJar>("shadowJar") {
 
 tasks.named("assemble").configure {
     dependsOn("shadowJar")
+}
+
+tasks.withType<Javadoc> {
+    options {
+        this as StandardJavadocDocletOptions
+        addBooleanOption("Xdoclint:none", true)
+        addStringOption("Xmaxwarns", "1")
+    }
 }
 
 java {

@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     "implementation"(project(":propack-api"))
-    "implementation"(files("../libs/flint-path-0.0.1.jar"))
+    "compileOnly"(files("../libs/flint-path-0.0.1.jar"))
 
     "compileOnly"("org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r")
 
@@ -52,6 +52,14 @@ tasks.named<ShadowJar>("shadowJar") {
 
 tasks.named("assemble").configure {
     dependsOn("shadowJar")
+}
+
+tasks.withType<Javadoc> {
+    options {
+        this as StandardJavadocDocletOptions
+        addBooleanOption("Xdoclint:none", true)
+        addStringOption("Xmaxwarns", "1")
+    }
 }
 
 java {

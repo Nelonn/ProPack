@@ -18,11 +18,9 @@
 
 package me.nelonn.propack.bukkit;
 
-import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public enum Config {
     DISPATCHER_STORE("dispatcher.store", "propack:memory_store"),
@@ -40,6 +38,7 @@ public enum Config {
     PATCH_PACKETS_ITEMS("patch_packets.items", true),
     PATCH_PACKETS_SOUNDS("patch_packets.sounds", true);
 
+    private static FileConfiguration fileConfiguration = null;
     private final String path;
     private final Object def;
 
@@ -57,7 +56,7 @@ public enum Config {
     }
 
     public Object getValue() {
-        return ProPackPlugin.getInstance().getConfig().get(path, def);
+        return fileConfiguration.get(path, def);
     }
 
     public String asString() {
@@ -80,17 +79,12 @@ public enum Config {
         return (int) getValue();
     }
 
-    public List<String> asStringList() {
-        return ProPackPlugin.getInstance().getConfig().getStringList(path);
-    }
-
-    public ConfigurationSection asConfigSection() {
-        return ProPackPlugin.getInstance().getConfig().getConfigurationSection(path);
-    }
-
     @Override
     public String toString() {
         return asString();
     }
 
+    static void setFileConfiguration(FileConfiguration fileConfiguration) {
+        Config.fileConfiguration = fileConfiguration;
+    }
 }

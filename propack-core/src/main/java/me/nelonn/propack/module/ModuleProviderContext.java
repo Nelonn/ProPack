@@ -25,7 +25,7 @@ import java.nio.file.Path;
 
 public interface ModuleProviderContext {
 
-    @NotNull ModuleMeta getMeta();
+    @NotNull ModuleDescription getDescription();
 
     @NotNull Path getDataDirectory();
 

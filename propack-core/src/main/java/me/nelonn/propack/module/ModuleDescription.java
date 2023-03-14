@@ -16,10 +16,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.builder.loader;
+package me.nelonn.propack.module;
 
-import com.google.gson.JsonObject;
-import me.nelonn.propack.definition.ItemDefinition;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public interface ItemDefinitionLoader extends TypedLoaderExtras<JsonObject, ItemDefinition> {
+import java.util.List;
+import java.util.regex.Pattern;
+
+public interface ModuleDescription {
+    Pattern NAME_PATTERN = Pattern.compile("^[A-Za-z0-9_-]+$");
+
+    @NotNull String getName();
+
+    default @NotNull String getDisplayName() {
+        return getName() + " v" + getVersion();
+    }
+
+    @NotNull String getBootstrapper();
+
+    @NotNull String getVersion();
+
+    @Nullable String getDescription();
+
+    @NotNull List<String> getAuthors();
+
+    @NotNull List<String> getContributors();
+
+    @Nullable String getWebsite();
+
+    @Nullable String getLoggerPrefix();
+
 }

@@ -18,10 +18,10 @@
 
 package me.nelonn.propack.core.builder.asset;
 
+import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.asset.CombinedItemModel;
-import me.nelonn.propack.definition.Item;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -35,7 +35,7 @@ public class CombinedItemModelBuilder extends ItemModelBuilder {
     }
 
     @Override
-    public CombinedItemModelBuilder setTargetItems(Set<Item> targetItems) {
+    public CombinedItemModelBuilder setTargetItems(Set<Identifier> targetItems) {
         return (CombinedItemModelBuilder) super.setTargetItems(targetItems);
     }
 

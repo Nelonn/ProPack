@@ -18,25 +18,25 @@
 
 package me.nelonn.propack.core.builder.asset;
 
+import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.asset.ItemModel;
-import me.nelonn.propack.definition.Item;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
 public abstract class ItemModelBuilder extends AbstractAssetBuilder<ItemModel> {
-    protected Set<Item> targetItems;
+    protected Set<Identifier> targetItems;
 
     protected ItemModelBuilder(@NotNull Path path) {
         super(path);
     }
 
-    public Set<Item> getTargetItems() {
+    public Set<Identifier> getTargetItems() {
         return targetItems;
     }
 
-    public ItemModelBuilder setTargetItems(Set<Item> targetItems) {
+    public ItemModelBuilder setTargetItems(Set<Identifier> targetItems) {
         this.targetItems = targetItems;
         return this;
     }

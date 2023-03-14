@@ -20,12 +20,8 @@ package me.nelonn.propack.bukkit;
 
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
-import me.nelonn.propack.bukkit.definition.PackManager;
-import me.nelonn.propack.bukkit.dispatcher.Dispatcher;
-import me.nelonn.propack.bukkit.dispatcher.MemoryStore;
-import me.nelonn.propack.bukkit.dispatcher.StoreMap;
+import me.nelonn.propack.bukkit.dispatcher.Store;
 import me.nelonn.propack.core.DevServer;
-import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -39,21 +35,19 @@ import java.io.File;
 
 public final class ProPackPlugin extends JavaPlugin {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    private static final SharedLoader.Library library = new SharedLoader.Library("flint-path-0.0.1.jar", "me.nelonn.flint.path.Path");
 
     public static ProPackPlugin getInstance() {
         return (ProPackPlugin) Bukkit.getPluginManager().getPlugin("ProPack");
     }
 
     private BukkitAudiences adventure;
-    private ProPackCore proPackCore;
-    private PackManager packManager;
-    private StoreMap storeMap;
-    private Dispatcher dispatcher;
+    private BukkitProPackCore core;
     private DevServer devServer;
 
     @Override
     public void onLoad() {
-        ProPack.setPlugin(this);
+        new SharedLoader(this).loadIfNotExists(library);
 
         File modulesDir = new File(getDataFolder(), "modules");
         if (!getDataFolder().exists()) {
@@ -75,18 +69,11 @@ public final class ProPackPlugin extends JavaPlugin {
     public void onEnable() {
         adventure = BukkitAudiences.create(this);
 
-        proPackCore = new ProPackCore(getDataFolder());
+        core = new BukkitProPackCore(this);
+        ProPack.setCore(core);
         reloadConfig();
-        proPackCore.getModuleManager().fullReload();
-
-        packManager = new PackManager(proPackCore, getDataFolder());
+        reloadModules();
         reloadPacks();
-
-        storeMap = new StoreMap();
-        storeMap.register("memory_store", new MemoryStore(this));
-
-        dispatcher = new Dispatcher(this);
-        Bukkit.getPluginManager().registerEvents(dispatcher, this);
 
         new ProPackCommand(this).register(this);
 
@@ -101,9 +88,9 @@ public final class ProPackPlugin extends JavaPlugin {
         CompatibilitiesManager.disableCompatibilities();
         adventure.close();
         adventure = null;
-        proPackCore.getModuleManager().disableAllAndClear();
+        core.getModuleManager().disableAll();
         if (devServer != null) {
-            proPackCore.getHostingMap().unregister(devServer);
+            core.getHostingMap().unregister(devServer);
             try {
                 devServer.close();
             } catch (Exception ignored) {
@@ -116,24 +103,36 @@ public final class ProPackPlugin extends JavaPlugin {
     @Override
     public void reloadConfig() {
         super.reloadConfig();
-        proPackCore.getModuleManager().fullReload();
+        Config.setFileConfiguration(getConfig());
         if (devServer != null) {
-            proPackCore.getHostingMap().unregister(devServer);
+            core.getHostingMap().unregister(devServer);
             try {
                 devServer.close();
             } catch (Exception ignored) {
             }
             devServer = null;
         }
-        proPackCore.getProjectLoader().getItemDefinitionLoaders().add(BukkitItemDefinitionLoader.INSTANCE);
         if (Config.DEV_SERVER_ENABLED.asBoolean()) {
             devServer = new DevServer(Config.DEV_SERVER_RETURN_IP.asString(), Config.DEV_SERVER_PORT.asInt());
-            proPackCore.getHostingMap().register("dev_server", devServer);
+            core.getHostingMap().register("dev_server", devServer);
+        }
+        Store store = core.getStoreMap().get(Config.DISPATCHER_STORE.asString());
+        if (store == null) {
+            LOGGER.error("Store '{}' not found", Config.DISPATCHER_STORE.asString());
+        }
+        core.getDispatcher().setStore(store);
+    }
+
+    public void reloadModules() {
+        try {
+            core.getModuleManager().loadAll();
+        } catch (Exception e) {
+            LOGGER.error("Unable to load modules", e);
         }
     }
 
     public void reloadPacks() {
-        packManager.loadAll();
+        core.getPackManager().loadAll();
     }
 
     public @NotNull BukkitAudiences adventure() {
@@ -143,19 +142,7 @@ public final class ProPackPlugin extends JavaPlugin {
         return this.adventure;
     }
 
-    public ProPackCore getCore() {
-        return proPackCore;
-    }
-
-    public PackManager getPackManager() {
-        return packManager;
-    }
-
-    public StoreMap getStoreMap() {
-        return storeMap;
-    }
-
-    public Dispatcher getDispatcher() {
-        return dispatcher;
+    public BukkitProPackCore getCore() {
+        return core;
     }
 }

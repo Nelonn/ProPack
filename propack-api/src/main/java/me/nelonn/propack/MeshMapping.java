@@ -18,13 +18,13 @@
 
 package me.nelonn.propack;
 
+import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.definition.Item;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface MeshMapping {
 
-    @Nullable Integer getCustomModelData(@NotNull Path mesh, @NotNull Item item);
+    @Nullable Integer getCustomModelData(@NotNull Path mesh, @NotNull Identifier itemId);
 
 }

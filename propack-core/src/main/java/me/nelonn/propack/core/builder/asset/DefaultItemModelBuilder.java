@@ -18,10 +18,10 @@
 
 package me.nelonn.propack.core.builder.asset;
 
+import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.asset.DefaultItemModel;
-import me.nelonn.propack.definition.Item;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -34,7 +34,7 @@ public class DefaultItemModelBuilder extends ItemModelBuilder {
     }
 
     @Override
-    public DefaultItemModelBuilder setTargetItems(Set<Item> targetItems) {
+    public DefaultItemModelBuilder setTargetItems(Set<Identifier> targetItems) {
         return (DefaultItemModelBuilder) super.setTargetItems(targetItems);
     }
 

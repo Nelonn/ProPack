@@ -20,17 +20,17 @@ package me.nelonn.propack.core.builder.task;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.asset.SlotItemModel;
 import me.nelonn.propack.builder.Project;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
 import me.nelonn.propack.core.builder.MeshMappingBuilder;
 import me.nelonn.propack.core.builder.asset.*;
-import me.nelonn.propack.builder.task.AbstractTask;
-import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.LogManagerCompat;
-import me.nelonn.propack.definition.Item;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,13 +61,6 @@ public class SerializeTask extends AbstractTask {
 
         root.addProperty("name", getProject().getName());
 
-        JsonObject items = new JsonObject();
-        root.add("items", items);
-
-        for (Item item : getProject().getItemDefinition().getItems()) {
-            items.addProperty(item.getId().toString(), item.isBlock());
-        }
-
         JsonObject resources = new JsonObject();
         root.add("resources", resources);
 
@@ -79,8 +72,8 @@ public class SerializeTask extends AbstractTask {
                 itemModelObject.addProperty("Type", "DefaultItemModel");
                 itemModelObject.addProperty("Mesh", defaultModel.getMesh().toString());
                 JsonArray targetItems = new JsonArray();
-                for (Item targetItem : defaultModel.getTargetItems()) {
-                    targetItems.add(targetItem.getId().toString());
+                for (Identifier targetItemId : defaultModel.getTargetItems()) {
+                    targetItems.add(targetItemId.toString());
                 }
                 itemModelObject.add("Target", targetItems);
             } else if (itemModel instanceof CombinedItemModelBuilder) {
@@ -91,8 +84,8 @@ public class SerializeTask extends AbstractTask {
                 combinedModel.getElements().forEach(elementsArray::add);
                 itemModelObject.add("Elements", elementsArray);
                 JsonArray targetItems = new JsonArray();
-                for (Item targetItem : combinedModel.getTargetItems()) {
-                    targetItems.add(targetItem.getId().toString());
+                for (Identifier targetItemId : combinedModel.getTargetItems()) {
+                    targetItems.add(targetItemId.toString());
                 }
                 itemModelObject.add("Target", targetItems);
             } else if (itemModel instanceof SlotItemModelBuilder) {
@@ -107,8 +100,8 @@ public class SerializeTask extends AbstractTask {
                     slotsObject.add(slot.getName(), slotEntries);
                 }
                 JsonArray targetItems = new JsonArray();
-                for (Item targetItem : slotModel.getTargetItems()) {
-                    targetItems.add(targetItem.getId().toString());
+                for (Identifier targetItemId : slotModel.getTargetItems()) {
+                    targetItems.add(targetItemId.toString());
                 }
                 itemModelObject.add("Target", targetItems);
             }
@@ -147,7 +140,7 @@ public class SerializeTask extends AbstractTask {
             for (Map.Entry<Integer, Path> entry : itemEntry.getMap().entrySet()) {
                 mapping.addProperty(entry.getValue().toString(), entry.getKey());
             }
-            meshMappingObject.add(itemEntry.getItem().getId().toString(), mapping);
+            meshMappingObject.add(itemEntry.getItemId().toString(), mapping);
         }
         resources.add("mesh_mapping", meshMappingObject);
 

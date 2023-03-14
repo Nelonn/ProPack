@@ -21,7 +21,6 @@ package me.nelonn.propack.core.builder;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.file.VirtualFile;
-import me.nelonn.propack.definition.ItemDefinition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +31,6 @@ public class InternalProject implements Project {
     public final String name;
     public final File projectDir;
     private File buildDir;
-    public final ItemDefinition itemDefinition;
     public final BuildConfiguration buildConfiguration;
     public final VirtualFile metaFile;
     public final VirtualFile iconFile;
@@ -40,7 +38,6 @@ public class InternalProject implements Project {
 
     public InternalProject(@NotNull String name,
                            @NotNull File projectDir,
-                           @NotNull ItemDefinition itemDefinition,
                            @NotNull BuildConfiguration buildConfiguration,
                            @NotNull VirtualFile metaFile,
                            @Nullable VirtualFile iconFile,
@@ -48,7 +45,6 @@ public class InternalProject implements Project {
         this.name = name;
         this.projectDir = projectDir;
         this.buildDir = new File(projectDir, "build");
-        this.itemDefinition = itemDefinition;
         this.buildConfiguration = buildConfiguration;
         this.metaFile = metaFile;
         this.iconFile = iconFile;
@@ -73,11 +69,6 @@ public class InternalProject implements Project {
     @Override
     public void setBuildDir(File buildDir) {
         this.buildDir = buildDir;
-    }
-
-    @Override
-    public ItemDefinition getItemDefinition() {
-        return itemDefinition;
     }
 
     @Override

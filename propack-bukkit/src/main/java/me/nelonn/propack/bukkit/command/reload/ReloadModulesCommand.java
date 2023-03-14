@@ -36,7 +36,7 @@ public class ReloadModulesCommand extends BaseReloadCommand {
 
     @Override
     public void execute(@NotNull CommandSender sender) {
-        plugin.getCore().getModuleManager().fullReload();
+        plugin.reloadModules();
         TagResolver.Single placeholder = Placeholder.component("modules", Component.text(plugin.getCore().getModuleManager().getModules().length));
         Util.send(sender, "<white><modules> ProPack <gray>modules loaded", placeholder);
     }

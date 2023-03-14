@@ -23,11 +23,8 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import me.nelonn.propack.UploadedPack;
-import me.nelonn.propack.bukkit.Config;
+import me.nelonn.propack.bukkit.ResourcePackInfo;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -39,15 +36,12 @@ public class ProtocolPackSender implements PackSender {
         protocolManager = ProtocolLibrary.getProtocolManager();
     }
 
-    public void send(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
-        Component component = MiniMessage.miniMessage().deserialize(Config.DISPATCHER_PROMPT.asString(),
-                Placeholder.component("player", Component.text(player.getName())),
-                Placeholder.component("pack_name", Component.text(uploadedPack.getName())));
+    public void send(@NotNull Player player, @NotNull ResourcePackInfo packInfo) {
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.RESOURCE_PACK_SEND);
-        packet.getStrings().write(0, uploadedPack.getUrl());
-        packet.getStrings().write(1, uploadedPack.getSha1String());
-        packet.getBooleans().write(0, Config.DISPATCHER_REQUIRED.asBoolean());
-        packet.getChatComponents().write(0, toProtocolLike(component));
+        packet.getStrings().write(0, packInfo.getUpload().getUrl());
+        packet.getStrings().write(1, packInfo.getUpload().getSha1String());
+        packet.getBooleans().write(0, packInfo.getShouldForce());
+        packet.getChatComponents().write(0, toProtocolLike(packInfo.getPrompt()));
         try {
             protocolManager.sendServerPacket(player, packet);
         } catch (Exception e) {

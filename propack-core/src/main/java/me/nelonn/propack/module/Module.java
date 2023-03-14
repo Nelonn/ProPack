@@ -29,10 +29,10 @@ import java.io.InputStream;
 public interface Module {
 
     default @NotNull String getName() {
-        return getMeta().getName();
+        return getDescription().getName();
     }
 
-    @NotNull ModuleMeta getMeta();
+    @NotNull ModuleDescription getDescription();
 
     @NotNull File getDataFolder();
 

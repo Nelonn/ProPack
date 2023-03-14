@@ -29,10 +29,12 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class BuildConfiguration {
     private final StrictMode strictMode;
-    private final Set<String> ignoredExtensions;
+    private final Pattern dirIgnore;
+    private final Pattern fileIgnore;
     private final ObfuscationConfiguration obfuscationConfiguration;
     private final Map<String, String> allLangTranslations;
     private final Set<String> languages;
@@ -42,7 +44,8 @@ public class BuildConfiguration {
     private final LinkedHashSet<TaskBootstrap> tasks;
 
     public BuildConfiguration(@NotNull StrictMode strictMode,
-                              @NotNull Set<String> ignoredExtensions,
+                              @Nullable Pattern dirIgnore,
+                              @Nullable Pattern fileIgnore,
                               @NotNull ObfuscationConfiguration obfuscationConfiguration,
                               @NotNull Map<String, String> allLangTranslations,
                               @NotNull Set<String> languages,
@@ -50,7 +53,8 @@ public class BuildConfiguration {
                               @Nullable Hosting hosting,
                               @Nullable Map<String, Object> uploadOptions) {
         this.strictMode = strictMode;
-        this.ignoredExtensions = ignoredExtensions;
+        this.dirIgnore = dirIgnore;
+        this.fileIgnore = fileIgnore;
         this.obfuscationConfiguration = obfuscationConfiguration;
         this.allLangTranslations = allLangTranslations;
         this.languages = languages;
@@ -79,8 +83,12 @@ public class BuildConfiguration {
         return strictMode;
     }
 
-    public @NotNull Set<String> getIgnoredExtensions() {
-        return ignoredExtensions;
+    public @Nullable Pattern getDirIgnore() {
+        return dirIgnore;
+    }
+
+    public @Nullable Pattern getFileIgnore() {
+        return fileIgnore;
     }
 
     public @NotNull ObfuscationConfiguration getObfuscationConfiguration() {

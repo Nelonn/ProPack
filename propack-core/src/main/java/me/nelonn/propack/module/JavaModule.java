@@ -29,17 +29,17 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 
-public abstract class JavaModule implements Module { // TODO: module loading system
+public abstract class JavaModule implements Module {
     private boolean enabled = false;
     private ProPackCore core = null;
-    private ModuleMeta meta = null;
+    private ModuleDescription meta = null;
     private File dataFolder = null;
     private File file = null;
     private Logger logger = null;
 
     @NotNull
     @Override
-    public ModuleMeta getMeta() {
+    public ModuleDescription getDescription() {
         return meta;
     }
 
@@ -121,7 +121,7 @@ public abstract class JavaModule implements Module { // TODO: module loading sys
         return file;
     }
 
-    public final void init(@NotNull ProPackCore core, @NotNull ModuleMeta meta, @NotNull File dataFolder, @NotNull File file) {
+    public final void init(@NotNull ProPackCore core, @NotNull ModuleDescription meta, @NotNull File dataFolder, @NotNull File file) {
         this.core = core;
         this.meta = meta;
         this.dataFolder = dataFolder;

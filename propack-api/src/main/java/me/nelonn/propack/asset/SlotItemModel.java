@@ -18,9 +18,9 @@
 
 package me.nelonn.propack.asset;
 
+import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
-import me.nelonn.propack.definition.Item;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class SlotItemModel extends MultiItemModel {
     private final Map<String, Slot> slots;
 
-    public SlotItemModel(@NotNull ResourcePack resourcePack, @NotNull Path path, @NotNull Set<Item> targetItems,
+    public SlotItemModel(@NotNull ResourcePack resourcePack, @NotNull Path path, @NotNull Set<Identifier> targetItems,
                             @NotNull Path baseMesh, @NotNull Map<String, Slot> slots) {
         super(resourcePack, path, targetItems, baseMesh);
         this.slots = Collections.unmodifiableMap(slots);

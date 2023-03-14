@@ -21,7 +21,6 @@ package me.nelonn.propack.builder;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.builder.file.VirtualFile;
 import me.nelonn.propack.core.builder.BuildConfiguration;
-import me.nelonn.propack.definition.ItemDefinition;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -36,8 +35,6 @@ public interface Project {
     File getBuildDir();
 
     void setBuildDir(File dir);
-
-    ItemDefinition getItemDefinition();
 
     BuildConfiguration getBuildConfiguration();
 

@@ -1,13 +1,27 @@
 {
-  ItemDefinition: {
-    Type: "Bukkit"
-  },
   // Available options: false, 'warn', true
   Strict: true,
-  IgnoredExtensions: [
-    "old.png",
-    "psd",
-    "txt",
-    "md"
-  ]
+  // Ignore directory regexps
+  DirIgnore: [
+    "^\\.old$",
+    "^\\.src$",
+    "^\\.ignore$"
+  ],
+  // Ignore file regexps
+  FileIgnore: [
+    "\\.old\\.png$",
+    "\\.psd$",
+    "\\.txt$",
+    "\\.md$"
+  ],
+  Obfuscation: {
+    Enabled: true,
+    Namespace: "obfuscated",
+    ShuffleSequence: true,
+    Meshes: true,
+    Textures: true,
+    Ogg: true,
+    Sounds: true,
+    Fonts: true
+  }
 }

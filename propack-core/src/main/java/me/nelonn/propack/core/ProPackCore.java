@@ -20,7 +20,7 @@ package me.nelonn.propack.core;
 
 import me.nelonn.propack.builder.hosting.HostingMap;
 import me.nelonn.propack.core.loader.ProjectLoader;
-import me.nelonn.propack.module.CraftModuleManager;
+import me.nelonn.propack.module.JavaModuleManager;
 import me.nelonn.propack.module.ModuleManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +34,7 @@ public class ProPackCore {
     public ProPackCore(@NotNull File directory) {
         this.hostingMap = new SimpleHostingMap();
         this.projectLoader = new ProjectLoader(this);
-        this.moduleManager = new CraftModuleManager(new File(directory, "modules"));
+        this.moduleManager = new JavaModuleManager(new File(directory, "modules"));
     }
 
     public HostingMap getHostingMap() {

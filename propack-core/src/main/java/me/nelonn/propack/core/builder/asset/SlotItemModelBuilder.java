@@ -18,10 +18,10 @@
 
 package me.nelonn.propack.core.builder.asset;
 
+import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.asset.SlotItemModel;
-import me.nelonn.propack.definition.Item;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -36,7 +36,7 @@ public class SlotItemModelBuilder extends ItemModelBuilder {
     }
 
     @Override
-    public SlotItemModelBuilder setTargetItems(Set<Item> targetItems) {
+    public SlotItemModelBuilder setTargetItems(Set<Identifier> targetItems) {
         return (SlotItemModelBuilder) super.setTargetItems(targetItems);
     }
 

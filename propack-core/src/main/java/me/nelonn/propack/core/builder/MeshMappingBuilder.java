@@ -20,9 +20,9 @@ package me.nelonn.propack.core.builder;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.MapMeshMapping;
-import me.nelonn.propack.definition.Item;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,10 +32,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MeshMappingBuilder {
-    private final Map<Item, ItemEntry> mappers = new HashMap<>();
+    private final Map<Identifier, ItemEntry> mappers = new HashMap<>();
 
-    public @NotNull MeshMappingBuilder.ItemEntry getMapper(@NotNull Item item) {
-        return mappers.computeIfAbsent(item, ItemEntry::new);
+    public @NotNull MeshMappingBuilder.ItemEntry getMapper(@NotNull Identifier itemId) {
+        return mappers.computeIfAbsent(itemId, ItemEntry::new);
     }
 
     public @NotNull Collection<ItemEntry> getMappers() {
@@ -43,25 +43,25 @@ public class MeshMappingBuilder {
     }
 
     public @NotNull MapMeshMapping build() {
-        Map<Item, Map<Path, Integer>> map = new HashMap<>();
+        Map<Identifier, Map<Path, Integer>> map = new HashMap<>();
         for (ItemEntry itemEntry : getMappers()) {
-            map.put(itemEntry.getItem(), new HashMap<>(itemEntry.getMap().inverse()));
+            map.put(itemEntry.getItemId(), new HashMap<>(itemEntry.getMap().inverse()));
         }
         return new MapMeshMapping(map);
     }
 
     public static class ItemEntry {
-        private final Item item;
+        private final Identifier itemId;
         private final BiMap<Integer, Path> map = HashBiMap.create();
         private final AtomicInteger integer = new AtomicInteger(1);
 
-        public ItemEntry(@NotNull Item item) {
-            this.item = item;
+        public ItemEntry(@NotNull Identifier itemId) {
+            this.itemId = itemId;
         }
 
         @NotNull
-        public Item getItem() {
-            return item;
+        public Identifier getItemId() {
+            return itemId;
         }
 
         @Nullable

@@ -16,32 +16,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack;
+package me.nelonn.propack.module;
 
-import me.nelonn.flint.path.Identifier;
-import me.nelonn.propack.definition.Item;
-import me.nelonn.propack.definition.ItemDefinition;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Path;
 
-public class MapItemDefinition implements ItemDefinition {
-    private final Map<Identifier, Item> items;
+public class ModuleProviderContextImpl implements ModuleProviderContext {
+    private final ModuleDescription description;
+    private final Path dataDirectory;
+    private final Logger logger;
 
-    public MapItemDefinition(@NotNull Map<Identifier, Item> items) {
-        this.items = new HashMap<>(items);
+    public ModuleProviderContextImpl(@NotNull ModuleDescription description, @NotNull Path dataDirectory) {
+        this.description = description;
+        this.dataDirectory = dataDirectory;
+        this.logger = LogManager.getLogger(description.getLoggerPrefix());
     }
 
     @Override
-    public @Nullable Item getItem(@NotNull Identifier identifier) {
-        return items.get(identifier);
+    public @NotNull ModuleDescription getDescription() {
+        return description;
     }
 
     @Override
-    public @NotNull Collection<Item> getItems() {
-        return items.values();
+    public @NotNull Path getDataDirectory() {
+        return dataDirectory;
+    }
+
+    @Override
+    public @NotNull Logger getLogger() {
+        return logger;
     }
 }
