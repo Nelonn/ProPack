@@ -151,9 +151,6 @@ public class ProjectLoader {
             String buildConfigContent = IOUtil.readString(buildConfigFile);
             JsonObject buildConfigObject = GsonHelper.deserialize(buildConfigContent, true);
 
-            JsonObject itemDefinitionObject = GsonHelper.getObject(buildConfigObject, "ItemDefinition");
-            String type = GsonHelper.getString(itemDefinitionObject, "Type");
-
             if (buildConfigObject.has("Strict")) {
                 JsonElement jsonElement = buildConfigObject.get("Strict");
 
