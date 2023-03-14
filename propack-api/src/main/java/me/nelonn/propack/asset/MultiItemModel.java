@@ -18,9 +18,9 @@
 
 package me.nelonn.propack.asset;
 
+import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
-import me.nelonn.propack.definition.Item;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -28,7 +28,7 @@ import java.util.Set;
 public abstract class MultiItemModel extends AbstractItemModel {
     protected final Path baseMesh;
 
-    protected MultiItemModel(@NotNull ResourcePack resourcePack, @NotNull Path path, @NotNull Set<Item> targetItems,
+    protected MultiItemModel(@NotNull ResourcePack resourcePack, @NotNull Path path, @NotNull Set<Identifier> targetItems,
                              @NotNull Path baseMesh) {
         super(resourcePack, path, targetItems);
         this.baseMesh = baseMesh;

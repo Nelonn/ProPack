@@ -18,9 +18,9 @@
 
 package me.nelonn.propack.asset;
 
+import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
-import me.nelonn.propack.definition.Item;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -30,7 +30,7 @@ import java.util.Set;
 public class CombinedItemModel extends MultiItemModel {
     private final Set<String> elements;
 
-    public CombinedItemModel(@NotNull ResourcePack resourcePack, @NotNull Path path, @NotNull Set<Item> targetItems,
+    public CombinedItemModel(@NotNull ResourcePack resourcePack, @NotNull Path path, @NotNull Set<Identifier> targetItems,
                              @NotNull Path baseMesh, @NotNull Set<String> elements) {
         super(resourcePack, path, targetItems, baseMesh);
         this.elements = Collections.unmodifiableSet(elements);

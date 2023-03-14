@@ -1,9 +1,4 @@
 {
-  ItemDefinition: {
-    Type: "JsonFile",
-    Lenient: true,
-    File: "item_definition.json5"
-  },
   // Available options: false, 'warn', true
   Strict: true,
   // Ignore directory regexps

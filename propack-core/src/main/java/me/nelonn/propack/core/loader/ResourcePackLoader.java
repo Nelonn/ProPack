@@ -23,18 +23,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.MapItemDefinition;
 import me.nelonn.propack.MapMeshMapping;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.asset.SlotItemModel;
 import me.nelonn.propack.core.builder.asset.*;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.IOUtil;
-import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.Util;
-import me.nelonn.propack.definition.Item;
-import me.nelonn.propack.definition.ItemDefinition;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -45,8 +40,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class ResourcePackLoader {
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
-
     public @NotNull ResourcePack load(@NotNull File file) {
         try {
             JsonObject root = GsonHelper.deserialize(IOUtil.readString(file));
@@ -56,15 +49,6 @@ public class ResourcePackLoader {
             }
 
             String name = GsonHelper.getString(root, "name");
-
-            JsonObject itemsObject = GsonHelper.getObject(root, "items");
-            Map<Identifier, Item> items = new HashMap<>();
-            for (Map.Entry<String, JsonElement> itemElement : itemsObject.entrySet()) {
-                boolean isBlock = GsonHelper.asBoolean(itemElement.getValue(), itemElement.getKey());
-                Item item = new Item(Identifier.of(itemElement.getKey()), isBlock);
-                items.put(item.getId(), item);
-            }
-            MapItemDefinition itemDefinition = new MapItemDefinition(items);
 
             JsonObject resources = GsonHelper.getObject(root, "resources");
 
@@ -77,12 +61,12 @@ public class ResourcePackLoader {
                 if (type.equals("DefaultItemModel")) {
                     Path mesh = Path.of(GsonHelper.getString(modelObject, "Mesh"));
                     JsonArray targetArray = GsonHelper.getArray(modelObject, "Target");
-                    Set<Item> targetItems = parseTargetItems(targetArray, itemDefinition);
+                    Set<Identifier> targetItems = parseTargetItems(targetArray);
                     itemModels.put(path, new DefaultItemModelBuilder(path).setMesh(mesh).setTargetItems(targetItems));
                 } else if (type.equals("CombinedItemModel")) {
                     Path mesh = Path.of(GsonHelper.getString(modelObject, "Mesh"));
                     JsonArray targetArray = GsonHelper.getArray(modelObject, "Target");
-                    Set<Item> targetItems = parseTargetItems(targetArray, itemDefinition);
+                    Set<Identifier> targetItems = parseTargetItems(targetArray);
                     JsonArray elementsArray = GsonHelper.getArray(modelObject, "Elements");
                     Set<String> elements = new HashSet<>();
                     Util.forEachStringArray(elementsArray, "Elements", elements::add);
@@ -91,7 +75,7 @@ public class ResourcePackLoader {
                 } else if (type.equals("SlotItemModel")) {
                     Path mesh = Path.of(GsonHelper.getString(modelObject, "Mesh"));
                     JsonArray targetArray = GsonHelper.getArray(modelObject, "Target");
-                    Set<Item> targetItems = parseTargetItems(targetArray, itemDefinition);
+                    Set<Identifier> targetItems = parseTargetItems(targetArray);
                     JsonObject slotsObject = GsonHelper.getObject(modelObject, "Slots");
                     Map<String, SlotItemModel.Slot> slots = new HashMap<>();
                     for (Map.Entry<String, JsonElement> slotEntry : slotsObject.entrySet()) {
@@ -134,16 +118,16 @@ public class ResourcePackLoader {
             }
 
             JsonObject meshMappingObject = GsonHelper.getObject(resources, "mesh_mapping");
-            Map<Item, Map<Path, Integer>> map = new HashMap<>();
+            Map<Identifier, Map<Path, Integer>> map = new HashMap<>();
             for (Map.Entry<String, JsonElement> entry : meshMappingObject.entrySet()) {
-                Item item = itemDefinition.getItem(Identifier.of(entry.getKey()));
+                Identifier itemId = Identifier.of(entry.getKey());
                 JsonObject jsonObject = GsonHelper.asObject(entry.getValue(), entry.getKey());
                 Map<Path, Integer> meshMap = new HashMap<>();
                 for (Map.Entry<String, JsonElement> meshEntry : jsonObject.entrySet()) {
                     int cmd = GsonHelper.asInt(meshEntry.getValue(), meshEntry.getKey());
                     meshMap.put(Path.of(meshEntry.getKey()), cmd);
                 }
-                map.put(item, meshMap);
+                map.put(itemId, meshMap);
             }
             MapMeshMapping meshMapping = new MapMeshMapping(map);
 
@@ -158,10 +142,10 @@ public class ResourcePackLoader {
         }
     }
 
-    private Set<Item> parseTargetItems(JsonArray jsonArray, ItemDefinition itemDefinition) {
-        HashSet<Item> output = new HashSet<>();
+    private Set<Identifier> parseTargetItems(JsonArray jsonArray) {
+        HashSet<Identifier> output = new HashSet<>();
         Util.forEachStringArray(jsonArray, "Target", s -> {
-            output.add(itemDefinition.getItem(Identifier.of(s)));
+            output.add(Identifier.of(s));
         });
         return output;
     }

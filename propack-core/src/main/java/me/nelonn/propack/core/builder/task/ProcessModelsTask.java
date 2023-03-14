@@ -42,7 +42,6 @@ import me.nelonn.propack.builder.task.AbstractTask;
 import me.nelonn.propack.builder.task.FileProcessingException;
 import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.*;
-import me.nelonn.propack.definition.Item;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -62,7 +61,7 @@ public class ProcessModelsTask extends AbstractTask {
     public void run(@NotNull TaskIO io) {
         MeshMappingBuilder meshMappingBuilder = new MeshMappingBuilder();
         io.getExtras().put(EXTRA_MESH_MAPPING_BUILDER, meshMappingBuilder);
-        Map<Path, Set<Item>> meshesToOverride = new HashMap<>();
+        Map<Path, Set<Identifier>> meshesToOverride = new HashMap<>();
         for (File file : io.getFiles()) {
             try {
                 String filePath = file.getPath();
@@ -73,7 +72,7 @@ public class ProcessModelsTask extends AbstractTask {
                 String type = GsonHelper.getString(rootJson, "Type");
                 String mesh = GsonHelper.getString(rootJson, "Mesh");
                 Path meshPath = PathUtil.resolve(mesh, resourcePath);
-                Set<Item> targetItems = parseTarget(rootJson);
+                Set<Identifier> targetItems = parseTarget(rootJson);
                 ItemModelBuilder builder;
                 if (type.equals("DefaultItemModel")) {
                     builder = new DefaultItemModelBuilder(resourcePath).setMesh(meshPath);
@@ -201,7 +200,7 @@ public class ProcessModelsTask extends AbstractTask {
                 } else {
                     throw new IllegalArgumentException("Unknown model type: " + type);
                 }
-                Set<Item> toOverride = meshesToOverride.computeIfAbsent(meshPath, key -> new HashSet<>());
+                Set<Identifier> toOverride = meshesToOverride.computeIfAbsent(meshPath, key -> new HashSet<>());
                 toOverride.addAll(targetItems);
                 builder.setTargetItems(targetItems);
                 io.getAssets().putItemModel(builder);
@@ -231,10 +230,10 @@ public class ProcessModelsTask extends AbstractTask {
                         jsonModel.getOverrides());
                 JsonObject resultJson = jsonModel.serialize();
                 io.getFiles().addFile(new JsonFile("assets/" + resourcePath.getNamespace() + "/models/" + resourcePath.getValue() + ".json", resultJson));
-                Set<Item> toOverride = meshesToOverride.get(resourcePath);
+                Set<Identifier> toOverride = meshesToOverride.get(resourcePath);
                 if (toOverride != null) {
-                    for (Item item : toOverride) {
-                        meshMappingBuilder.getMapper(item).add(resourcePath);
+                    for (Identifier itemId : toOverride) {
+                        meshMappingBuilder.getMapper(itemId).add(resourcePath);
                     }
                 }
             } catch (Exception e) {
@@ -243,7 +242,7 @@ public class ProcessModelsTask extends AbstractTask {
         }
         // overriding default models (custom_model_data)
         for (MeshMappingBuilder.ItemEntry itemEntry : meshMappingBuilder.getMappers()) {
-            String path = "include/assets/minecraft/models/item/" + itemEntry.getItem().getId().getValue() + ".json";
+            String path = "include/assets/minecraft/models/item/" + itemEntry.getItemId().getValue() + ".json";
             File file = io.getFiles().getFile(path);
             if (!(file instanceof JsonFile)) {
                 LOGGER.error("Default model not found: {}", path);
@@ -261,26 +260,18 @@ public class ProcessModelsTask extends AbstractTask {
         }
     }
 
-    private Set<Item> parseTarget(JsonObject model) {
-        Set<Item> output = new HashSet<>();
+    private Set<Identifier> parseTarget(JsonObject model) {
+        Set<Identifier> output = new HashSet<>();
         if (GsonHelper.hasString(model, "Target")) {
             String target = GsonHelper.getString(model, "Target");
-            Item item = getProject().getItemDefinition().getItem(Identifier.of(target));
-            if (item == null) {
-                throw new JsonParseException("Item not found: " + target);
-            }
-            output.add(item);
+            output.add(Identifier.of(target));
         } else if (GsonHelper.hasArray(model, "Target")) {
             JsonArray targets = GsonHelper.getArray(model, "Target");
             if (targets.isEmpty()) {
                 throw new JsonParseException("Target cannot be empty");
             }
             for (JsonElement target : targets) {
-                Item item = getProject().getItemDefinition().getItem(Identifier.of(target.getAsString()));
-                if (item == null) {
-                    throw new JsonParseException("Item not found: " + target.getAsString());
-                }
-                output.add(item);
+                output.add(Identifier.of(target.getAsString()));
             }
         } else {
             throw new JsonParseException("Missing 'Target'");

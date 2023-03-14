@@ -26,16 +26,13 @@ import me.nelonn.propack.builder.StrictMode;
 import me.nelonn.propack.builder.file.ByteFile;
 import me.nelonn.propack.builder.file.VirtualFile;
 import me.nelonn.propack.builder.hosting.Hosting;
-import me.nelonn.propack.builder.loader.ItemDefinitionLoader;
 import me.nelonn.propack.builder.loader.TextLoader;
 import me.nelonn.propack.builder.util.Extra;
-import me.nelonn.propack.builder.util.Extras;
 import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.core.builder.BuildConfiguration;
 import me.nelonn.propack.core.builder.InternalProject;
 import me.nelonn.propack.core.builder.ObfuscationConfiguration;
 import me.nelonn.propack.core.builder.PackageOptions;
-import me.nelonn.propack.core.loader.itemdefinition.JsonFileItemDefinitionLoader;
 import me.nelonn.propack.core.loader.text.LegacyTextLoader;
 import me.nelonn.propack.core.loader.text.MiniMessageTextLoader;
 import me.nelonn.propack.core.loader.text.TextComponentLoader;
@@ -43,7 +40,6 @@ import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.Util;
-import me.nelonn.propack.definition.ItemDefinition;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.apache.logging.log4j.Logger;
@@ -63,11 +59,9 @@ public class ProjectLoader {
     public static final Extra<File> EXTRA_CONFIG_DIR = new Extra<>(File.class, "propack.project_loader.config_dir");
     private final ProPackCore core;
     private final List<TextLoader> textLoaders;
-    private final List<ItemDefinitionLoader> itemDefinitionLoaders;
 
     public ProjectLoader(@NotNull ProPackCore core,
-                         @Nullable List<TextLoader> textLoaders,
-                         @Nullable List<ItemDefinitionLoader> itemDefinitionLoaders) {
+                         @Nullable List<TextLoader> textLoaders) {
         this.core = core;
         if (textLoaders != null) {
             this.textLoaders = new ArrayList<>(textLoaders);
@@ -77,24 +71,14 @@ public class ProjectLoader {
             this.textLoaders.add(MiniMessageTextLoader.INSTANCE);
             this.textLoaders.add(TextComponentLoader.INSTANCE);
         }
-        if (itemDefinitionLoaders != null) {
-            this.itemDefinitionLoaders = new ArrayList<>(itemDefinitionLoaders);
-        } else {
-            this.itemDefinitionLoaders = new ArrayList<>();
-            this.itemDefinitionLoaders.add(JsonFileItemDefinitionLoader.INSTANCE);
-        }
     }
 
     public ProjectLoader(@NotNull ProPackCore core) {
-        this(core, null, null);
+        this(core, null);
     }
 
     public List<TextLoader> getTextLoaders() {
         return textLoaders;
-    }
-
-    public List<ItemDefinitionLoader> getItemDefinitionLoaders() {
-        return itemDefinitionLoaders;
     }
 
     public @NotNull InternalProject load(@NotNull File projectFile, boolean loadBuilt) {
@@ -158,7 +142,6 @@ public class ProjectLoader {
             throw new IllegalArgumentException("Something went wrong when loading '" + projectFile.getName() + "'", e);
         }
 
-        ItemDefinition itemDefinition;
         StrictMode strictMode;
         Pattern fileIgnore = null;
         Pattern dirIgnore = null;
@@ -170,16 +153,6 @@ public class ProjectLoader {
 
             JsonObject itemDefinitionObject = GsonHelper.getObject(buildConfigObject, "ItemDefinition");
             String type = GsonHelper.getString(itemDefinitionObject, "Type");
-
-            List<ItemDefinitionLoader> results = itemDefinitionLoaders.stream().filter(loader -> loader.is(type)).collect(Collectors.toList());
-            if (results.isEmpty()) {
-                throw new UnsupportedOperationException("No loader found for ItemDefinition type '" + type + "'");
-            } else if (results.size() > 1) {
-                LOGGER.warn("Found more than 1 loaders for the ItemDefinition type '{}'", type);
-            }
-            Extras extras = new Extras();
-            extras.put(EXTRA_CONFIG_DIR, new File(projectFile.getParentFile(), "config"));
-            itemDefinition = results.get(0).load(itemDefinitionObject, extras);
 
             if (buildConfigObject.has("Strict")) {
                 JsonElement jsonElement = buildConfigObject.get("Strict");
@@ -326,8 +299,8 @@ public class ProjectLoader {
             }
         }
 
-        InternalProject project = new InternalProject(name, projectFile.getParentFile(),
-                itemDefinition, buildConfiguration, packMeta, packIcon, resourcePack);
+        InternalProject project = new InternalProject(name, projectFile.getParentFile(), buildConfiguration,
+                packMeta, packIcon, resourcePack);
 
         LOGGER.info("Project '{}' successfully loaded", name);
 

@@ -112,7 +112,6 @@ public final class ProPackPlugin extends JavaPlugin {
             }
             devServer = null;
         }
-        core.getProjectLoader().getItemDefinitionLoaders().add(BukkitItemDefinitionLoader.INSTANCE);
         if (Config.DEV_SERVER_ENABLED.asBoolean()) {
             devServer = new DevServer(Config.DEV_SERVER_RETURN_IP.asString(), Config.DEV_SERVER_PORT.asInt());
             core.getHostingMap().register("dev_server", devServer);

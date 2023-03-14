@@ -1,7 +1,4 @@
 {
-  ItemDefinition: {
-    Type: "Bukkit"
-  },
   // Available options: false, 'warn', true
   Strict: true,
   // Ignore directory regexps

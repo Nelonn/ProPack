@@ -20,7 +20,6 @@ package me.nelonn.propack.bukkit;
 
 import com.google.common.base.Preconditions;
 import me.nelonn.flint.path.Identifier;
-import me.nelonn.propack.definition.Item;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,8 +36,8 @@ public final class ProPack {
         ProPack.core = core;
     }
 
-    public static @NotNull Item adapt(@NotNull Material material) {
-        return new Item(Identifier.of(material.getKey().toString()), material.isBlock());
+    public static @NotNull Identifier adapt(@NotNull Material material) {
+        return Identifier.of(material.getKey().toString());
     }
 
     private ProPack() {

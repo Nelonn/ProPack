@@ -25,16 +25,16 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.MinecraftKey;
 import com.comphenix.protocol.wrappers.nbt.NbtType;
+import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.asset.*;
-import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.Config;
+import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.adapter.Adapter;
 import me.nelonn.propack.bukkit.adapter.WrappedCompoundTag;
 import me.nelonn.propack.bukkit.adapter.WrappedItemStack;
 import me.nelonn.propack.bukkit.adapter.WrappedListTag;
-import me.nelonn.propack.definition.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
@@ -162,7 +162,7 @@ public class PacketListener extends PacketAdapter {
             }
             Material material = Material.matchMaterial(itemStack.getItemId().toString());
             assert material != null;
-            Item itemType = ProPack.adapt(material);
+            Identifier itemType = ProPack.adapt(material);
             if (!itemModel.getTargetItems().contains(itemType)) return;
             Integer cmd = resourcePack.getMeshMapping().getCustomModelData(mesh, itemType);
             if (cmd == null) return;
