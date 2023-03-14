@@ -129,22 +129,6 @@ public final class Util {
         return file;
     }
 
-    /*@SuppressWarnings("unchecked")
-    public static @NotNull Hosting provideHosting(@NotNull String string) {
-        try {
-            Class<? extends Hosting> clazz = (Class<? extends Hosting>) Class.forName(string);
-            return clazz.getDeclaredConstructor().newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("Class '" + string + "' not found");
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Class '" + string + "' must implement '" + Hosting.class.getName() + "'");
-        } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException("Class '" + string + "' has no constructor without arguments");
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }*/
-
     private Util() {
         throw new UnsupportedOperationException();
     }
