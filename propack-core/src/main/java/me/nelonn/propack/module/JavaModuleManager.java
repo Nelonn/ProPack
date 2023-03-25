@@ -19,6 +19,7 @@
 package me.nelonn.propack.module;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import org.apache.commons.io.IOUtils;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -37,6 +39,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class JavaModuleManager implements ModuleManager {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -65,29 +69,70 @@ public class JavaModuleManager implements ModuleManager {
         });
         for (Path path : stream) {
             try {
-                URLClassLoader child = new URLClassLoader(new URL[]{path.toUri().toURL()}, getClass().getClassLoader());
-                InputStream inputStream = child.getResourceAsStream("module.json");
-                if (inputStream == null) continue;
-                String moduleDescriptionString = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                JsonObject jsonObject = GsonHelper.deserialize(moduleDescriptionString);
-                JsonModuleDescription moduleMeta = JsonModuleDescription.deserialize(jsonObject);
-                try {
-                    Class<?> bootstrapper = Class.forName(moduleMeta.getBootstrapper(), true, child);
-                    if (!ModuleBootstrap.class.isAssignableFrom(bootstrapper)) {
-                        throw new IllegalArgumentException("Bootstrapper class must implement '" + ModuleBootstrap.class.getName() + "'");
-                    }
-                    ModuleBootstrap moduleBootstrap = (ModuleBootstrap) bootstrapper.getDeclaredConstructor().newInstance();
-                    File dataDir = new File(path.getParent().toFile(), moduleMeta.getName());
-                    ModuleProviderContext context = new ModuleProviderContextImpl(moduleMeta, dataDir.toPath());
-                    moduleBootstrap.bootstrap(context);
-                    JavaModule module = moduleBootstrap.createModule(context);
-                    module.enable();
-                    modules.put(moduleMeta.getName(), module);
-                } catch (Exception e) {
-                    LOGGER.error("Error occurred while enabling " + moduleMeta.getDisplayName() + " (Is it up to date?)", e);
-                }
+                loadModule(path.toFile());
             } catch (Exception e) {
                 LOGGER.error("Unable to load module '" + path.getFileName() + "'", e);
+            }
+        }
+        stream.close();
+    }
+
+    public @NotNull Module loadModule(@NotNull File file) {
+        JsonModuleDescription description;
+        try {
+            description = getModuleDescription(file);
+        } catch (InvalidDescriptionException e) {
+            throw new IllegalArgumentException("Invalid module", e);
+        }
+        File dataFolder = new File(modulesDir, description.getName());
+        try {
+            URLClassLoader child = new URLClassLoader(new URL[]{file.toURI().toURL()}, getClass().getClassLoader());
+            Class<?> bootstrapper = Class.forName(description.getBootstrapper(), true, child);
+            if (!ModuleBootstrap.class.isAssignableFrom(bootstrapper)) {
+                throw new IllegalArgumentException("Bootstrapper class must implement '" + ModuleBootstrap.class.getName() + "'");
+            }
+            ModuleBootstrap moduleBootstrap = (ModuleBootstrap) bootstrapper.getDeclaredConstructor().newInstance();
+            ModuleProviderContext context = new ModuleProviderContextImpl(description, dataFolder.toPath());
+            moduleBootstrap.bootstrap(context);
+            JavaModule module = moduleBootstrap.createModule(context);
+            module.enable();
+            modules.put(description.getName(), module);
+            return module;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid module", e);
+        }
+    }
+
+    public @NotNull JsonModuleDescription getModuleDescription(@NotNull File file) throws InvalidDescriptionException {
+        JarFile jar = null;
+        InputStream stream = null;
+        try {
+            jar = new JarFile(file);
+            JarEntry entry = jar.getJarEntry("module.json");
+
+            if (entry == null) {
+                throw new InvalidDescriptionException(new FileNotFoundException("Jar does not contain module.json"));
+            }
+
+            stream = jar.getInputStream(entry);
+
+            String moduleDescriptionString = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            JsonObject jsonObject = GsonHelper.deserialize(moduleDescriptionString);
+            return JsonModuleDescription.deserialize(jsonObject);
+        } catch (IOException | JsonParseException ex) {
+            throw new InvalidDescriptionException(ex);
+        } finally {
+            if (jar != null) {
+                try {
+                    jar.close();
+                } catch (IOException ignored) {
+                }
+            }
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException ignored) {
+                }
             }
         }
     }
