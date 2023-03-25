@@ -4,5 +4,6 @@ version: ${version}
 api-version: 1.17
 author: Nelonn
 load: STARTUP
-description: Resources manager, auto build resource pack
+description: Modern solution for minecraft resource pack development
+website: 'https://github.com/Nelonn/ProPack'
 softdepend: [ProtocolLib, PlaceholderAPI]
