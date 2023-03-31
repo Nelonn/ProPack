@@ -3,10 +3,11 @@
 Modern solution for minecraft resource pack development
 
 ## Features
-- [Resource pack obfuscation](#obfuscation)
-- [Auto CustomModelData Mapping](#autocmd)
-- [Auto fancyPants custom armor](#customarmor)
-- And much more...
+- [Models generating](#meshes--models)
+- [Auto CustomModelData](#auto-custommodeldata)
+- [Auto sounds FFmpeg conversion](#sounds)
+- [Auto fancyPants (custom armor)](#armor-textures)
+- [Obfuscation](#obfuscation)
 
 ## Example Project
 Look at the [example project](https://github.com/Nelonn/ProPack/blob/master/propack-core/src/main/resources/example)
@@ -20,10 +21,11 @@ Json is used in lenient mode, possible file extensions:
 Some futures from json 5 will not work due to [GSON](https://github.com/google/gson) flaws
 
 ## Meshes & Models
-[Java Block/Item models](https://minecraft.fandom.com/wiki/Model) in the ProPack are called meshes.
-Their files should end with `.mesh.json`
+[Java Block/Item models](https://minecraft.fandom.com/wiki/Model) in the ProPack are called *meshes*.
+Their files should end with `.mesh.json`.
 
-Models file name should end with `.model.json`. 
+Models configuration file name should end with `.model.json`. 
+
 Currently implemented model types:
 
 <br>
@@ -85,9 +87,9 @@ SlotItemModel, example:
 }
 ```
 
-`Target` - this is an indication of the items for which you need to `Auto CustomModelData Mapping` of the specified model
+`Target` - this is an indication of the items for which you need to [Auto CustomModelData](#auto-custommodeldata) of the specified model.
 
-## <a name="autocmd"></a> Auto CustomModelData Mapping
+## Auto CustomModelData
 When building resource pack ProPack takes the default model from the folder `include/assets/minecraft/models/item/<item>.json`
 and adds the necessary elements to override.
 
@@ -106,18 +108,17 @@ Example NBT tag for SlotItemModel: `{CustomModel:"example:models/example_slotmod
 
 ## Sounds
 
-Sound files must ends with `.sound.json`
-- Example: `scream.sound.json`
+Sound files must ends with `.sound.json`, eg. `scream.sound.json`
 
 Sound file paths can be relative, example `../folder/sound`.
 
 FFmpeg auto conversion is supported. Use `-Dpropack.ffmpeg=path` to indicate its location,
 by default it `ffmpeg`
 
-## <a name="armortextures"></a> Armor Textures
+## Armor Textures
 Added an automatic builder of custom textures for leather armor for the [shader `fancyPants`](https://github.com/Ancientkingg/fancyPants)
 
-Armor file must ends with `.armor.json`
+Armor file must ends with `.armor.json`, eg. `emerald.armor.json`
 
 [Example file]():
 ```json
@@ -146,32 +147,36 @@ The second animated version:
   }
 }
 ```
-`.png` is not required to be specified
+`.png` is not required to be specified.
+
 For more information, see [README.md of fancyPants](https://github.com/Ancientkingg/fancyPants/blob/master/README.md)
 
 `SaveImage` allows you to determine whether to save 
 the specified `Image` in the output resource pack
 
 ## Languages
-Language file must ends with `.lang.json`
-- Example: `en_us.lang.json`
+Language file must ends with `.lang.json`, eg. `en_us.lang.json`.
+
+Path in content doesn't matter.
+
+Multiple languages in the same namespace will be merged into one.
 
 There is also a placeholder `<namespace>`.
-Multiple languages in the same namespace will be merged into one.
 
 ## Fonts
 Fonts work unchanged except for the file extension `.font.json`
 
-## <a name="obfuscation"></a> Obfuscation
+## Obfuscation
 It just obfuscates the entire resource pack, except for translations.
 The settings for this function are in [`config/build.json5`](https://github.com/Nelonn/ProPack/blob/master/propack-core/src/main/resources/example/config/build.json5)
 
 ## Planned in the future
+- [ ] Rewrite builder to C++ or Golang as binary executable.
 - [ ] Integration into [ItemsAdder](https://www.spigotmc.org/resources/%E2%9C%A8itemsadder%E2%AD%90emotes-mobs-items-armors-hud-gui-emojis-blocks-wings-hats-liquids.73355/), [Oraxen](https://www.spigotmc.org/resources/%E2%98%84%EF%B8%8F-oraxen-add-items-blocks-armors-hats-food-furnitures-plants-and-gui.72448/), [Model Engine](https://www.spigotmc.org/resources/conxeptworks-model-engine—ultimate-custom-entity-model-manager-1-16-5-1-19-3.79477/), etc.
-- [ ] Fonts generating
-- [ ] CI/CD using [Redis](https://redis.io/), etc.
-- [ ] Improve the quality of the code and API
-- [ ] Mod for [Fabric](https://fabricmc.net/)
+- [ ] Fonts generating.
+- [ ] Resource pack CI/CD using [Redis](https://redis.io/), etc. (for multi server)
+- [ ] Improve the quality of the code and API.
+- [ ] Mod for [Fabric](https://fabricmc.net/).
 
 ## License
 *Click here to read [the entire license](https://github.com/Nelonn/ProPack/blob/master/LICENSE.txt).*
