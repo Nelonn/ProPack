@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    "compileOnly"(files("../libs/flint-path-0.0.1.jar"))
+    "compileOnly"(files("../libs/lib-flint-path-0.0.1.jar"))
     "compileOnly"("net.kyori:adventure-api:4.12.0")
     "compileOnly"("org.jetbrains:annotations:23.1.0")
 }

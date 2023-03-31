@@ -25,8 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 
 public final class SharedLoader {
@@ -56,8 +54,8 @@ public final class SharedLoader {
                     in.transferTo(out);
                 }
             }
-            URLClassLoader loader = new URLClassLoader(new URL[]{file.toURI().toURL()}, Bukkit.class.getClassLoader());
-            Class.forName(library.getCheckClass(), true, loader);
+            Bukkit.getPluginManager().loadPlugin(file);
+            Class.forName(library.getCheckClass());
         } catch (Exception e) {
             throw new RuntimeException("Unable to load shared library '" + library.getFileName() + "'", e);
         }
