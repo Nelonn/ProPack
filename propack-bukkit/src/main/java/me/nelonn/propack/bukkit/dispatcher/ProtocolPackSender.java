@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.dispatcher.sender;
+package me.nelonn.propack.bukkit.dispatcher;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -29,7 +29,7 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class ProtocolPackSender implements PackSender {
+public class ProtocolPackSender {
     private final ProtocolManager protocolManager;
 
     public ProtocolPackSender() {
@@ -49,7 +49,7 @@ public class ProtocolPackSender implements PackSender {
         }
     }
 
-    private WrappedChatComponent toProtocolLike(Component component) {
+    private static WrappedChatComponent toProtocolLike(Component component) {
         return WrappedChatComponent.fromJson(GsonComponentSerializer.gson().serialize(component));
     }
 

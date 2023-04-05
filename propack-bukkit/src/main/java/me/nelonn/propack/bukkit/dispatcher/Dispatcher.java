@@ -24,11 +24,7 @@ import me.nelonn.propack.bukkit.Config;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.ResourcePackInfo;
-import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
 import me.nelonn.propack.bukkit.definition.PackDefinition;
-import me.nelonn.propack.bukkit.dispatcher.sender.BukkitPackSender;
-import me.nelonn.propack.bukkit.dispatcher.sender.PackSender;
-import me.nelonn.propack.bukkit.dispatcher.sender.ProtocolPackSender;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -52,16 +48,14 @@ import java.util.UUID;
 public class Dispatcher implements Listener {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final ProPackPlugin plugin;
-    private final PackSender packSender;
+    private final ProtocolPackSender packSender;
     private final Map<UUID, SentPack> pending = new HashMap<>();
     private final Store fallbackStore;
     private Store store;
 
     public Dispatcher(@NotNull ProPackPlugin plugin, @NotNull MemoryStore memoryStore) {
         this.plugin = plugin;
-        packSender = /*Util.isPaper() ? new PaperPackSender() :*/
-                CompatibilitiesManager.hasPlugin("ProtocolLib") ? new ProtocolPackSender() :
-                        new BukkitPackSender();
+        packSender = new ProtocolPackSender();
         Bukkit.getPluginManager().registerEvents(this, plugin);
         fallbackStore = memoryStore;
         store = fallbackStore;

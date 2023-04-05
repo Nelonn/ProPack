@@ -2,6 +2,8 @@
 # ProPack
 Modern solution for minecraft resource pack development
 
+[ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/) is required for bukkit version
+
 ## Features
 - [Models generating](#meshes--models)
 - [Auto CustomModelData](#auto-custommodeldata)
