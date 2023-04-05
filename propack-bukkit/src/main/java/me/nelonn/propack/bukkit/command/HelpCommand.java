@@ -35,5 +35,6 @@ public class HelpCommand extends Command {
     protected void onCommand(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args) {
         Util.send(sender, "<white>" + plugin.getDescription().getName() + " <gray>v" + plugin.getDescription().getVersion());
         Util.send(sender, "<gray>/propack build <project>");
+        Util.send(sender, "<gray>/propack reload [config|modules|packs]");
     }
 }

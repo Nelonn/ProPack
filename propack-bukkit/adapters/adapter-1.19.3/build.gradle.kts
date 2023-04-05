@@ -11,7 +11,7 @@ java.toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 dependencies {
     // https://papermc.io/repo/service/rest/repository/browse/maven-public/io/papermc/paper/dev-bundle/
     paperDevBundle("1.19.3-R0.1-20221226.180038-55")
-    "compileOnly"(files("../../../libs/flint-path-0.0.1.jar"))
+    "compileOnly"(files("../../../libs/lib-flint-path-0.0.1.jar"))
     "compileOnly"(project(":propack-api"))
     "compileOnly"(project(":propack-core"))
     "compileOnly"(project(":propack-bukkit"))

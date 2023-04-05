@@ -24,7 +24,6 @@ import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.Util;
 import me.nelonn.propack.bukkit.definition.PackDefinition;
 import me.nelonn.propack.bukkit.definition.ProjectDefinition;
-import me.nelonn.propack.core.builder.InternalProject;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -56,9 +55,8 @@ public class BuildCommand extends Command {
         }
         new Thread(() -> {
             try {
-                InternalProject internalProject = (InternalProject) projectDefinition.getProject();
-                internalProject.build();
-                ResourcePack resourcePack = internalProject.getResourcePack().orElseThrow();
+                projectDefinition.build();
+                ResourcePack resourcePack = projectDefinition.getResourcePack().orElseThrow();
                 if (resourcePack.isUploaded()) {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         Optional<ResourcePack> playerPack = ProPack.getCore().getDispatcher().getAppliedResourcePack(player);

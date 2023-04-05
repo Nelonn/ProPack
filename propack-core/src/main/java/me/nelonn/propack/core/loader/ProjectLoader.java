@@ -81,7 +81,7 @@ public class ProjectLoader {
         return textLoaders;
     }
 
-    public @NotNull InternalProject load(@NotNull File projectFile, boolean loadBuilt) {
+    public @NotNull InternalProject load(@NotNull File projectFile, boolean tryLoadBuilt) {
         String name;
         VirtualFile packMeta;
         VirtualFile packIcon;
@@ -287,7 +287,7 @@ public class ProjectLoader {
 
         ResourcePack resourcePack = null;
         File builtResourcePack = new File(projectFile.getParentFile(), "build/" + name + ".propack");
-        if (builtResourcePack.exists() && loadBuilt) {
+        if (builtResourcePack.exists() && tryLoadBuilt) {
             try {
                 ResourcePackLoader resourcePackLoader = new ResourcePackLoader();
                 resourcePack = resourcePackLoader.load(builtResourcePack);

@@ -16,7 +16,7 @@ repositories {
 dependencies {
     "implementation"(project(":propack-api"))
     "implementation"(project(":propack-core"))
-    "implementation"(files("../libs/flint-path-0.0.1.jar"))
+    "implementation"(files("../libs/lib-flint-path-0.0.1.jar"))
 
     "implementation"("org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r")
 
