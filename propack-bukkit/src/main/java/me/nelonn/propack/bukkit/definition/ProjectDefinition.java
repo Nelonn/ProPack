@@ -19,16 +19,26 @@
 package me.nelonn.propack.bukkit.definition;
 
 import me.nelonn.propack.ResourcePack;
-import me.nelonn.propack.builder.Project;
+import me.nelonn.propack.core.builder.InternalProject;
+import me.nelonn.propack.core.loader.ProjectLoader;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.Optional;
 
 public class ProjectDefinition implements PackDefinition {
-    private final Project project;
+    private final File file;
+    private InternalProject project;
+    private ProjectLoader projectLoader;
 
-    public ProjectDefinition(@NotNull Project project) {
-        this.project = project;
+    public ProjectDefinition(@NotNull File file, @NotNull ProjectLoader projectLoader, boolean tryLoadBuilt) {
+        this.file = file;
+        this.projectLoader = projectLoader;
+        if (tryLoadBuilt) {
+            loadOrBuild();
+        } else {
+            build();
+        }
     }
 
     @Override
@@ -41,7 +51,35 @@ public class ProjectDefinition implements PackDefinition {
         return project.getResourcePack();
     }
 
-    public @NotNull Project getProject() {
+    public @NotNull File getFile() {
+        return file;
+    }
+
+    public @NotNull InternalProject getProject() {
         return project;
+    }
+
+    public @NotNull ProjectLoader getProjectLoader() {
+        return projectLoader;
+    }
+
+    public void setProjectLoader(@NotNull ProjectLoader projectLoader) {
+        this.projectLoader = projectLoader;
+    }
+
+    public void loadOrBuild() {
+        project = projectLoader.load(file, true);
+        if (project.getResourcePack().isEmpty()) {
+            build0();
+        }
+    }
+
+    public void build() {
+        project = projectLoader.load(file, false);
+        build0();
+    }
+
+    private void build0() {
+        project.build(); // TODO: improve
     }
 }

@@ -20,7 +20,6 @@ package me.nelonn.propack.bukkit.definition;
 
 import com.google.gson.JsonObject;
 import me.nelonn.propack.core.ProPackCore;
-import me.nelonn.propack.core.builder.InternalProject;
 import me.nelonn.propack.core.loader.ProjectLoader;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.LogManagerCompat;
@@ -65,12 +64,8 @@ public class PackManager {
                 if (type.equalsIgnoreCase("Project")) {
                     boolean buildAtStartup = GsonHelper.getBoolean(jsonObject, "BuildAtStartup", false);
                     File projectFile = new File(directory, name + File.separatorChar + "project.json5");
-                    InternalProject internalProject = projectLoader.load(projectFile, !buildAtStartup);
-                    if (buildAtStartup || internalProject.getResourcePack().isEmpty()) {
-                        internalProject.build(); // TODO: improve
-                    }
-                    ProjectDefinition resourcePackDefinition = new ProjectDefinition(internalProject);
-                    definitions.put(name, resourcePackDefinition);
+                    ProjectDefinition projectDefinition = new ProjectDefinition(projectFile, projectLoader, !buildAtStartup);
+                    definitions.put(name, projectDefinition);
                 } else if (type.equalsIgnoreCase("File")) {
                     throw new UnsupportedOperationException("Resource pack definition type 'File' currently not supported");
                 }
