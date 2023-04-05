@@ -7,4 +7,4 @@ load: STARTUP
 description: Modern solution for minecraft resource pack development
 website: 'https://github.com/Nelonn/ProPack'
 depend: [ProtocolLib]
-#softdepend: [PlaceholderAPI]
+softdepend: [PlaceholderAPI]

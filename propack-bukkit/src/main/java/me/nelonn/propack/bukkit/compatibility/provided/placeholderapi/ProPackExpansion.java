@@ -21,16 +21,17 @@ package me.nelonn.propack.bukkit.compatibility.provided.placeholderapi;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ProPackExpansion extends PlaceholderExpansion {
     private final ProPackPlugin plugin;
 
-    public static void register(@NotNull final ProPackPlugin plugin) {
+    public static void register(@NotNull ProPackPlugin plugin) {
         new ProPackExpansion(plugin).register();
     }
 
-    public ProPackExpansion(final ProPackPlugin plugin) {
+    public ProPackExpansion(@NotNull ProPackPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -41,7 +42,7 @@ public class ProPackExpansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getAuthor() {
-        return "Nelonn";
+        return plugin.getDescription().getAuthors().get(0);
     }
 
     @Override
@@ -55,10 +56,11 @@ public class ProPackExpansion extends PlaceholderExpansion {
     }
 
     @Override
-    public String onRequest(final OfflinePlayer player, @NotNull final String params) {
+    public String onRequest(final OfflinePlayer offlinePlayer, @NotNull final String params) {
+        if (!offlinePlayer.isOnline()) return null;
+        Player player = (Player) offlinePlayer;
         /*final Glyph glyph = plugin.getFontManager().getGlyphFromName(params);
-        if (glyph != null)
-            return String.valueOf(glyph.getCharacter());*/
-        return null; // Placeholder is unknown by the Expansion
+        if (glyph != null) return String.valueOf(glyph.getCharacter());*/
+        return player.getName();
     }
 }
