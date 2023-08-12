@@ -35,7 +35,7 @@ import java.io.File;
 
 public final class ProPackPlugin extends JavaPlugin {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static final SharedLoader.Library library = new SharedLoader.Library("lib-flint-path-0.0.1.jar", "me.nelonn.flint.path.Path");
+    private static final SharedLoader.Library library = new SharedLoader.Library("flint-path-0.0.1.jar", "me.nelonn.flint.path.Path");
 
     public static ProPackPlugin getInstance() {
         return (ProPackPlugin) Bukkit.getPluginManager().getPlugin("ProPack");
@@ -67,6 +67,12 @@ public final class ProPackPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        try {
+            Class.forName(library.getCheckClass());
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException("ProPack shared library not loaded");
+        }
+
         adventure = BukkitAudiences.create(this);
 
         core = new BukkitProPackCore(this);

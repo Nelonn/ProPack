@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 
 public final class SharedLoader {
+    private static final String DIRECTORY = "libraries";
     private static final String DOT_SHARED = ".shared";
     private final Plugin plugin;
     private final File sharedDir;
@@ -35,7 +36,7 @@ public final class SharedLoader {
     public SharedLoader(@NotNull Plugin plugin) {
         this.plugin = plugin;
         File rootDir = Bukkit.getServer().getPluginsFolder().getParentFile();
-        sharedDir = new File(rootDir, "libraries" + File.separatorChar + DOT_SHARED);
+        sharedDir = new File(rootDir, DIRECTORY + "/" + DOT_SHARED);
     }
 
     public void loadIfNotExists(@NotNull Library library) {
@@ -48,9 +49,11 @@ public final class SharedLoader {
             File file = new File(sharedDir, library.getFileName());
             if (!file.exists()) {
                 sharedDir.mkdirs();
-                try (InputStream in = plugin.getResource(library.getFileName() + DOT_SHARED);
+                try (InputStream in = plugin.getResource(DIRECTORY + "/" + library.getFileName() + DOT_SHARED);
                      OutputStream out = Files.newOutputStream(file.toPath())) {
-                    assert in != null;
+                    if (in == null) {
+                        throw new IllegalArgumentException("Shared library not found in jar");
+                    }
                     in.transferTo(out);
                 }
             }
