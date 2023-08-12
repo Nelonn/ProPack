@@ -96,7 +96,10 @@ public final class DevServer extends Hosting implements Closeable {
         private void handle(@NotNull Socket socket) throws IOException {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.ISO_8859_1));
 
-            String[] requestLine = bufferedReader.readLine().split(" ");
+            String superHeader = bufferedReader.readLine();
+            if (superHeader == null) return;
+
+            String[] requestLine = superHeader.split(" ");
             if (requestLine.length != 3) {
                 LOGGER.warn("Unexpected request line: {}", Arrays.toString(requestLine));
                 socket.close();
