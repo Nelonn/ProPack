@@ -19,10 +19,11 @@
 package me.nelonn.propack.bukkit.compatibility.provided.placeholderapi;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ProPackExpansion extends PlaceholderExpansion {
     private final ProPackPlugin plugin;
@@ -56,11 +57,20 @@ public class ProPackExpansion extends PlaceholderExpansion {
     }
 
     @Override
-    public String onRequest(final OfflinePlayer offlinePlayer, @NotNull final String params) {
-        if (!offlinePlayer.isOnline()) return null;
-        Player player = (Player) offlinePlayer;
-        /*final Glyph glyph = plugin.getFontManager().getGlyphFromName(params);
-        if (glyph != null) return String.valueOf(glyph.getCharacter());*/
-        return player.getName();
+    public @Nullable String onPlaceholderRequest(final @Nullable Player player, @NotNull String params) {
+        params = params.toLowerCase();
+        String result = null;
+        if (player != null) {
+            // return in switches is 'yield'
+            result = switch (params.toLowerCase()) {
+                case "resourcepack", "rp" -> plugin.getCore().getDispatcher().getAppliedResourcePack(player)
+                        .map(ResourcePack::getName).orElse("");
+                // TODO: glyphs
+                default -> null;
+            };
+        } else {
+            // ...
+        }
+        return result;
     }
 }
