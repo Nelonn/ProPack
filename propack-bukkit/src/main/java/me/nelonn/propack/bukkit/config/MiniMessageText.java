@@ -16,17 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.dispatcher;
+package me.nelonn.propack.bukkit.config;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.UUID;
+public interface MiniMessageText {
+    ConfigValue.Deserializer<MiniMessageText> DESERIALIZER =
+            obj -> (MiniMessageText) tagResolvers -> MiniMessage.miniMessage().deserialize((String) obj, tagResolvers);
 
-public interface Store {
-
-    @Nullable SentPack getActiveResourcePack(@NotNull UUID uuid);
-
-    void setActiveResourcePack(@NotNull UUID uuid, @Nullable SentPack sentPack);
+    @NotNull Component accept(final @NotNull TagResolver... tagResolvers);
 
 }

@@ -31,10 +31,13 @@ import me.nelonn.propack.builder.task.AbstractTask;
 import me.nelonn.propack.builder.task.FileProcessingException;
 import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.GsonHelper;
+import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.PathUtil;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 public class ProcessFontsTask extends AbstractTask {
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     public static final TaskBootstrap BOOTSTRAP = ProcessFontsTask::new;
 
     public ProcessFontsTask(@NotNull Project project) {
@@ -55,6 +58,16 @@ public class ProcessFontsTask extends AbstractTask {
                 if (providersArray != null) {
                     for (JsonElement jsonElement : providersArray) {
                         JsonObject providerObject = jsonElement.getAsJsonObject();
+                        if (GsonHelper.hasString(providerObject, "type")) {
+                            String type = GsonHelper.getString(providerObject, "type");
+                            if (type.equalsIgnoreCase("bitmap")) {
+                                int ascent = GsonHelper.getInt(providerObject, "ascent");
+                                int height = GsonHelper.getInt(providerObject, "height", 0);
+                                if (ascent > height) {
+                                    LOGGER.warn("Ascent {} higher than height {}", ascent, height);
+                                }
+                            }
+                        }
                         if (GsonHelper.hasString(providerObject, "file")) {
                             String path = GsonHelper.getString(providerObject, "file");
                             path = PathUtil.resolve(path, resourcePath).toString();

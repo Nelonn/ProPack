@@ -59,4 +59,12 @@ public class UploadedPackImpl implements UploadedPack {
         return sha1String;
     }
 
+    @Override
+    public String toString() {
+        return "UploadedPack{" +
+                "name='" + name + '\'' +
+                ", url='" + url + '\'' +
+                ", sha1String='" + sha1String + '\'' +
+                '}';
+    }
 }

@@ -19,30 +19,22 @@
 package me.nelonn.propack.asset;
 
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractAsset implements Asset {
-    protected final ResourcePack resourcePack;
-    protected final Path path;
+    protected final Path friendlyPath;
 
-    protected AbstractAsset(@NotNull ResourcePack resourcePack, @NotNull Path path) {
-        this.resourcePack = resourcePack;
-        this.path = path;
+    protected AbstractAsset(@NotNull Path friendlyPath) {
+        this.friendlyPath = friendlyPath;
     }
 
     @Override
-    public @NotNull ResourcePack getResourcePack() {
-        return resourcePack;
-    }
-
-    @Override
-    public @NotNull Path getPath() {
-        return path;
+    public @NotNull Path friendlyPath() {
+        return friendlyPath;
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '{' + getPath() + ", " + getResourcePack().getName() + '}';
+        return getClass().getSimpleName() + '[' + friendlyPath() + ']';
     }
 }

@@ -23,21 +23,8 @@ import me.nelonn.flint.path.Path;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
+public interface Meshes {
 
-public class MapMeshMapping implements MeshMapping {
-    private final Map<Identifier, Map<Path, Integer>> map;
+    @Nullable Integer getCustomModelData(@NotNull Path mesh, @NotNull Identifier itemId);
 
-    public MapMeshMapping(Map<Identifier, Map<Path, Integer>> map) {
-        this.map = new HashMap<>(map);
-        this.map.replaceAll((k, v) -> new HashMap<>(v)); // deep copy
-    }
-
-    @Override
-    public @Nullable Integer getCustomModelData(@NotNull Path mesh, @NotNull Identifier itemId) {
-        Map<Path, Integer> itemMap = map.get(itemId);
-        if (itemMap == null) return null;
-        return itemMap.get(mesh);
-    }
 }

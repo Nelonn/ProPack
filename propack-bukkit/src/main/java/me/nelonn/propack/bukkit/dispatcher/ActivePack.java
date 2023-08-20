@@ -16,38 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.module;
+package me.nelonn.propack.bukkit.dispatcher;
 
-import me.nelonn.propack.core.ProPackCore;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.InputStream;
+public class ActivePack {
+    public final String name;
+    public final String sha1;
 
-public interface Module {
-
-    default @NotNull String getName() {
-        return getDescription().getName();
+    public ActivePack(@NotNull String name, @NotNull String sha1) {
+        this.name = name;
+        this.sha1 = sha1;
     }
-
-    @NotNull ModuleDescription getDescription();
-
-    @NotNull File getDataFolder();
-
-    @Nullable InputStream getResource(@NotNull String file);
-
-    void enable();
-
-    void disable();
-
-    void setEnabled(final boolean enabled);
-
-    boolean isEnabled();
-
-    @NotNull ProPackCore getCore();
-
-    @NotNull Logger getLogger();
-
 }

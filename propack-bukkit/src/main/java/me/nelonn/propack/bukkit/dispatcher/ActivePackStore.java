@@ -19,13 +19,14 @@
 package me.nelonn.propack.bukkit.dispatcher;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class SentPack {
-    public final String name;
-    public final String sha1;
+import java.util.UUID;
 
-    public SentPack(@NotNull String name, @NotNull String sha1) {
-        this.name = name;
-        this.sha1 = sha1;
-    }
+public interface ActivePackStore {
+
+    @Nullable ActivePack getActiveResourcePack(@NotNull UUID uuid);
+
+    void setActiveResourcePack(@NotNull UUID uuid, @Nullable ActivePack activePack);
+
 }

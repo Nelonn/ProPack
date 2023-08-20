@@ -23,7 +23,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import me.nelonn.propack.bukkit.ResourcePackInfo;
+import me.nelonn.propack.bukkit.ResourcePackOffer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.entity.Player;
@@ -36,12 +36,13 @@ public class ProtocolPackSender {
         protocolManager = ProtocolLibrary.getProtocolManager();
     }
 
-    public void send(@NotNull Player player, @NotNull ResourcePackInfo packInfo) {
+    public void send(@NotNull Player player, @NotNull ResourcePackOffer packOffer) {
+        //player.setResourcePack(packOffer.getUpload().getUrl(), packOffer.getUpload().getSha1String(), packOffer.getShouldForce(), packOffer.getPrompt());
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.RESOURCE_PACK_SEND);
-        packet.getStrings().write(0, packInfo.getUpload().getUrl());
-        packet.getStrings().write(1, packInfo.getUpload().getSha1String());
-        packet.getBooleans().write(0, packInfo.getShouldForce());
-        packet.getChatComponents().write(0, toProtocolLike(packInfo.getPrompt()));
+        packet.getStrings().write(0, packOffer.getUpload().getUrl());
+        packet.getStrings().write(1, packOffer.getUpload().getSha1String());
+        packet.getBooleans().write(0, packOffer.getShouldForce());
+        packet.getChatComponents().write(0, toProtocolLike(packOffer.getPrompt()));
         try {
             protocolManager.sendServerPacket(player, packet);
         } catch (Exception e) {

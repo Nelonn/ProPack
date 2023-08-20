@@ -15,6 +15,7 @@ dependencies {
     "compileOnly"(files("../libs/lib-flint-path-0.0.1.jar"))
     "compileOnly"("net.kyori:adventure-api:4.12.0")
     "compileOnly"("org.jetbrains:annotations:23.1.0")
+    "compileOnly"("org.apache.logging.log4j:log4j-api:2.19.0")
 }
 
 tasks.withType<Javadoc> {

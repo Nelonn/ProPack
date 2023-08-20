@@ -19,13 +19,12 @@
 package me.nelonn.propack.core.builder.asset;
 
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
 import org.jetbrains.annotations.NotNull;
 
 public interface AssetBuilder<A> {
 
     @NotNull Path getPath();
 
-    @NotNull A build(@NotNull ResourcePack resourcePack);
+    @NotNull A build();
 
 }

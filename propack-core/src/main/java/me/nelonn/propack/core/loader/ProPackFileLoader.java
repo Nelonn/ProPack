@@ -23,9 +23,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.MapMeshMapping;
-import me.nelonn.propack.ResourcePack;
+import me.nelonn.propack.MeshesMap;
+import me.nelonn.propack.Resources;
 import me.nelonn.propack.asset.SlotItemModel;
+import me.nelonn.propack.core.builder.ResourcesCreator;
 import me.nelonn.propack.core.builder.asset.*;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.IOUtil;
@@ -39,10 +40,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ResourcePackLoader {
-    public @NotNull ResourcePack load(@NotNull File file) {
+public class ProPackFileLoader {
+    public @NotNull Resources load(@NotNull File file) {
         try {
-            JsonObject root = GsonHelper.deserialize(IOUtil.readString(file));
+            return load(IOUtil.readString(file));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Something went wrong when loading '" + file.getName() + "'", e);
+        }
+    }
+
+    public @NotNull Resources load(@NotNull String content) {
+        try {
+            JsonObject root = GsonHelper.deserialize(content);
             int version = GsonHelper.getInt(root, "version");
             if (version != 1) {
                 throw new UnsupportedOperationException("Version " + version + " not supported");
@@ -129,16 +138,17 @@ public class ResourcePackLoader {
                 }
                 map.put(itemId, meshMap);
             }
-            MapMeshMapping meshMapping = new MapMeshMapping(map);
+            MeshesMap meshMapping = new MeshesMap(map);
 
-            return new LoadedResourcePack(name,
+            return ResourcesCreator.create(
                     itemModels.values(),
                     sounds.values(),
                     armorTextures.values(),
                     fonts.values(),
-                    meshMapping);
+                    meshMapping
+            );
         } catch (Exception e) {
-            throw new IllegalArgumentException("Something went wrong when loading '" + file.getName() + "'", e);
+            throw new IllegalArgumentException("Something went wrong when loading resource pack", e);
         }
     }
 

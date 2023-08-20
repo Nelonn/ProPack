@@ -22,7 +22,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.MapMeshMapping;
+import me.nelonn.propack.MeshesMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,10 +31,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MeshMappingBuilder {
+public class MeshesMapBuilder {
     private final Map<Identifier, ItemEntry> mappers = new HashMap<>();
 
-    public @NotNull MeshMappingBuilder.ItemEntry getMapper(@NotNull Identifier itemId) {
+    public @NotNull MeshesMapBuilder.ItemEntry getMapper(@NotNull Identifier itemId) {
         return mappers.computeIfAbsent(itemId, ItemEntry::new);
     }
 
@@ -42,12 +42,12 @@ public class MeshMappingBuilder {
         return mappers.values();
     }
 
-    public @NotNull MapMeshMapping build() {
+    public @NotNull MeshesMap build() {
         Map<Identifier, Map<Path, Integer>> map = new HashMap<>();
         for (ItemEntry itemEntry : getMappers()) {
             map.put(itemEntry.getItemId(), new HashMap<>(itemEntry.getMap().inverse()));
         }
-        return new MapMeshMapping(map);
+        return new MeshesMap(map);
     }
 
     public static class ItemEntry {

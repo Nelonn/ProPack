@@ -19,7 +19,6 @@
 package me.nelonn.propack.asset;
 
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -29,8 +28,8 @@ public class ArmorTexture extends AbstractAsset {
     private final boolean hasLayer1;
     private final boolean hasLayer2;
 
-    public ArmorTexture(@NotNull ResourcePack resourcePack, @NotNull Path path, @NotNull Color color, boolean hasLayer1, boolean hasLayer2) {
-        super(resourcePack, path);
+    public ArmorTexture(@NotNull Path path, @NotNull Color color, boolean hasLayer1, boolean hasLayer2) {
+        super(path);
         this.color = color;
         this.hasLayer1 = hasLayer1;
         this.hasLayer2 = hasLayer2;

@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.*;
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.propack.ResourcePack;
+import me.nelonn.propack.Resources;
 import me.nelonn.propack.builder.StrictMode;
 import me.nelonn.propack.builder.file.ByteFile;
 import me.nelonn.propack.builder.file.VirtualFile;
@@ -289,8 +290,9 @@ public class ProjectLoader {
         File builtResourcePack = new File(projectFile.getParentFile(), "build/" + name + ".propack");
         if (builtResourcePack.exists() && tryLoadBuilt) {
             try {
-                ResourcePackLoader resourcePackLoader = new ResourcePackLoader();
-                resourcePack = resourcePackLoader.load(builtResourcePack);
+                ProPackFileLoader proPackFileLoader = new ProPackFileLoader();
+                Resources resources = proPackFileLoader.load(builtResourcePack);
+                resourcePack = new LoadedResourcePack(name, resources);
             } catch (Exception e) {
                 LOGGER.error("Unable to load built resource pack", e);
             }

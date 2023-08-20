@@ -34,7 +34,7 @@ public class ProPackCore {
     public ProPackCore(@NotNull File directory) {
         this.hostingMap = new SimpleHostingMap();
         this.projectLoader = new ProjectLoader(this);
-        this.moduleManager = new JavaModuleManager(new File(directory, "modules"));
+        this.moduleManager = new JavaModuleManager(this, new File(directory, "modules"));
     }
 
     public HostingMap getHostingMap() {

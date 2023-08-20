@@ -20,7 +20,6 @@ package me.nelonn.propack.asset;
 
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -30,9 +29,9 @@ import java.util.Set;
 public class CombinedItemModel extends MultiItemModel {
     private final Set<String> elements;
 
-    public CombinedItemModel(@NotNull ResourcePack resourcePack, @NotNull Path path, @NotNull Set<Identifier> targetItems,
+    public CombinedItemModel(@NotNull Path path, @NotNull Set<Identifier> targetItems,
                              @NotNull Path baseMesh, @NotNull Set<String> elements) {
-        super(resourcePack, path, targetItems, baseMesh);
+        super(path, targetItems, baseMesh);
         this.elements = Collections.unmodifiableSet(elements);
     }
 
@@ -49,7 +48,7 @@ public class CombinedItemModel extends MultiItemModel {
             sb.append(s);
         });
         String hex = Integer.toHexString(sb.toString().hashCode());
-        return Path.of(path.getNamespace(), path.getValue() + '-' + hex);
+        return Path.of(friendlyPath.getNamespace(), friendlyPath.getValue() + '-' + hex);
     }
 
     public @NotNull Set<String> getElements() {

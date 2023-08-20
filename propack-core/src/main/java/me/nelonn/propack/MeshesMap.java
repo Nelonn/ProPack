@@ -16,39 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.dispatcher;
+package me.nelonn.propack;
 
-import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.Plugin;
+import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Path;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class MemoryStore implements Store, Listener {
-    private final Map<UUID, SentPack> map = new ConcurrentHashMap<>();
+public class MeshesMap implements Meshes {
+    private final Map<Identifier, Map<Path, Integer>> map;
 
-    public MemoryStore(@NotNull Plugin plugin) {
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+    public MeshesMap(Map<Identifier, Map<Path, Integer>> map) {
+        this.map = new HashMap<>(map);
+        this.map.replaceAll((k, v) -> new HashMap<>(v)); // deep copy
     }
 
     @Override
-    public @Nullable SentPack getActiveResourcePack(@NotNull UUID uuid) {
-        return map.get(uuid);
-    }
-
-    @Override
-    public void setActiveResourcePack(@NotNull UUID uuid, @Nullable SentPack sentPack) {
-        map.put(uuid, sentPack);
-    }
-
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        map.remove(event.getPlayer().getUniqueId());
+    public @Nullable Integer getCustomModelData(@NotNull Path mesh, @NotNull Identifier itemId) {
+        Map<Path, Integer> itemMap = map.get(itemId);
+        if (itemMap == null) return null;
+        return itemMap.get(mesh);
     }
 }

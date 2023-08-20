@@ -20,7 +20,6 @@ package me.nelonn.propack.core.builder.asset;
 
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.asset.SlotItemModel;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,7 +57,7 @@ public class SlotItemModelBuilder extends ItemModelBuilder {
         return this;
     }
 
-    public @NotNull SlotItemModel build(@NotNull ResourcePack resourcePack) {
-        return new SlotItemModel(resourcePack, path, targetItems, mesh, slots);
+    public @NotNull SlotItemModel build() {
+        return new SlotItemModel(path, targetItems, mesh, slots);
     }
 }

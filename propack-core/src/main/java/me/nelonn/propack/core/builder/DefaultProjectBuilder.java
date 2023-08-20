@@ -23,10 +23,6 @@ import me.nelonn.propack.builder.ProjectBuilder;
 import me.nelonn.propack.builder.task.Task;
 import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.builder.task.*;
-import me.nelonn.propack.core.builder.task.PackageTask;
-import me.nelonn.propack.core.builder.task.ProcessModelsTask;
-import me.nelonn.propack.core.builder.task.SerializeTask;
-import me.nelonn.propack.core.builder.task.UploadTask;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -75,11 +71,13 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
 
             BuiltResourcePack builtResourcePack = new BuiltResourcePack(project,
-                    io.getAssets().getItemModels(),
-                    io.getAssets().getSounds(),
-                    io.getAssets().getArmorTextures(),
-                    io.getAssets().getFonts(),
-                    requireNonNull(io.getExtras().get(ProcessModelsTask.EXTRA_MESH_MAPPING_BUILDER)).build(),
+                    ResourcesCreator.create(
+                            io.getAssets().getItemModels(),
+                            io.getAssets().getSounds(),
+                            io.getAssets().getArmorTextures(),
+                            io.getAssets().getFonts(),
+                            requireNonNull(io.getExtras().get(ProcessModelsTask.EXTRA_MESH_MAPPING_BUILDER)).build()
+                    ),
                     requireNonNull(io.getExtras().get(SerializeTask.EXTRA_FILE)),
                     requireNonNull(io.getExtras().get(PackageTask.EXTRA_ZIP)),
                     requireNonNull(io.getExtras().get(PackageTask.EXTRA_SHA1)),

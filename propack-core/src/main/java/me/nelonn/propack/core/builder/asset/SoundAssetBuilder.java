@@ -19,7 +19,6 @@
 package me.nelonn.propack.core.builder.asset;
 
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.asset.SoundAsset;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +38,7 @@ public class SoundAssetBuilder extends AbstractAssetBuilder<SoundAsset> {
         return this;
     }
 
-    public @NotNull SoundAsset build(@NotNull ResourcePack resourcePack) {
-        return new SoundAsset(resourcePack, path, soundPath);
+    public @NotNull SoundAsset build() {
+        return new SoundAsset(path, soundPath);
     }
 }

@@ -1,5 +1,5 @@
 dispatcher:
-  # memory store included out of box
+  # 'propack:memory_store' included out of box
   # additional stores can be added by other plugins/modules
   store: 'propack:memory_store'
   # if disabled, you can access the store anyway.
@@ -22,8 +22,8 @@ dispatcher:
 dev_server:
   # if enabled, 'propack:dev_server' will be added to the hostings map
   enabled: false
-  # example: https://return_ip:port/pack_sha1.zip
-  return_ip: '127.0.0.1'
+  # example: https://host_ip:port/pack_sha1.zip
+  host_ip: '127.0.0.1'
   port: 3000
 
 # requires ProtocolLib

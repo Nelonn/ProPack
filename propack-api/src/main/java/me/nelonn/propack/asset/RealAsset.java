@@ -16,15 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack;
+package me.nelonn.propack.asset;
 
-import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public interface MeshMapping {
+public interface RealAsset extends Asset {
 
-    @Nullable Integer getCustomModelData(@NotNull Path mesh, @NotNull Identifier itemId);
+    /**
+     * Assets can be obfuscated, so this method will return the path where the asset is located in the zip file
+     * @return Real path of asset
+     */
+    @NotNull Path realPath();
 
 }

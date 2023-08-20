@@ -23,7 +23,7 @@ import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.Util;
 import me.nelonn.propack.bukkit.definition.PackDefinition;
-import me.nelonn.propack.bukkit.definition.ProjectDefinition;
+import me.nelonn.propack.bukkit.definition.ProjectPack;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -49,14 +49,14 @@ public class BuildCommand extends Command {
             return;
         }
         PackDefinition definition = plugin.getCore().getPackManager().getDefinition(args[0]);
-        if (!(definition instanceof ProjectDefinition projectDefinition)) {
+        if (!(definition instanceof ProjectPack projectPack)) {
             Util.send(sender, "<red>Resource pack '" + args[0] + "' is not project");
             return;
         }
         new Thread(() -> {
             try {
-                projectDefinition.build();
-                ResourcePack resourcePack = projectDefinition.getResourcePack().orElseThrow();
+                projectPack.build();
+                ResourcePack resourcePack = projectPack.getResourcePack().orElseThrow();
                 if (resourcePack.isUploaded()) {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         Optional<ResourcePack> playerPack = ProPack.getCore().getDispatcher().getAppliedResourcePack(player);
@@ -78,7 +78,7 @@ public class BuildCommand extends Command {
         if (args.length > 1) return Collections.emptyList();
         String lower = args.length == 0 ? "" : args[0].toLowerCase(Locale.ROOT);
         return plugin.getCore().getPackManager().getDefinitions().stream().filter(packDefinition -> {
-            return packDefinition instanceof ProjectDefinition && packDefinition.getName().startsWith(lower);
+            return packDefinition instanceof ProjectPack && packDefinition.getName().startsWith(lower);
         }).map(PackDefinition::getName).toList();
     }
 }

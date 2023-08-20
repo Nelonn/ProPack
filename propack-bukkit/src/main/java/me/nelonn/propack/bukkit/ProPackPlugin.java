@@ -20,7 +20,8 @@ package me.nelonn.propack.bukkit;
 
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
-import me.nelonn.propack.bukkit.dispatcher.Store;
+import me.nelonn.propack.bukkit.config.PluginConfig;
+import me.nelonn.propack.bukkit.dispatcher.ActivePackStore;
 import me.nelonn.propack.core.DevServer;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.core.util.LogManagerCompat;
@@ -44,6 +45,7 @@ public final class ProPackPlugin extends JavaPlugin {
     private BukkitAudiences adventure;
     private BukkitProPackCore core;
     private DevServer devServer;
+    private PluginConfig config;
 
     @Override
     public void onLoad() {
@@ -77,8 +79,9 @@ public final class ProPackPlugin extends JavaPlugin {
 
         core = new BukkitProPackCore(this);
         ProPack.setCore(core);
-        reloadConfig();
+        config = new PluginConfig(this, "config.yml");
         reloadModules();
+        reloadConfig();
         reloadPacks();
 
         new ProPackCommand(this).register(this);
@@ -108,8 +111,7 @@ public final class ProPackPlugin extends JavaPlugin {
 
     @Override
     public void reloadConfig() {
-        super.reloadConfig();
-        Config.setFileConfiguration(getConfig());
+        config.load();
         if (devServer != null) {
             core.getHostingMap().unregister(devServer);
             try {
@@ -118,15 +120,16 @@ public final class ProPackPlugin extends JavaPlugin {
             }
             devServer = null;
         }
-        if (Config.DEV_SERVER_ENABLED.asBoolean()) {
-            devServer = new DevServer(Config.DEV_SERVER_RETURN_IP.asString(), Config.DEV_SERVER_PORT.asInt());
+        if (config.get(Config.devServerEnabled)) {
+            devServer = new DevServer(config.get(Config.devServerHostIp), config.get(Config.devServerPort));
             core.getHostingMap().register("dev_server", devServer);
         }
-        Store store = core.getStoreMap().get(Config.DISPATCHER_STORE.asString());
-        if (store == null) {
-            LOGGER.error("Store '{}' not found", Config.DISPATCHER_STORE.asString());
+        String dispatcherStore = config.get(Config.dispatcherStore);
+        ActivePackStore activePackStore = core.getActivePackStoreMap().get(dispatcherStore);
+        if (activePackStore == null) {
+            LOGGER.error("Store '{}' not found", dispatcherStore);
         }
-        core.getDispatcher().setStore(store);
+        core.getDispatcher().setStore(activePackStore);
     }
 
     public void reloadModules() {
@@ -146,6 +149,11 @@ public final class ProPackPlugin extends JavaPlugin {
             throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
         }
         return this.adventure;
+    }
+
+    @NotNull
+    public PluginConfig config() {
+        return config;
     }
 
     public BukkitProPackCore getCore() {

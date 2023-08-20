@@ -20,7 +20,6 @@ package me.nelonn.propack.asset;
 
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -28,9 +27,8 @@ import java.util.Set;
 public class DefaultItemModel extends AbstractItemModel {
     private final Path mesh;
 
-    public DefaultItemModel(@NotNull ResourcePack resourcePack, @NotNull Path path,
-                            @NotNull Set<Identifier> targetItems, @NotNull Path mesh) {
-        super(resourcePack, path, targetItems);
+    public DefaultItemModel(@NotNull Path path, @NotNull Set<Identifier> targetItems, @NotNull Path mesh) {
+        super(path, targetItems);
         this.mesh = mesh;
     }
 

@@ -16,33 +16,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit;
+package me.nelonn.propack.module;
 
-import me.nelonn.propack.UploadedPack;
-import net.kyori.adventure.text.Component;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ResourcePackInfo {
-    private final UploadedPack upload;
-    private final Component prompt;
-    private final boolean shouldForce;
+import java.io.File;
+import java.io.InputStream;
 
-    public ResourcePackInfo(@NotNull UploadedPack upload, @Nullable Component prompt, boolean shouldForce) {
-        this.upload = upload;
-        this.prompt = prompt;
-        this.shouldForce = shouldForce;
+public interface Module {
+
+    default @NotNull String getName() {
+        return getDescription().getName();
     }
 
-    public @NotNull UploadedPack getUpload() {
-        return upload;
-    }
+    @NotNull ModuleDescription getDescription();
 
-    public @Nullable Component getPrompt() {
-        return prompt;
-    }
+    @NotNull File getDataFolder();
 
-    public boolean getShouldForce() {
-        return shouldForce;
-    }
+    @Nullable InputStream getResource(@NotNull String file);
+
+    void enable();
+
+    void disable();
+
+    void setEnabled(final boolean enabled);
+
+    boolean isEnabled();
+
+    @NotNull Logger getLogger();
+
 }
