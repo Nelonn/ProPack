@@ -16,16 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.dispatcher.sender;
+package me.nelonn.propack.bukkit.config;
 
-import me.nelonn.propack.bukkit.ResourcePackInfo;
-import org.bukkit.entity.Player;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 
-public class BukkitPackSender implements PackSender {
+public interface MiniMessageText {
+    ConfigValue.Deserializer<MiniMessageText> DESERIALIZER =
+            obj -> (MiniMessageText) tagResolvers -> MiniMessage.miniMessage().deserialize((String) obj, tagResolvers);
 
-    public void send(@NotNull Player player, @NotNull ResourcePackInfo info) {
-        player.setResourcePack(info.getUpload().getUrl(), info.getUpload().getSha1Bytes());
-    }
+    @NotNull Component accept(final @NotNull TagResolver... tagResolvers);
 
 }

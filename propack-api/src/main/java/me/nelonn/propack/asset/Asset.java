@@ -19,20 +19,14 @@
 package me.nelonn.propack.asset;
 
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
 import org.jetbrains.annotations.NotNull;
 
 public interface Asset {
 
     /**
-     * @return Resource pack that contains this asset
-     */
-    @NotNull ResourcePack getResourcePack();
-
-    /**
      * Not obfuscated path getter
      * @return User-friendly path to asset
      */
-    @NotNull Path getPath();
+    @NotNull Path friendlyPath();
 
 }

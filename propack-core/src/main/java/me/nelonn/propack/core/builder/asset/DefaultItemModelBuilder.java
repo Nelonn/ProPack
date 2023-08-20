@@ -20,7 +20,6 @@ package me.nelonn.propack.core.builder.asset;
 
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.asset.DefaultItemModel;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,7 +46,7 @@ public class DefaultItemModelBuilder extends ItemModelBuilder {
         return this;
     }
 
-    public @NotNull DefaultItemModel build(@NotNull ResourcePack resourcePack) {
-        return new DefaultItemModel(resourcePack, path, targetItems, mesh);
+    public @NotNull DefaultItemModel build() {
+        return new DefaultItemModel(path, targetItems, mesh);
     }
 }

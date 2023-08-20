@@ -19,7 +19,6 @@
 package me.nelonn.propack.core.builder.asset;
 
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.asset.ArmorTexture;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,7 +60,7 @@ public class ArmorTextureBuilder extends AbstractAssetBuilder<ArmorTexture> {
         return this;
     }
 
-    public @NotNull ArmorTexture build(@NotNull ResourcePack resourcePack) {
-        return new ArmorTexture(resourcePack, path, color, hasLayer1, hasLayer2);
+    public @NotNull ArmorTexture build() {
+        return new ArmorTexture(path, color, hasLayer1, hasLayer2);
     }
 }

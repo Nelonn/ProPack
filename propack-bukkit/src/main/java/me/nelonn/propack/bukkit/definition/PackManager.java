@@ -19,7 +19,8 @@
 package me.nelonn.propack.bukkit.definition;
 
 import com.google.gson.JsonObject;
-import me.nelonn.propack.core.ProPackCore;
+import me.nelonn.flint.path.Identifier;
+import me.nelonn.propack.bukkit.BukkitProPackCore;
 import me.nelonn.propack.core.loader.ProjectLoader;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.LogManagerCompat;
@@ -31,17 +32,20 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class PackManager {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final Map<String, PackDefinition> definitions = new HashMap<>();
-    private final ProjectLoader projectLoader;
+    private final BukkitProPackCore core;
     private final File directory;
+    private final ProjectLoader projectLoader;
 
-    public PackManager(@NotNull ProPackCore core, @NotNull File directory) {
+    public PackManager(@NotNull BukkitProPackCore core, @NotNull File directory) {
+        this.core = core;
         this.directory = directory;
         projectLoader = core.getProjectLoader();
     }
@@ -64,10 +68,17 @@ public class PackManager {
                 if (type.equalsIgnoreCase("Project")) {
                     boolean buildAtStartup = GsonHelper.getBoolean(jsonObject, "BuildAtStartup", false);
                     File projectFile = new File(directory, name + File.separatorChar + "project.json5");
-                    ProjectDefinition projectDefinition = new ProjectDefinition(projectFile, projectLoader, !buildAtStartup);
-                    definitions.put(name, projectDefinition);
+                    ProjectPack projectPack = new ProjectPack(projectFile, projectLoader, !buildAtStartup);
+                    definitions.put(name, projectPack);
                 } else if (type.equalsIgnoreCase("File")) {
                     throw new UnsupportedOperationException("Resource pack definition type 'File' currently not supported");
+                } else {
+                    Identifier id = Identifier.of(type);
+                    DefinitionType definitionType = core.getDefinitionTypeMap().get(id);
+                    if (definitionType == null) {
+                        throw new NullPointerException("Pack type '" + id + "' not found");
+                    }
+                    definitions.put(name, definitionType.apply(jsonObject));
                 }
             } catch (Exception e) {
                 LOGGER.error("Unable to load '" + name + "': " + e.getMessage());
@@ -84,8 +95,8 @@ public class PackManager {
         return definitions.get(name);
     }
 
-    public List<PackDefinition> getDefinitions() {
-        return definitions.values().stream().toList();
+    public Collection<PackDefinition> getDefinitions() {
+        return Collections.unmodifiableCollection(definitions.values());
     }
 
     public @NotNull ProjectLoader getProjectLoader() {

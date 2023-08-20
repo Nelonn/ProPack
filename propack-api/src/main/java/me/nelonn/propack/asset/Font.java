@@ -19,22 +19,18 @@
 package me.nelonn.propack.asset;
 
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
 import org.jetbrains.annotations.NotNull;
 
-public class Font extends AbstractAsset {
-    private final Path fontPath;
+public class Font extends AbstractAsset implements RealAsset {
+    private final Path realPath;
 
-    public Font(@NotNull ResourcePack resourcePack, @NotNull Path path, @NotNull Path fontPath) {
-        super(resourcePack, path);
-        this.fontPath = fontPath;
+    public Font(@NotNull Path path, @NotNull Path realPath) {
+        super(path);
+        this.realPath = realPath;
     }
 
-    /**
-     * Assets can be obfuscated, so this method will return an obfuscated path (if enabled)
-     * @return Real path of asset
-     */
-    public @NotNull Path getFontPath() {
-        return fontPath;
+    @Override
+    public @NotNull Path realPath() {
+        return realPath;
     }
 }

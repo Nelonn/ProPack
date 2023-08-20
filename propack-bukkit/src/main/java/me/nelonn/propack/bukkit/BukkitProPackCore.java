@@ -18,33 +18,48 @@
 
 package me.nelonn.propack.bukkit;
 
+import com.google.gson.JsonObject;
+import me.nelonn.flint.path.Identifier;
+import me.nelonn.propack.bukkit.definition.DefinitionTypeMap;
+import me.nelonn.propack.bukkit.definition.PackDefinition;
 import me.nelonn.propack.bukkit.definition.PackManager;
+import me.nelonn.propack.bukkit.dispatcher.ActivePackStoreMap;
 import me.nelonn.propack.bukkit.dispatcher.Dispatcher;
-import me.nelonn.propack.bukkit.dispatcher.MemoryStore;
-import me.nelonn.propack.bukkit.dispatcher.StoreMap;
+import me.nelonn.propack.bukkit.dispatcher.MemoryActivePackStore;
 import me.nelonn.propack.core.ProPackCore;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
 public class BukkitProPackCore extends ProPackCore {
+    private final DefinitionTypeMap definitionTypeMap;
     private final PackManager packManager;
-    private final StoreMap storeMap;
+    private final ActivePackStoreMap activePackStoreMap;
     private final Dispatcher dispatcher;
+    public Map<Identifier, Function<JsonObject, PackDefinition>> tempDefs = new HashMap<>();
 
     public BukkitProPackCore(@NotNull ProPackPlugin plugin) {
         super(plugin.getDataFolder());
+        definitionTypeMap = new DefinitionTypeMap();
         packManager = new PackManager(this, plugin.getDataFolder());
-        storeMap = new StoreMap();
-        MemoryStore memoryStore = new MemoryStore(plugin);
-        storeMap.register("memory_store", memoryStore);
+        activePackStoreMap = new ActivePackStoreMap();
+        MemoryActivePackStore memoryStore = new MemoryActivePackStore(plugin);
+        activePackStoreMap.register("memory_store", memoryStore);
         dispatcher = new Dispatcher(plugin, memoryStore);
+    }
+
+    public DefinitionTypeMap getDefinitionTypeMap() {
+        return definitionTypeMap;
     }
 
     public PackManager getPackManager() {
         return packManager;
     }
 
-    public StoreMap getStoreMap() {
-        return storeMap;
+    public ActivePackStoreMap getActivePackStoreMap() {
+        return activePackStoreMap;
     }
 
     public Dispatcher getDispatcher() {

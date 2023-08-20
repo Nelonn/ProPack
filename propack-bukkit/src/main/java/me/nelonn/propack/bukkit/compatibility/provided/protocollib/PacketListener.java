@@ -26,18 +26,20 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.MinecraftKey;
 import com.comphenix.protocol.wrappers.nbt.NbtType;
 import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.InvalidPathException;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
+import me.nelonn.propack.Resources;
 import me.nelonn.propack.asset.*;
 import me.nelonn.propack.bukkit.Config;
 import me.nelonn.propack.bukkit.ProPack;
+import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.adapter.Adapter;
 import me.nelonn.propack.bukkit.adapter.WrappedCompoundTag;
 import me.nelonn.propack.bukkit.adapter.WrappedItemStack;
 import me.nelonn.propack.bukkit.adapter.WrappedListTag;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -46,12 +48,14 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+@SuppressWarnings("deprecation")
 public class PacketListener extends PacketAdapter {
     private static final String CUSTOM_MODEL_FIELD = "CustomModel";
     private static final String CUSTOM_MODEL_DATA_FIELD = "CustomModelData";
     private final Adapter adapter;
+    private final ProPackPlugin plugin;
 
-    public PacketListener(@NotNull Plugin plugin) {
+    public PacketListener(@NotNull ProPackPlugin plugin) {
         super(plugin, ListenerPriority.HIGHEST, // priority is inverted
                 PacketType.Play.Client.SET_CREATIVE_SLOT,
 
@@ -60,7 +64,9 @@ public class PacketListener extends PacketAdapter {
                 PacketType.Play.Server.ENTITY_EQUIPMENT,
                 PacketType.Play.Server.ENTITY_METADATA,
 
-                PacketType.Play.Server.CUSTOM_SOUND_EFFECT);
+                PacketType.Play.Server.CUSTOM_SOUND_EFFECT, // Removed in 1.19.3
+                PacketType.Play.Server.NAMED_SOUND_EFFECT);
+        this.plugin = plugin;
         try {
             String craftBukkit = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
             String minecraft = Bukkit.getServer().getBukkitVersion().split("-")[0];
@@ -79,7 +85,7 @@ public class PacketListener extends PacketAdapter {
         }
     }
 
-    public static void register(@NotNull Plugin plugin) {
+    public static void register(@NotNull ProPackPlugin plugin) {
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketListener(plugin));
     }
 
@@ -87,7 +93,7 @@ public class PacketListener extends PacketAdapter {
     public void onPacketReceiving(PacketEvent event) {
         PacketType type = event.getPacketType();
         Object packet = event.getPacket().getHandle();
-        if (type == PacketType.Play.Client.SET_CREATIVE_SLOT && Config.PATCH_PACKETS_ITEMS.asBoolean()) {
+        if (type == PacketType.Play.Client.SET_CREATIVE_SLOT && plugin.config().get(Config.patchPacketItems)) {
             adapter.patchSetCreativeSlot(packet, this::patchInItems);
         }
     }
@@ -98,7 +104,8 @@ public class PacketListener extends PacketAdapter {
         Object packet = event.getPacket().getHandle();
         Optional<ResourcePack> resourcePack = ProPack.getCore().getDispatcher().getAppliedResourcePack(event.getPlayer());
         if (resourcePack.isEmpty()) return;
-        if (Config.PATCH_PACKETS_ITEMS.asBoolean()) {
+        final Resources resources = resourcePack.get().resources();
+        if (plugin.config().get(Config.patchPacketItems)) {
             BiConsumer<Object, Consumer<WrappedItemStack>> method;
             if (type == PacketType.Play.Server.SET_SLOT) {
                 method = adapter::patchSetSlot;
@@ -111,14 +118,16 @@ public class PacketListener extends PacketAdapter {
             } else {
                 return;
             }
-            method.accept(packet, stack -> patchOutItems(stack, resourcePack.get()));
+            method.accept(packet, stack -> patchOutItems(stack, resources));
         }
-        if (Config.PATCH_PACKETS_SOUNDS.asBoolean() && type == PacketType.Play.Server.CUSTOM_SOUND_EFFECT) {
+        if (plugin.config().get(Config.patchPacketSounds) &&
+                (type == PacketType.Play.Server.CUSTOM_SOUND_EFFECT ||
+                        type == PacketType.Play.Server.NAMED_SOUND_EFFECT)) {
             MinecraftKey minecraftKey = event.getPacket().getMinecraftKeys().read(0);
             Path path = Path.of(minecraftKey.getPrefix(), minecraftKey.getKey());
-            SoundAsset soundAsset = resourcePack.get().getSound(path);
-            if (soundAsset != null) {
-                path = soundAsset.getSoundPath();
+            SoundAsset sound = resources.soundNullable(path);
+            if (sound != null) {
+                path = sound.realPath();
                 minecraftKey = new MinecraftKey(path.getNamespace(), path.getValue());
                 event.getPacket().getMinecraftKeys().write(0, minecraftKey);
             }
@@ -132,14 +141,19 @@ public class PacketListener extends PacketAdapter {
         tag.remove(CUSTOM_MODEL_DATA_FIELD);
     }
 
-    private void patchOutItems(WrappedItemStack itemStack, ResourcePack resourcePack) {
+    private void patchOutItems(@NotNull WrappedItemStack itemStack, @NotNull Resources resources) {
         try {
             WrappedCompoundTag tag = itemStack.getTag();
             if (tag == null || !tag.contains(CUSTOM_MODEL_FIELD, NbtType.TAG_STRING.getRawID())) return;
             String customModel = tag.getString(CUSTOM_MODEL_FIELD);
             if (customModel.isEmpty()) return;
-            Path path = Path.of(customModel);
-            ItemModel itemModel = resourcePack.getItemModel(path);
+            Path path;
+            try {
+                path = Path.of(customModel);
+            } catch (InvalidPathException ignored) {
+                return;
+            }
+            ItemModel itemModel = resources.itemModelNullable(path);
             if (itemModel == null) return;
             Path mesh;
             if (itemModel instanceof DefaultItemModel defaultItemModel) {
@@ -164,7 +178,7 @@ public class PacketListener extends PacketAdapter {
             assert material != null;
             Identifier itemType = ProPack.adapt(material);
             if (!itemModel.getTargetItems().contains(itemType)) return;
-            Integer cmd = resourcePack.getMeshMapping().getCustomModelData(mesh, itemType);
+            Integer cmd = resources.getMeshes().getCustomModelData(mesh, itemType);
             if (cmd == null) return;
             tag.putInt(CUSTOM_MODEL_DATA_FIELD, cmd);
         } catch (Exception e) {

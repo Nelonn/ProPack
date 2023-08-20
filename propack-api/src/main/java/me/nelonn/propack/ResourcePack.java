@@ -18,38 +18,15 @@
 
 package me.nelonn.propack;
 
-import me.nelonn.flint.path.Path;
-import me.nelonn.propack.asset.ArmorTexture;
-import me.nelonn.propack.asset.Font;
-import me.nelonn.propack.asset.ItemModel;
-import me.nelonn.propack.asset.SoundAsset;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.Optional;
 
 public interface ResourcePack {
 
     @NotNull String getName();
 
-    @Nullable ItemModel getItemModel(@NotNull Path path);
-
-    @NotNull Collection<ItemModel> getItemModels();
-
-    @Nullable SoundAsset getSound(@NotNull Path path);
-
-    @NotNull Collection<SoundAsset> getSounds();
-
-    @Nullable ArmorTexture getArmorTexture(@NotNull Path path);
-
-    @NotNull Collection<ArmorTexture> getArmorTextures();
-
-    @Nullable Font getFont(@NotNull Path path);
-
-    @NotNull Collection<Font> getFonts();
-
-    @NotNull MeshMapping getMeshMapping();
+    @NotNull Resources resources();
 
     @NotNull Optional<UploadedPack> getUpload();
 

@@ -16,19 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.dispatcher.sender;
+package me.nelonn.propack.bukkit.dispatcher;
 
-import me.nelonn.propack.bukkit.ResourcePackInfo;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class PaperPackSender implements PackSender { // TODO: not working
-    public PaperPackSender() {
-    }
+public class ActivePack {
+    public final String name;
+    public final String sha1;
 
-    public void send(@NotNull Player player, @NotNull ResourcePackInfo packInfo) {
-        player.setResourcePack(packInfo.getUpload().getUrl(), packInfo.getUpload().getSha1String(),
-                packInfo.getShouldForce(), packInfo.getPrompt());
+    public ActivePack(@NotNull String name, @NotNull String sha1) {
+        this.name = name;
+        this.sha1 = sha1;
     }
-
 }

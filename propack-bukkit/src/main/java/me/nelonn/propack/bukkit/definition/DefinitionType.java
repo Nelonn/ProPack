@@ -16,15 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack;
+package me.nelonn.propack.bukkit.definition;
 
-import me.nelonn.flint.path.Identifier;
-import me.nelonn.flint.path.Path;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.google.gson.JsonObject;
 
-public interface MeshMapping {
+import java.util.function.Function;
 
-    @Nullable Integer getCustomModelData(@NotNull Path mesh, @NotNull Identifier itemId);
-
+public interface DefinitionType extends Function<JsonObject, PackDefinition> {
 }

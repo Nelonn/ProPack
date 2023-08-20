@@ -18,20 +18,18 @@
 
 package me.nelonn.propack.module;
 
-import me.nelonn.propack.core.ProPackCore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public abstract class JavaModule implements Module {
     private boolean enabled = false;
-    private ProPackCore core = null;
     private ModuleDescription meta = null;
     private File dataFolder = null;
     private File file = null;
@@ -52,13 +50,12 @@ public abstract class JavaModule implements Module {
     @Override
     public @Nullable InputStream getResource(@NotNull String file) {
         try {
-            URL url = getClass().getClassLoader().getResource(file);
-            if (url == null) {
+            JarFile jarFile = new JarFile(this.file);
+            JarEntry entry = jarFile.getJarEntry(file);
+            if (entry == null) {
                 return null;
             }
-            URLConnection connection = url.openConnection();
-            connection.setUseCaches(false);
-            return connection.getInputStream();
+            return jarFile.getInputStream(entry);
         } catch (IOException ex) {
             return null;
         }
@@ -102,11 +99,6 @@ public abstract class JavaModule implements Module {
     }
 
     @Override
-    public @NotNull ProPackCore getCore() {
-        return core;
-    }
-
-    @Override
     public @NotNull Logger getLogger() {
         return logger;
     }
@@ -121,8 +113,7 @@ public abstract class JavaModule implements Module {
         return file;
     }
 
-    public final void init(@NotNull ProPackCore core, @NotNull ModuleDescription meta, @NotNull File dataFolder, @NotNull File file) {
-        this.core = core;
+    public final void init(@NotNull ModuleDescription meta, @NotNull File dataFolder, @NotNull File file) {
         this.meta = meta;
         this.dataFolder = dataFolder;
         this.file = file;

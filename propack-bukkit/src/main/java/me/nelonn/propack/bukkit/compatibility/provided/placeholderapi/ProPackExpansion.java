@@ -19,18 +19,20 @@
 package me.nelonn.propack.bukkit.compatibility.provided.placeholderapi;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ProPackExpansion extends PlaceholderExpansion {
     private final ProPackPlugin plugin;
 
-    public static void register(@NotNull final ProPackPlugin plugin) {
+    public static void register(@NotNull ProPackPlugin plugin) {
         new ProPackExpansion(plugin).register();
     }
 
-    public ProPackExpansion(final ProPackPlugin plugin) {
+    public ProPackExpansion(@NotNull ProPackPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -41,7 +43,7 @@ public class ProPackExpansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getAuthor() {
-        return "Nelonn";
+        return plugin.getDescription().getAuthors().get(0);
     }
 
     @Override
@@ -55,10 +57,20 @@ public class ProPackExpansion extends PlaceholderExpansion {
     }
 
     @Override
-    public String onRequest(final OfflinePlayer player, @NotNull final String params) {
-        /*final Glyph glyph = plugin.getFontManager().getGlyphFromName(params);
-        if (glyph != null)
-            return String.valueOf(glyph.getCharacter());*/
-        return null; // Placeholder is unknown by the Expansion
+    public @Nullable String onPlaceholderRequest(final @Nullable Player player, @NotNull String params) {
+        params = params.toLowerCase();
+        String result = null;
+        if (player != null) {
+            // return in switches is 'yield'
+            result = switch (params.toLowerCase()) {
+                case "resourcepack", "rp" -> plugin.getCore().getDispatcher().getAppliedResourcePack(player)
+                        .map(ResourcePack::getName).orElse("");
+                // TODO: glyphs
+                default -> null;
+            };
+        } else {
+            // ...
+        }
+        return result;
     }
 }

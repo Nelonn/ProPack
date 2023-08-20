@@ -56,7 +56,7 @@ dependencies {
     "implementation"("net.kyori:adventure-platform-api:4.2.0")
     "implementation"("net.kyori:adventure-platform-bukkit:4.2.0")
 
-    "compileOnly"("com.comphenix.protocol:ProtocolLib:4.7.0")
+    "compileOnly"("com.comphenix.protocol:ProtocolLib:5.1.0")
     "compileOnly"("me.clip:placeholderapi:2.11.2")
     //"compileOnly"("com.github.oraxen:oraxen:-SNAPSHOT")
 

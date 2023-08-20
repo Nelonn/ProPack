@@ -23,15 +23,10 @@ import me.nelonn.propack.UploadedPack;
 import me.nelonn.propack.bukkit.Config;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
-import me.nelonn.propack.bukkit.ResourcePackInfo;
-import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
+import me.nelonn.propack.bukkit.ResourcePackOffer;
 import me.nelonn.propack.bukkit.definition.PackDefinition;
-import me.nelonn.propack.bukkit.dispatcher.sender.BukkitPackSender;
-import me.nelonn.propack.bukkit.dispatcher.sender.PackSender;
-import me.nelonn.propack.bukkit.dispatcher.sender.ProtocolPackSender;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -52,45 +47,43 @@ import java.util.UUID;
 public class Dispatcher implements Listener {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final ProPackPlugin plugin;
-    private final PackSender packSender;
-    private final Map<UUID, SentPack> pending = new HashMap<>();
-    private final Store fallbackStore;
-    private Store store;
+    private final ProtocolPackSender packSender;
+    private final Map<UUID, ActivePack> pending = new HashMap<>();
+    private final ActivePackStore fallbackActivePackStore;
+    private ActivePackStore activePackStore;
 
-    public Dispatcher(@NotNull ProPackPlugin plugin, @NotNull MemoryStore memoryStore) {
+    public Dispatcher(@NotNull ProPackPlugin plugin, @NotNull MemoryActivePackStore memoryStore) {
         this.plugin = plugin;
-        packSender = /*Util.isPaper() ? new PaperPackSender() :*/
-                CompatibilitiesManager.hasPlugin("ProtocolLib") ? new ProtocolPackSender() :
-                        new BukkitPackSender();
+        packSender = new ProtocolPackSender();
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        fallbackStore = memoryStore;
-        store = fallbackStore;
+        fallbackActivePackStore = memoryStore;
+        activePackStore = fallbackActivePackStore;
     }
 
-    public @NotNull Store getStore() {
-        return store;
+    public @NotNull ActivePackStore getStore() {
+        return activePackStore;
     }
 
-    public void setStore(@Nullable Store store) {
-        this.store = store != null ? store : fallbackStore;
+    public void setStore(@Nullable ActivePackStore activePackStore) {
+        this.activePackStore = activePackStore != null ? activePackStore : fallbackActivePackStore;
     }
 
-    public void sendOffer(@NotNull Player player, @NotNull ResourcePackInfo packInfo) {
-        packSender.send(player, packInfo);
-        pending.put(player.getUniqueId(), new SentPack(packInfo.getUpload().getName(), packInfo.getUpload().getSha1String()));
+    public void sendOffer(@NotNull Player player, @NotNull ResourcePackOffer packOffer) {
+        packSender.send(player, packOffer);
+        pending.put(player.getUniqueId(), new ActivePack(packOffer.getUpload().getName(), packOffer.getUpload().getSha1String()));
     }
 
     /**
-     * This method uses dispatcher configuration as ResourcePackInfo
+     * This method uses dispatcher configuration as ResourcePackOffer
      * @param player receiver
      * @param uploadedPack uploaded resource pack
      */
     public void sendOfferAsDefault(@NotNull Player player, @NotNull UploadedPack uploadedPack) {
-        Component prompt = MiniMessage.miniMessage().deserialize(Config.DISPATCHER_PROMPT.asString(),
+        Component prompt = plugin.config().get(Config.dispatcherPrompt).accept(
                 Placeholder.component("player", Component.text(player.getName())),
                 Placeholder.component("pack_name", Component.text(uploadedPack.getName())));
-        ResourcePackInfo packInfo = new ResourcePackInfo(uploadedPack, prompt, Config.DISPATCHER_REQUIRED.asBoolean());
-        sendOffer(player, packInfo);
+        ResourcePackOffer packOffer = new ResourcePackOffer(uploadedPack, prompt, plugin.config().get(Config.dispatcherRequired));
+        sendOffer(player, packOffer);
     }
 
     /**
@@ -101,21 +94,22 @@ public class Dispatcher implements Listener {
     public void sendOfferAsDefault(@NotNull Player player, @NotNull ResourcePack resourcePack) {
         Optional<UploadedPack> uploadedPack = resourcePack.getUpload();
         if (uploadedPack.isEmpty()) {
-            throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not upload");
+            throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not uploaded");
         }
         sendOfferAsDefault(player, uploadedPack.get());
     }
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        if (!Config.DISPATCHER_ENABLED.asBoolean()) return;
-        PackDefinition definition = ProPack.getCore().getPackManager().getDefinition(Config.DISPATCHER_PACK.asString());
+    private void onJoin(PlayerJoinEvent event) {
+        if (!plugin.config().get(Config.dispatcherEnabled)) return;
+        String packName = plugin.config().get(Config.dispatcherPack);
+        PackDefinition definition = ProPack.getCore().getPackManager().getDefinition(packName);
         if (definition == null) {
-            LOGGER.warn("Resource pack '" + Config.DISPATCHER_PACK.asString() + "' not found");
+            LOGGER.warn("Resource pack '" + packName + "' not found");
             return;
         }
         if (definition.getResourcePack().isEmpty()) {
-            LOGGER.warn("Resource pack '" + Config.DISPATCHER_PACK.asString() + "' not built");
+            LOGGER.warn("Resource pack '" + packName + "' not built");
             return;
         }
         ResourcePack resourcePack = definition.getResourcePack().get();
@@ -124,13 +118,13 @@ public class Dispatcher implements Listener {
         }
         UploadedPack uploadedPack = resourcePack.getUpload().get();
         Player player = event.getPlayer();
-        SentPack active = store.getActiveResourcePack(player.getUniqueId());
+        ActivePack active = activePackStore.getActiveResourcePack(player.getUniqueId());
         if (active != null) {
-            if (Config.DISPATCHER_REPLACE.asBoolean()) {
+            if (plugin.config().get(Config.dispatcherReplace)) {
                 if (active.name.equals(resourcePack.getName()) && active.sha1.equals(uploadedPack.getSha1String())) return;
             } else return;
         }
-        int delay = Config.DISPATCHER_DELAY.asInt();
+        int delay = plugin.config().get(Config.dispatcherDelay);
         if (delay > 0) {
             Bukkit.getScheduler().runTaskLater(plugin, () -> sendOfferAsDefault(player, uploadedPack), delay * 20L);
         } else {
@@ -139,28 +133,30 @@ public class Dispatcher implements Listener {
     }
 
     @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
+    private void onQuit(PlayerQuitEvent event) {
         pending.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
-    public void onStatus(PlayerResourcePackStatusEvent event) {
+    private void onStatus(PlayerResourcePackStatusEvent event) {
         if (event.getStatus() == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) {
-            store.setActiveResourcePack(event.getPlayer().getUniqueId(), pending.remove(event.getPlayer().getUniqueId()));
-            if (Config.PATCH_PACKETS_ITEMS.asBoolean()) {
-                // TODO: resend player's inventory
+            Player player = event.getPlayer();
+            activePackStore.setActiveResourcePack(player.getUniqueId(), pending.remove(player.getUniqueId()));
+            if (plugin.config().get(Config.patchPacketItems)) {
+                player.updateInventory();
+                // TODO: resend entities
             }
         }
     }
 
-    public @Nullable SentPack getPendingResourcePack(@NotNull Player player) {
+    public @Nullable ActivePack getPendingResourcePack(@NotNull Player player) {
         return pending.get(player.getUniqueId());
     }
 
     public @NotNull Optional<ResourcePack> getAppliedResourcePack(@NotNull Player player) {
-        SentPack sentPack = store.getActiveResourcePack(player.getUniqueId());
-        if (sentPack == null) return Optional.empty();
-        PackDefinition definition = plugin.getCore().getPackManager().getDefinition(sentPack.name);
+        ActivePack activePack = activePackStore.getActiveResourcePack(player.getUniqueId());
+        if (activePack == null) return Optional.empty();
+        PackDefinition definition = plugin.getCore().getPackManager().getDefinition(activePack.name);
         if (definition == null) return Optional.empty();
         return definition.getResourcePack();
     }

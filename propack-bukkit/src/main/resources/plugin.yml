@@ -6,4 +6,5 @@ author: Nelonn
 load: STARTUP
 description: Modern solution for minecraft resource pack development
 website: 'https://github.com/Nelonn/ProPack'
-softdepend: [ProtocolLib, PlaceholderAPI]
+depend: [ProtocolLib]
+softdepend: [PlaceholderAPI]

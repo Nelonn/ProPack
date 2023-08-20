@@ -20,7 +20,6 @@ package me.nelonn.propack.core.builder.asset;
 
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.asset.CombinedItemModel;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,7 +56,7 @@ public class CombinedItemModelBuilder extends ItemModelBuilder {
         return this;
     }
 
-    public @NotNull CombinedItemModel build(@NotNull ResourcePack resourcePack) {
-        return new CombinedItemModel(resourcePack, path, targetItems, mesh, elements);
+    public @NotNull CombinedItemModel build() {
+        return new CombinedItemModel(path, targetItems, mesh, elements);
     }
 }

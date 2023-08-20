@@ -2,6 +2,9 @@
 # ProPack
 Modern solution for minecraft resource pack development
 
+[ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/) is required for bukkit version
+
+
 ## Features
 - [Models generating](#meshes--models)
 - [Auto CustomModelData](#auto-custommodeldata)
@@ -9,8 +12,10 @@ Modern solution for minecraft resource pack development
 - [Auto fancyPants (custom armor)](#armor-textures)
 - [Obfuscation](#obfuscation)
 
+
 ## Example Project
 Look at the [example project](https://github.com/Nelonn/ProPack/blob/master/propack-core/src/main/resources/example)
+
 
 ## Json specification
 Json is used in lenient mode, possible file extensions:
@@ -19,6 +24,7 @@ Json is used in lenient mode, possible file extensions:
 - jsonc
 
 Some futures from json 5 will not work due to [GSON](https://github.com/google/gson) flaws
+
 
 ## Meshes & Models
 [Java Block/Item models](https://minecraft.fandom.com/wiki/Model) in the ProPack are called *meshes*.
@@ -89,6 +95,7 @@ SlotItemModel, example:
 
 `Target` - this is an indication of the items for which you need to [Auto CustomModelData](#auto-custommodeldata) of the specified model.
 
+
 ## Auto CustomModelData
 When building resource pack ProPack takes the default model from the folder `include/assets/minecraft/models/item/<item>.json`
 and adds the necessary elements to override.
@@ -106,6 +113,7 @@ Example NBT tag for CombinedItemModel:
 
 Example NBT tag for SlotItemModel: `{CustomModel:"example:models/example_slotmodel",ModelSlots:{scope:"holographic"}}`
 
+
 ## Sounds
 
 Sound files must ends with `.sound.json`, eg. `scream.sound.json`
@@ -114,6 +122,7 @@ Sound file paths can be relative, example `../folder/sound`.
 
 FFmpeg auto conversion is supported. Use `-Dpropack.ffmpeg=path` to indicate its location,
 by default it `ffmpeg`
+
 
 ## Armor Textures
 Added an automatic builder of custom textures for leather armor for the [shader `fancyPants`](https://github.com/Ancientkingg/fancyPants)
@@ -154,6 +163,7 @@ For more information, see [README.md of fancyPants](https://github.com/Ancientki
 `SaveImage` allows you to determine whether to save 
 the specified `Image` in the output resource pack
 
+
 ## Languages
 Language file must ends with `.lang.json`, eg. `en_us.lang.json`.
 
@@ -163,20 +173,26 @@ Multiple languages in the same namespace will be merged into one.
 
 There is also a placeholder `<namespace>`.
 
+
 ## Fonts
 Fonts work unchanged except for the file extension `.font.json`
+
+It is recommended to work with custom fonts from another plugin working with ProPack API
+
 
 ## Obfuscation
 It just obfuscates the entire resource pack, except for translations.
 The settings for this function are in [`config/build.json5`](https://github.com/Nelonn/ProPack/blob/master/propack-core/src/main/resources/example/config/build.json5)
 
+
 ## Planned in the future
-- [ ] Rewrite builder to C++ or Golang as binary executable.
+- [ ] Rewrite builder to **Rust** as cross-platform binary executable for all archs.
 - [ ] Integration into [ItemsAdder](https://www.spigotmc.org/resources/%E2%9C%A8itemsadder%E2%AD%90emotes-mobs-items-armors-hud-gui-emojis-blocks-wings-hats-liquids.73355/), [Oraxen](https://www.spigotmc.org/resources/%E2%98%84%EF%B8%8F-oraxen-add-items-blocks-armors-hats-food-furnitures-plants-and-gui.72448/), [Model Engine](https://www.spigotmc.org/resources/conxeptworks-model-engine—ultimate-custom-entity-model-manager-1-16-5-1-19-3.79477/), etc.
-- [ ] Fonts generating.
-- [ ] Resource pack CI/CD using [Redis](https://redis.io/), etc. (for multi server)
+- [ ] Fonts generating (auto symbol mapping, etc.)
+- [ ] **(ALMOST DONE)** Resource pack CI/CD using [Redis](https://redis.io/), etc. (for multi server)
 - [ ] Improve the quality of the code and API.
 - [ ] Mod for [Fabric](https://fabricmc.net/).
+
 
 ## License
 *Click here to read [the entire license](https://github.com/Nelonn/ProPack/blob/master/LICENSE.txt).*

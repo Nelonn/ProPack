@@ -26,13 +26,13 @@ import me.nelonn.flint.path.Path;
 import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.file.File;
 import me.nelonn.propack.builder.file.JsonFile;
+import me.nelonn.propack.builder.task.AbstractTask;
+import me.nelonn.propack.builder.task.FileProcessingException;
+import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.core.builder.ObfuscationConfiguration;
 import me.nelonn.propack.core.builder.asset.FontBuilder;
 import me.nelonn.propack.core.builder.asset.SoundAssetBuilder;
-import me.nelonn.propack.builder.task.AbstractTask;
-import me.nelonn.propack.builder.task.FileProcessingException;
-import me.nelonn.propack.builder.task.TaskBootstrap;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.PathUtil;
 import me.nelonn.propack.core.util.Util;
@@ -52,7 +52,7 @@ public class ObfuscateTask extends AbstractTask {
     public void run(@NotNull TaskIO io) {
         ObfuscationConfiguration conf = getProject().getBuildConfiguration().getObfuscationConfiguration();
         String obfuscatedNamespace = conf.getNamespace();
-        AtomicInteger integer = new AtomicInteger(1);
+        ObfuscatedNamer namer = new ObfuscatedNamer();
         // Obfuscate meshes
         if (conf.isMeshes()) {
             Map<Path, Path> meshMapping = new HashMap<>();
@@ -64,7 +64,7 @@ public class ObfuscateTask extends AbstractTask {
                     if (pathSplit.length < 4 || pathSplit[1].equalsIgnoreCase("minecraft") ||
                             !pathSplit[2].equalsIgnoreCase("models")) continue;
                     Path contentPath = Path.of(pathSplit[1], Util.substringLast(pathSplit[3], ".json"));
-                    Path obfuscatedPath = Path.of(conf.getNamespace(), nextHex(integer));
+                    Path obfuscatedPath = Path.of(conf.getNamespace(), namer.next());
                     io.getFiles().addFile(file.copyAs(PathUtil.assetsPath(obfuscatedPath, "models") + ".json"));
                     meshMapping.put(contentPath, obfuscatedPath);
                     io.getFiles().removeFile(filePath);
@@ -155,14 +155,14 @@ public class ObfuscateTask extends AbstractTask {
         }
         // Obfuscate textures
         if (conf.isTextures()) {
-            integer.set(1);
+            namer.reset();
             Map<Path, Path> pngMapping = new HashMap<>();
             for (File file : files(io, conf)) {
                 try {
                     String filePath = file.getPath();
                     if (!filePath.startsWith("content/") || !filePath.endsWith(".png")) continue;
                     Path resourcePath = PathUtil.resourcePath(filePath, ".png");
-                    Path obfuscatedPath = Path.of(obfuscatedNamespace, nextHex(integer));
+                    Path obfuscatedPath = Path.of(obfuscatedNamespace, namer.next());
                     io.getFiles().addFile(file.copyAs(PathUtil.assetsPath(obfuscatedPath, "textures") + ".png"));
                     pngMapping.put(resourcePath, obfuscatedPath);
                     io.getFiles().removeFile(filePath);
@@ -231,14 +231,14 @@ public class ObfuscateTask extends AbstractTask {
         }
         // Obfuscate ogg
         if (conf.isOgg()) {
-            integer.set(1);
+            namer.reset();
             Map<Path, Path> oggMapping = new HashMap<>();
             for (File file : files(io, conf)) {
                 try {
                     String filePath = file.getPath();
                     if (!filePath.startsWith("content/") || !filePath.endsWith(".ogg")) continue;
                     Path resourcePath = PathUtil.resourcePath(filePath, ".ogg");
-                    Path obfuscatedPath = Path.of(obfuscatedNamespace, nextHex(integer));
+                    Path obfuscatedPath = Path.of(obfuscatedNamespace, namer.next());
                     io.getFiles().addFile(file.copyAs(PathUtil.assetsPath(obfuscatedPath, "sounds") + ".ogg"));
                     oggMapping.put(resourcePath, obfuscatedPath);
                     io.getFiles().removeFile(filePath);
@@ -286,7 +286,7 @@ public class ObfuscateTask extends AbstractTask {
         }
         // Obfuscate sounds
         if (conf.isSounds()) {
-            integer.set(1);
+            namer.reset();
             JsonObject obfuscatedSounds = new JsonObject();
             List<String> filesToRemove = new ArrayList<>();
             for (SoundAssetBuilder soundAsset : io.getAssets().getSounds()) {
@@ -300,7 +300,7 @@ public class ObfuscateTask extends AbstractTask {
                 }
                 JsonObject soundsObject = ((JsonFile) soundsFile).getContent();
                 JsonObject soundObject = soundsObject.getAsJsonObject(soundAsset.getSoundPath().getValue());
-                Path obfuscatedSoundPath = Path.of(obfuscatedNamespace, nextHex(integer));
+                Path obfuscatedSoundPath = Path.of(obfuscatedNamespace, namer.next());
                 obfuscatedSounds.add(obfuscatedSoundPath.getValue(), soundObject);
                 soundAsset.setSoundPath(obfuscatedSoundPath);
             }
@@ -311,14 +311,14 @@ public class ObfuscateTask extends AbstractTask {
         }
         // Obfuscate fonts
         if (conf.isFonts()) {
-            integer.set(1);
+            namer.reset();
             for (FontBuilder font : io.getAssets().getFonts()) {
                 String fontFilePath = "assets/" + font.getFontPath().getNamespace() + "/font/" + font.getFontPath().getValue() + ".json";
                 File fontFile = io.getFiles().removeFile(fontFilePath);
                 if (!(fontFile instanceof JsonFile)) {
                     throw new IllegalStateException("font file not found for '" + font.getPath() + "'");
                 }
-                Path obfuscatedPath = Path.of(obfuscatedNamespace, nextHex(integer));
+                Path obfuscatedPath = Path.of(obfuscatedNamespace, namer.next());
                 font.setFontPath(obfuscatedPath);
                 io.getFiles().addFile(fontFile.copyAs(PathUtil.assetsPath(obfuscatedPath, "font") + ".json"));
             }
@@ -335,7 +335,18 @@ public class ObfuscateTask extends AbstractTask {
         }
     }
 
-    private String nextHex(AtomicInteger integer) {
-        return Integer.toHexString(integer.getAndIncrement());
+    public static class ObfuscatedNamer {
+        private final AtomicInteger integer = new AtomicInteger(1);
+
+        public ObfuscatedNamer() {
+        }
+
+        public void reset() {
+            integer.set(0);
+        }
+
+        public String next() {
+            return Integer.toHexString(integer.getAndIncrement());
+        }
     }
 }

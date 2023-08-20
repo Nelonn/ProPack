@@ -18,73 +18,26 @@
 
 package me.nelonn.propack.bukkit;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import me.nelonn.propack.bukkit.config.ConfigValue;
+import me.nelonn.propack.bukkit.config.MiniMessageText;
 
-public enum Config {
-    DISPATCHER_STORE("dispatcher.store", "propack:memory_store"),
-    DISPATCHER_ENABLED("dispatcher.enabled", true),
-    DISPATCHER_REPLACE("dispatcher.replace", false),
-    DISPATCHER_PACK("dispatcher.pack"),
-    DISPATCHER_DELAY("dispatcher.delay", 0),
-    DISPATCHER_REQUIRED("dispatcher.required", false),
-    DISPATCHER_PROMPT("dispatcher.prompt", "&#fa4943Accept the pack to enjoy a full experience"),
+public class Config {
+    public static final ConfigValue<String> dispatcherStore = new ConfigValue<>("dispatcher.store", "propack:memory_store");
+    public static final ConfigValue<Boolean> dispatcherEnabled = new ConfigValue<>("dispatcher.enabled", true);
+    public static final ConfigValue<Boolean> dispatcherReplace = new ConfigValue<>("dispatcher.replace", false);
+    public static final ConfigValue<String> dispatcherPack = new ConfigValue<>("dispatcher.pack");
+    public static final ConfigValue<Integer> dispatcherDelay = new ConfigValue<>("dispatcher.delay", 0);
+    public static final ConfigValue<Boolean> dispatcherRequired = new ConfigValue<>("dispatcher.replace", false);
+    public static final ConfigValue<MiniMessageText> dispatcherPrompt = new ConfigValue<>("dispatcher.prompt", MiniMessageText.DESERIALIZER.deserialize("&#fa4943Accept the pack to enjoy a full experience"), MiniMessageText.DESERIALIZER);
 
-    DEV_SERVER_ENABLED("dev_server.enabled", false),
-    DEV_SERVER_RETURN_IP("dev_server.return_ip", "127.0.0.1"),
-    DEV_SERVER_PORT("dev_server.port", 3000),
+    public static final ConfigValue<Boolean> devServerEnabled = new ConfigValue<>("dev_server.enabled", false);
+    public static final ConfigValue<String> devServerHostIp = new ConfigValue<>("dev_server.host_ip", "127.0.0.1");
+    public static final ConfigValue<Integer> devServerPort = new ConfigValue<>("dev_server.port", 3000);
 
-    PATCH_PACKETS_ITEMS("patch_packets.items", true),
-    PATCH_PACKETS_SOUNDS("patch_packets.sounds", true);
+    public static final ConfigValue<Boolean> patchPacketItems = new ConfigValue<>("patch_packets.items", true);
+    public static final ConfigValue<Boolean> patchPacketSounds = new ConfigValue<>("patch_packets.sounds", true);
 
-    private static FileConfiguration fileConfiguration = null;
-    private final String path;
-    private final Object def;
-
-    Config(@NotNull String path, @Nullable Object def) {
-        this.path = path;
-        this.def = def;
-    }
-
-    Config(@NotNull String path) {
-        this(path, null);
-    }
-
-    public @NotNull String getPath() {
-        return path;
-    }
-
-    public Object getValue() {
-        return fileConfiguration.get(path, def);
-    }
-
-    public String asString() {
-        return (String) getValue();
-    }
-
-    public boolean asBoolean() {
-        Boolean value = (Boolean) getValue();
-        if (value == null) {
-            throw new NullPointerException("Config option '" + path + "' is null");
-        }
-        return (Boolean) getValue();
-    }
-
-    public int asInt() {
-        Integer value = (Integer) getValue();
-        if (value == null) {
-            throw new NullPointerException("Config option '" + path + "' is null");
-        }
-        return (int) getValue();
-    }
-
-    @Override
-    public String toString() {
-        return asString();
-    }
-
-    static void setFileConfiguration(FileConfiguration fileConfiguration) {
-        Config.fileConfiguration = fileConfiguration;
+    private Config() {
+        throw new UnsupportedOperationException();
     }
 }

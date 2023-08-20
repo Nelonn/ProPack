@@ -26,12 +26,12 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.Optional;
 
-public class ProjectDefinition implements PackDefinition {
+public class ProjectPack implements PackDefinition {
     private final File file;
     private InternalProject project;
     private ProjectLoader projectLoader;
 
-    public ProjectDefinition(@NotNull File file, @NotNull ProjectLoader projectLoader, boolean tryLoadBuilt) {
+    public ProjectPack(@NotNull File file, @NotNull ProjectLoader projectLoader, boolean tryLoadBuilt) {
         this.file = file;
         this.projectLoader = projectLoader;
         if (tryLoadBuilt) {

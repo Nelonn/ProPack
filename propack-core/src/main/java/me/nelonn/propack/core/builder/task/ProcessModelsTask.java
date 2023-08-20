@@ -30,7 +30,7 @@ import me.nelonn.propack.builder.file.File;
 import me.nelonn.propack.builder.file.JsonFile;
 import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.util.Extra;
-import me.nelonn.propack.core.builder.MeshMappingBuilder;
+import me.nelonn.propack.core.builder.MeshesMapBuilder;
 import me.nelonn.propack.core.builder.asset.CombinedItemModelBuilder;
 import me.nelonn.propack.core.builder.asset.DefaultItemModelBuilder;
 import me.nelonn.propack.core.builder.asset.ItemModelBuilder;
@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ProcessModelsTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     public static final TaskBootstrap BOOTSTRAP = ProcessModelsTask::new;
-    public static final Extra<MeshMappingBuilder> EXTRA_MESH_MAPPING_BUILDER = new Extra<>(MeshMappingBuilder.class, "propack.process_models.mesh_mapping_builder");
+    public static final Extra<MeshesMapBuilder> EXTRA_MESH_MAPPING_BUILDER = new Extra<>(MeshesMapBuilder.class, "propack.process_models.mesh_mapping_builder");
 
     public ProcessModelsTask(@NotNull Project project) {
         super("processModels", project);
@@ -59,8 +59,8 @@ public class ProcessModelsTask extends AbstractTask {
 
     @Override
     public void run(@NotNull TaskIO io) {
-        MeshMappingBuilder meshMappingBuilder = new MeshMappingBuilder();
-        io.getExtras().put(EXTRA_MESH_MAPPING_BUILDER, meshMappingBuilder);
+        MeshesMapBuilder meshesMapBuilder = new MeshesMapBuilder();
+        io.getExtras().put(EXTRA_MESH_MAPPING_BUILDER, meshesMapBuilder);
         Map<Path, Set<Identifier>> meshesToOverride = new HashMap<>();
         for (File file : io.getFiles()) {
             try {
@@ -233,7 +233,7 @@ public class ProcessModelsTask extends AbstractTask {
                 Set<Identifier> toOverride = meshesToOverride.get(resourcePath);
                 if (toOverride != null) {
                     for (Identifier itemId : toOverride) {
-                        meshMappingBuilder.getMapper(itemId).add(resourcePath);
+                        meshesMapBuilder.getMapper(itemId).add(resourcePath);
                     }
                 }
             } catch (Exception e) {
@@ -241,7 +241,7 @@ public class ProcessModelsTask extends AbstractTask {
             }
         }
         // overriding default models (custom_model_data)
-        for (MeshMappingBuilder.ItemEntry itemEntry : meshMappingBuilder.getMappers()) {
+        for (MeshesMapBuilder.ItemEntry itemEntry : meshesMapBuilder.getMappers()) {
             String path = "include/assets/minecraft/models/item/" + itemEntry.getItemId().getValue() + ".json";
             File file = io.getFiles().getFile(path);
             if (!(file instanceof JsonFile)) {

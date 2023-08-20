@@ -16,14 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.dispatcher.sender;
+package me.nelonn.propack;
 
-import me.nelonn.propack.bukkit.ResourcePackInfo;
-import org.bukkit.entity.Player;
+import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Path;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public interface PackSender {
+public interface Meshes {
 
-    void send(@NotNull Player player, @NotNull ResourcePackInfo packInfo);
+    @Nullable Integer getCustomModelData(@NotNull Path mesh, @NotNull Identifier itemId);
 
 }

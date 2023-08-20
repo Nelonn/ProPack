@@ -16,38 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.module;
+package me.nelonn.propack.asset;
 
-import me.nelonn.propack.core.ProPackCore;
-import org.apache.logging.log4j.Logger;
+import me.nelonn.flint.path.Path;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.InputStream;
+public interface RealAsset extends Asset {
 
-public interface Module {
-
-    default @NotNull String getName() {
-        return getDescription().getName();
-    }
-
-    @NotNull ModuleDescription getDescription();
-
-    @NotNull File getDataFolder();
-
-    @Nullable InputStream getResource(@NotNull String file);
-
-    void enable();
-
-    void disable();
-
-    void setEnabled(final boolean enabled);
-
-    boolean isEnabled();
-
-    @NotNull ProPackCore getCore();
-
-    @NotNull Logger getLogger();
+    /**
+     * Assets can be obfuscated, so this method will return the path where the asset is located in the zip file
+     * @return Real path of asset
+     */
+    @NotNull Path realPath();
 
 }

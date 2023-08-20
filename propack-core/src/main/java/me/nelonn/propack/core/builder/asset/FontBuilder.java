@@ -19,7 +19,6 @@
 package me.nelonn.propack.core.builder.asset;
 
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.asset.Font;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +39,7 @@ public class FontBuilder extends AbstractAssetBuilder<Font> {
     }
 
     @Override
-    public @NotNull Font build(@NotNull ResourcePack resourcePack) {
-        return new Font(resourcePack, path, fontPath);
+    public @NotNull Font build() {
+        return new Font(path, fontPath);
     }
 }

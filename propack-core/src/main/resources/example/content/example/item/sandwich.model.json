@@ -1,5 +1,5 @@
 {
-    "Type": "Default",
+    "Type": "DefaultItemModel",
     "Mesh": "./sandwich",
     "Target": "bread"
 }

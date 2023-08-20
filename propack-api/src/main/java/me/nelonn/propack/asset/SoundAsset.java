@@ -19,31 +19,24 @@
 package me.nelonn.propack.asset;
 
 import me.nelonn.flint.path.Path;
-import me.nelonn.propack.ResourcePack;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.jetbrains.annotations.NotNull;
 
-public class SoundAsset extends AbstractAsset {
-    private final Path soundPath;
+public class SoundAsset extends AbstractAsset implements RealAsset, Sound.Type {
+    private final Path realPath;
 
-    public SoundAsset(@NotNull ResourcePack resourcePack, @NotNull Path path, @NotNull Path soundPath) {
-        super(resourcePack, path);
-        this.soundPath = soundPath;
+    public SoundAsset(@NotNull Path path, @NotNull Path realPath) {
+        super(path);
+        this.realPath = realPath;
     }
 
-    /**
-     * Assets can be obfuscated, so this method will return an obfuscated path (if enabled)
-     * @return Real path of asset
-     */
-    public @NotNull Path getSoundPath() {
-        return soundPath;
+    public @NotNull Path realPath() {
+        return realPath;
     }
 
-    /**
-     * Adventure api implementation. This method uses output from getAssetPath()
-     * @return Sound.Type of this Sound Asset
-     */
-    public @NotNull Sound.Type asType() {
-        return this::getSoundPath;
+    @Override
+    public @NotNull Key key() {
+        return realPath();
     }
 }

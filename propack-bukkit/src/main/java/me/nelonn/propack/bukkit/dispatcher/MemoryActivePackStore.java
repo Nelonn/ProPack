@@ -18,39 +18,37 @@
 
 package me.nelonn.propack.bukkit.dispatcher;
 
-import me.nelonn.flint.path.Identifier;
+import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class StoreMap {
-    private final Map<Identifier, Store> knownStores = new HashMap<>();
+public class MemoryActivePackStore implements ActivePackStore, Listener {
+    private final Map<UUID, ActivePack> map = new ConcurrentHashMap<>();
 
-    public boolean register(@NotNull Identifier id, @NotNull Store store) {
-        if (knownStores.containsKey(id)) return false;
-        knownStores.put(id, store);
-        return true;
+    public MemoryActivePackStore(@NotNull Plugin plugin) {
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public boolean register(@NotNull String id, @NotNull Store store) {
-        return register(Identifier.ofWithFallback(id, "propack"), store);
+    @Override
+    public @Nullable ActivePack getActiveResourcePack(@NotNull UUID uuid) {
+        return map.get(uuid);
     }
 
-    public boolean unregister(@NotNull Identifier id) {
-        return knownStores.remove(id) != null;
+    @Override
+    public void setActiveResourcePack(@NotNull UUID uuid, @Nullable ActivePack activePack) {
+        map.put(uuid, activePack);
     }
 
-    public boolean unregister(@NotNull String id) {
-        return unregister(Identifier.ofWithFallback(id, "propack"));
-    }
-
-    public @Nullable Store get(@NotNull Identifier id) {
-        return knownStores.get(id);
-    }
-
-    public @Nullable Store get(@NotNull String id) {
-        return get(Identifier.ofWithFallback(id, "propack"));
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        map.remove(event.getPlayer().getUniqueId());
     }
 }
