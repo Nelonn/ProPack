@@ -18,10 +18,7 @@
 
 package me.nelonn.propack.bukkit;
 
-import com.google.gson.JsonObject;
-import me.nelonn.flint.path.Identifier;
 import me.nelonn.propack.bukkit.definition.DefinitionTypeMap;
-import me.nelonn.propack.bukkit.definition.PackDefinition;
 import me.nelonn.propack.bukkit.definition.PackManager;
 import me.nelonn.propack.bukkit.dispatcher.ActivePackStoreMap;
 import me.nelonn.propack.bukkit.dispatcher.Dispatcher;
@@ -29,16 +26,11 @@ import me.nelonn.propack.bukkit.dispatcher.MemoryActivePackStore;
 import me.nelonn.propack.core.ProPackCore;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-
 public class BukkitProPackCore extends ProPackCore {
     private final DefinitionTypeMap definitionTypeMap;
     private final PackManager packManager;
     private final ActivePackStoreMap activePackStoreMap;
     private final Dispatcher dispatcher;
-    public Map<Identifier, Function<JsonObject, PackDefinition>> tempDefs = new HashMap<>();
 
     public BukkitProPackCore(@NotNull ProPackPlugin plugin) {
         super(plugin.getDataFolder());

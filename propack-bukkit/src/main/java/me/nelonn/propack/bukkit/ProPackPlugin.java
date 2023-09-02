@@ -26,11 +26,11 @@ import me.nelonn.propack.core.DevServer;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.io.File;
 
@@ -53,13 +53,13 @@ public final class ProPackPlugin extends JavaPlugin {
 
         File modulesDir = new File(getDataFolder(), "modules");
         if (!getDataFolder().exists()) {
-            IOUtil.extractResources(ProPackPlugin.class, "example/", new File(getDataFolder(), "example"));
-            saveResource("example.json", false);
-            saveResource("config.yml", false);
+            IOUtil.extractResources(ProPackPlugin.class, "resources/example/", new File(getDataFolder(), "example"));
+            IOUtil.extractResource(ProPackPlugin.class, "resources/example.json", new File(getDataFolder(), "example.json"));
+            IOUtil.extractResource(ProPackPlugin.class, "resources/config.yml", new File(getDataFolder(), "config.yml"));
             modulesDir.mkdirs();
         } else {
             if (!new File(getDataFolder(), "config.yml").exists()) {
-                saveResource("config.yml", false);
+                IOUtil.extractResource(ProPackPlugin.class, "resources/config.yml", new File(getDataFolder(), "config.yml"));
             }
             if (!modulesDir.exists()) {
                 modulesDir.mkdirs();
@@ -79,7 +79,7 @@ public final class ProPackPlugin extends JavaPlugin {
 
         core = new BukkitProPackCore(this);
         ProPack.setCore(core);
-        config = new PluginConfig(this, "config.yml");
+        config = new PluginConfig(this, "resources/config.yml", "config.yml");
         reloadModules();
         reloadConfig();
         reloadPacks();

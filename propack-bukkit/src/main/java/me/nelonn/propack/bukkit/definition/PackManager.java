@@ -25,9 +25,9 @@ import me.nelonn.propack.core.loader.ProjectLoader;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.Util;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;

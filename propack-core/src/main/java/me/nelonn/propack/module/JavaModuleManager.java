@@ -24,9 +24,9 @@ import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;

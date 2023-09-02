@@ -139,46 +139,51 @@ public final class IOUtil {
 
             ZipEntry entry = jar.getNextEntry();
             while (entry != null) {
-                String resourcePath = entry.getName();
-                if (!entry.isDirectory() && resourcePath.startsWith(from)) {
-                    URL url = source.getClassLoader().getResource(resourcePath);
-                    if (url == null) {
-                        throw new IllegalArgumentException("The embedded resource '" + resourcePath + "' cannot be found in jar");
-                    }
-                    URLConnection connection = url.openConnection();
-                    connection.setUseCaches(false);
-                    InputStream in = connection.getInputStream();
-                    if (in == null) {
-                        throw new IllegalArgumentException("The embedded resource '" + resourcePath + "' cannot be found in jar");
-                    }
-                    resourcePath = resourcePath.substring(from.length());
-                    File outFile = new File(to, resourcePath);
-                    int lastIndex = resourcePath.lastIndexOf('/');
-                    File outDir = new File(to, resourcePath.substring(0, Math.max(lastIndex, 0)));
+                String absolutePath = entry.getName();
+                if (!entry.isDirectory() && absolutePath.startsWith(from)) {
+                    String relativePath = absolutePath.substring(from.length());
+                    File outFile = new File(to, relativePath);
+                    int lastIndex = relativePath.lastIndexOf('/');
+                    File outDir = new File(to, relativePath.substring(0, Math.max(lastIndex, 0)));
                     if (!outDir.exists()) {
                         outDir.mkdirs();
                     }
-                    try {
-                        if (outFile.exists()) {
-                            //LOGGER.warn("Could not save {} to {} because {} already exists.", outFile.getName(), outFile, outFile.getName());
-                        } else {
-                            try (OutputStream out = Files.newOutputStream(outFile.toPath())) {
-                                byte[] buffer = new byte[1024];
-                                int bytes;
-                                while ((bytes = in.read(buffer)) > 0) {
-                                    out.write(buffer, 0, bytes);
-                                }
-                            }
-                            in.close();
-                        }
-                    } catch (IOException e) {
-                        //LOGGER.error("Could not save " + outFile.getName() + " to " + outFile, e);
-                    }
+                    extractResource(source, absolutePath, outFile);
                 }
                 entry = jar.getNextEntry();
             }
             jar.closeEntry();
             jar.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void extractResource(@NotNull Class<?> source, @NotNull String input, @NotNull File output) {
+        try {
+            URL url = source.getClassLoader().getResource(input);
+            if (url == null) {
+                throw new IllegalArgumentException("The embedded resource '" + input + "' cannot be found in jar");
+            }
+            URLConnection connection = url.openConnection();
+            connection.setUseCaches(false);
+            try (InputStream in = connection.getInputStream()) {
+                if (in == null) {
+                    throw new IllegalArgumentException("The embedded resource '" + input + "' cannot be found in jar");
+                }
+                try {
+                    if (output.exists()) return;
+                    try (OutputStream out = Files.newOutputStream(output.toPath())) {
+                        byte[] buffer = new byte[1024];
+                        int bytes;
+                        while ((bytes = in.read(buffer)) > 0) {
+                            out.write(buffer, 0, bytes);
+                        }
+                    }
+                } catch (IOException e) {
+                    //LOGGER.error("Could not save " + outFile.getName() + " to " + outFile, e);
+                }
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

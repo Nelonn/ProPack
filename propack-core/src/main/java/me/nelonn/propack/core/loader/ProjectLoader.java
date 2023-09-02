@@ -43,9 +43,9 @@ import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.Util;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;

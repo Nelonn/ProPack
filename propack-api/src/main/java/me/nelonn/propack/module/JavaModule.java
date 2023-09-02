@@ -18,10 +18,10 @@
 
 package me.nelonn.propack.module;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -117,6 +117,6 @@ public abstract class JavaModule implements Module {
         this.meta = meta;
         this.dataFolder = dataFolder;
         this.file = file;
-        this.logger = LogManager.getLogger(meta.getLoggerPrefix());
+        this.logger = LoggerFactory.getLogger(meta.getLoggerPrefix());
     }
 }

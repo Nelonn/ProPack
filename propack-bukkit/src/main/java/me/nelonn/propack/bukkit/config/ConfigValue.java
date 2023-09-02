@@ -42,6 +42,10 @@ public class ConfigValue<T> {
         this(path, defaultValue, clazz, null);
     }
 
+    public ConfigValue(@NotNull String path, @Nullable Deserializer<T> deserializer) {
+        this(path, null, deserializer);
+    }
+
     public ConfigValue(@NotNull String path, @Nullable Class<T> clazz) {
         this(path, null, clazz);
     }

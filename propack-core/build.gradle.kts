@@ -20,7 +20,7 @@ dependencies {
 
     "compileOnly"("org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r")
 
-    "compileOnly"("org.apache.logging.log4j:log4j-api:2.19.0")
+    "compileOnly"("org.slf4j:slf4j-api:2.0.7")
 
     "compileOnly"("net.kyori:adventure-api:4.12.0")
     "compileOnly"("net.kyori:adventure-text-minimessage:4.12.0")

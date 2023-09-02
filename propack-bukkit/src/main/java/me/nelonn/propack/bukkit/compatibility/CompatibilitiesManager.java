@@ -21,11 +21,11 @@ package me.nelonn.propack.bukkit.compatibility;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.bukkit.compatibility.provided.placeholderapi.PlaceholderAPICompatibility;
 import me.nelonn.propack.bukkit.compatibility.provided.protocollib.ProtocolLibCompatibility;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ConcurrentHashMap;

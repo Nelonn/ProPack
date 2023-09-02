@@ -20,12 +20,12 @@ dependencies {
 
     "implementation"("org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r")
 
-    // Logging api
+    // Logging
+    "implementation"("org.slf4j:slf4j-api:2.0.7")
+    "implementation"("ch.qos.logback:logback-classic:1.4.11")
+    // Log4J Support
     "implementation"("org.apache.logging.log4j:log4j-api:2.19.0")
-    "implementation"("org.slf4j:slf4j-api:1.7.25")
-    // Logging impl
     "implementation"("org.apache.logging.log4j:log4j-to-slf4j:2.19.0")
-    "implementation"("ch.qos.logback:logback-classic:1.2.9")
 
     "implementation"("net.kyori:adventure-api:4.12.0")
     "implementation"("net.kyori:adventure-text-minimessage:4.12.0")

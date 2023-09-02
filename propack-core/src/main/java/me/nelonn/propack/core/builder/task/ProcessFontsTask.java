@@ -25,16 +25,16 @@ import me.nelonn.flint.path.Path;
 import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.file.File;
 import me.nelonn.propack.builder.file.JsonFile;
-import me.nelonn.propack.builder.task.TaskIO;
-import me.nelonn.propack.core.builder.asset.FontBuilder;
 import me.nelonn.propack.builder.task.AbstractTask;
 import me.nelonn.propack.builder.task.FileProcessingException;
 import me.nelonn.propack.builder.task.TaskBootstrap;
+import me.nelonn.propack.builder.task.TaskIO;
+import me.nelonn.propack.core.builder.asset.FontBuilder;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.PathUtil;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 public class ProcessFontsTask extends AbstractTask {
     private static final Logger LOGGER = LogManagerCompat.getLogger();

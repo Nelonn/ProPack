@@ -21,7 +21,7 @@ package me.nelonn.propack.bukkit;
 import me.nelonn.propack.bukkit.config.ConfigValue;
 import me.nelonn.propack.bukkit.config.MiniMessageText;
 
-public class Config {
+public final class Config {
     public static final ConfigValue<String> dispatcherStore = new ConfigValue<>("dispatcher.store", "propack:memory_store");
     public static final ConfigValue<Boolean> dispatcherEnabled = new ConfigValue<>("dispatcher.enabled", true);
     public static final ConfigValue<Boolean> dispatcherReplace = new ConfigValue<>("dispatcher.replace", false);
