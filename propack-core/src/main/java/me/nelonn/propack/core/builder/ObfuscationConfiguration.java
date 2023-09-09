@@ -27,12 +27,20 @@ public class ObfuscationConfiguration {
     private final boolean shuffleSequence;
     private final boolean meshes;
     private final boolean textures;
+    private final String texturesAtlasesFolder;
     private final boolean ogg;
     private final boolean sounds;
     private final boolean fonts;
 
-    public ObfuscationConfiguration(boolean enabled, @NotNull String namespace, boolean shuffleSequence, boolean meshes,
-                                    boolean textures, boolean ogg, boolean sounds, boolean fonts) {
+    public ObfuscationConfiguration(boolean enabled,
+                                    @NotNull String namespace,
+                                    boolean shuffleSequence,
+                                    boolean meshes,
+                                    boolean textures,
+                                    @NotNull String texturesAtlasesFolder,
+                                    boolean ogg,
+                                    boolean sounds,
+                                    boolean fonts) {
         if (!PathImpl.isValidNamespace(namespace)) {
             throw new IllegalArgumentException("Illegal namespace: " + namespace);
         }
@@ -41,6 +49,7 @@ public class ObfuscationConfiguration {
         this.shuffleSequence = shuffleSequence;
         this.meshes = meshes;
         this.textures = textures;
+        this.texturesAtlasesFolder = texturesAtlasesFolder;
         this.ogg = ogg;
         this.sounds = sounds;
         this.fonts = fonts;
@@ -64,6 +73,10 @@ public class ObfuscationConfiguration {
 
     public boolean isTextures() {
         return textures;
+    }
+
+    public String getTexturesAtlasesFolder() {
+        return texturesAtlasesFolder;
     }
 
     public boolean isOgg() {

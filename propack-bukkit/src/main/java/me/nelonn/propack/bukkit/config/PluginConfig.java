@@ -25,30 +25,38 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 
-public class PluginConfig {
+public class PluginConfig extends SectionConfig {
     private final JavaPlugin plugin;
     private final ConfigLoader loader;
     private String resourcePath;
     private File file;
-    private Configuration config;
 
     public PluginConfig(@NotNull JavaPlugin plugin, @NotNull String resourcePath, @NotNull File file, @NotNull ConfigLoader loader) {
+        super(null);
         this.plugin = plugin;
         this.resourcePath = resourcePath;
         this.file = file;
         this.loader = loader;
     }
 
+    public PluginConfig(@NotNull JavaPlugin plugin, @NotNull String resourcePath, @NotNull String fileName, @NotNull ConfigLoader loader) {
+        this(plugin, resourcePath, new File(plugin.getDataFolder(), fileName), loader);
+    }
+
     public PluginConfig(@NotNull JavaPlugin plugin, @NotNull String fileName, @NotNull ConfigLoader loader) {
-        this(plugin, fileName, new File(plugin.getDataFolder(), fileName), loader);
+        this(plugin, fileName, fileName, loader);
     }
 
     public PluginConfig(@NotNull JavaPlugin plugin, @NotNull String resourcePath, @NotNull File file) {
         this(plugin, resourcePath, file, YamlConfiguration::loadConfiguration);
     }
 
+    public PluginConfig(@NotNull JavaPlugin plugin, @NotNull String resourcePath, @NotNull String fileName) {
+        this(plugin, resourcePath, new File(plugin.getDataFolder(), fileName));
+    }
+
     public PluginConfig(@NotNull JavaPlugin plugin, @NotNull String fileName) {
-        this(plugin, fileName, new File(plugin.getDataFolder(), fileName));
+        this(plugin, fileName, fileName);
     }
 
     public @NotNull JavaPlugin getPlugin() {
@@ -95,23 +103,8 @@ public class PluginConfig {
                 throw new RuntimeException(e);
             }
         }
-        config = loader.loadConfiguration(file);
+        setRaw(loader.loadConfiguration(file));
         // TODO: match
-        plugin.getLogger().info(file.getName() + " loaded");
-    }
-
-    @NotNull
-    public <T> T get(@NotNull ConfigValue<T> configValue) {
-        String path = configValue.getPath();
-        Object obj = config.get(path);
-        if (obj == null) {
-            T defaultValue = configValue.getDefaultValue();
-            if (defaultValue == null) {
-                throw new NullPointerException("Config value at '" + path + "' is null");
-            }
-            return defaultValue;
-        }
-        return configValue.getDeserializer().deserialize(obj);
     }
 
     @FunctionalInterface

@@ -21,7 +21,7 @@ package me.nelonn.propack.cli.command;
 import me.nelonn.propack.core.ProPackCore;
 import me.nelonn.propack.core.builder.InternalProject;
 import me.nelonn.propack.core.util.LogManagerCompat;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import picocli.CommandLine;
 
 import java.io.File;

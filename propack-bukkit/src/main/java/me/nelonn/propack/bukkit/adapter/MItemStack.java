@@ -16,19 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.util;
+package me.nelonn.propack.bukkit.adapter;
 
+import me.nelonn.flint.path.Identifier;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.Nullable;
 
-public final class LogManagerCompat {
+public interface MItemStack {
+    @NotNull Identifier getItemId();
 
-    public static @NotNull Logger getLogger() {
-        return LoggerFactory.getLogger("ProPack");
-    }
-
-    private LogManagerCompat() {
-        throw new UnsupportedOperationException();
-    }
+    @Nullable MCompoundTag getTag();
 }

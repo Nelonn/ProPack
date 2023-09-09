@@ -24,12 +24,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 public final class Sha1 {
     private final byte[] bytes;
     private final String string;
 
-    private Sha1(byte @NotNull [] bytes, @NotNull String string) {
+    private Sha1(byte[] bytes, @NotNull String string) {
         this.bytes = bytes;
         this.string = string;
     }
@@ -49,20 +50,20 @@ public final class Sha1 {
         return asString();
     }
 
-    public static @NotNull Sha1 hash(@NotNull InputStream inputStream) throws IOException, NoSuchAlgorithmException {
-        byte[] bytes = bytes(inputStream);
-        String string = bytesToString(bytes);
-        return new Sha1(bytes, string);
+    public static @NotNull Sha1 fromHashBytes(byte[] hash) {
+        return new Sha1(Arrays.copyOf(hash, hash.length), bytesToString(hash));
     }
 
-    public static @NotNull Sha1 fromHashBytes(byte @NotNull [] hash) {
-        byte[] bytes = new byte[hash.length];
-        System.arraycopy(hash, 0, bytes, 0, hash.length);
-        String string = bytesToString(bytes);
-        return new Sha1(bytes, string);
+    public static @NotNull Sha1 fromHashString(@NotNull String hash) {
+        return new Sha1(stringToBytes(hash), hash);
     }
 
-    private static byte @NotNull [] bytes(@NotNull InputStream inputStream) throws IOException, NoSuchAlgorithmException {
+    public static @NotNull Sha1 fromInputStream(@NotNull InputStream inputStream) throws IOException, NoSuchAlgorithmException {
+        byte[] bytes = hash(inputStream);
+        return fromHashBytes(bytes);
+    }
+
+    private static byte @NotNull [] hash(@NotNull InputStream inputStream) throws IOException, NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-1");
         byte[] buffer = new byte[8 * 1024];
         int read;
@@ -72,7 +73,7 @@ public final class Sha1 {
         return digest.digest();
     }
 
-    private static @NotNull String bytesToString(byte @NotNull [] hash) {
+    private static @NotNull String bytesToString(byte[] hash) {
         StringBuilder sb = new StringBuilder();
         for (byte b : hash) {
             int value = b & 0xFF;
@@ -82,5 +83,19 @@ public final class Sha1 {
             sb.append(Integer.toHexString(value));
         }
         return sb.toString();
+    }
+
+    private static byte[] stringToBytes(@NotNull String hash) {
+        int length = hash.length();
+        if (length % 2 != 0) {
+            throw new IllegalArgumentException("Invalid SHA-1 string length");
+        }
+        byte[] bytes = new byte[length / 2];
+        for (int i = 0; i < length; i += 2) {
+            String hexByte = hash.substring(i, i + 2);
+            byte b = (byte) Integer.parseInt(hexByte, 16);
+            bytes[i / 2] = b;
+        }
+        return bytes;
     }
 }

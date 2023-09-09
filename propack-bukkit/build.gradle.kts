@@ -60,6 +60,8 @@ dependencies {
     "compileOnly"("me.clip:placeholderapi:2.11.2")
     //"compileOnly"("com.github.oraxen:oraxen:-SNAPSHOT")
 
+    "compileOnly"("org.slf4j:slf4j-api:2.0.7")
+
     "implementation"("org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r")
     "implementation"("commons-io:commons-io:2.11.0")
     "implementation"("org.apache.commons:commons-lang3:3.12.0")

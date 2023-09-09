@@ -18,18 +18,20 @@
 
 package me.nelonn.propack.bukkit.adapter;
 
+import me.nelonn.propack.bukkit.adapter.packet.MClientboundContainerSetSlotPacket;
+import me.nelonn.propack.bukkit.adapter.packet.MServerboundSetCreativeModeSlotPacket;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
 public interface Adapter {
-    void patchSetCreativeSlot(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
+    @NotNull MServerboundSetCreativeModeSlotPacket adaptPacket1(@NotNull Object packet);
 
-    void patchSetSlot(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
+    @NotNull MClientboundContainerSetSlotPacket adaptPacket2(@NotNull Object packet);
 
-    void patchSetContent(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
+    void patchSetContent(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 
-    void patchEntityEquipment(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
+    void patchEntityEquipment(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 
-    void patchSetEntityData(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
+    void patchSetEntityData(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 }

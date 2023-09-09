@@ -16,20 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.adapter;
+package me.nelonn.propack.bukkit.adapter.packet;
 
-import org.jetbrains.annotations.NotNull;
+import me.nelonn.propack.bukkit.adapter.MItemStack;
 
-public interface WrappedCompoundTag {
-    boolean contains(@NotNull String key, int type);
+public interface MServerboundSetCreativeModeSlotPacket {
 
-    void putInt(@NotNull String key, int value);
+    int getSlotNum();
 
-    @NotNull String getString(@NotNull String key);
+    MItemStack getItem();
 
-    @NotNull WrappedCompoundTag getCompound(@NotNull String key);
-
-    @NotNull WrappedListTag getList(@NotNull String key, int type);
-
-    void remove(@NotNull String key);
 }

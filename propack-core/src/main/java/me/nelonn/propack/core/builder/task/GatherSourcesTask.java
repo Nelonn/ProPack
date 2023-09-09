@@ -25,15 +25,15 @@ import me.nelonn.propack.builder.StrictMode;
 import me.nelonn.propack.builder.file.JsonFile;
 import me.nelonn.propack.builder.file.RealFile;
 import me.nelonn.propack.builder.file.TextFile;
-import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.builder.task.AbstractTask;
 import me.nelonn.propack.builder.task.TaskBootstrap;
+import me.nelonn.propack.builder.task.TaskIO;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.PathUtil;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.regex.Pattern;

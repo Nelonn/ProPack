@@ -18,12 +18,12 @@
 
 package me.nelonn.propack.bukkit.adapter;
 
-import me.nelonn.flint.path.Identifier;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public interface WrappedItemStack {
-    @NotNull Identifier getItemId();
+import java.util.Collection;
 
-    @Nullable WrappedCompoundTag getTag();
+public interface MListTag {
+
+    @NotNull Collection<String> asStringCollection();
+
 }

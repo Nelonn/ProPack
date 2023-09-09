@@ -38,6 +38,9 @@ import me.nelonn.propack.core.util.PathUtil;
 import me.nelonn.propack.core.util.Util;
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,6 +55,7 @@ public class ObfuscateTask extends AbstractTask {
     public void run(@NotNull TaskIO io) {
         ObfuscationConfiguration conf = getProject().getBuildConfiguration().getObfuscationConfiguration();
         String obfuscatedNamespace = conf.getNamespace();
+        String obfuscateTexturesAtlasesFolder = conf.getTexturesAtlasesFolder();
         ObfuscatedNamer namer = new ObfuscatedNamer();
         // Obfuscate meshes
         if (conf.isMeshes()) {
@@ -162,7 +166,16 @@ public class ObfuscateTask extends AbstractTask {
                     String filePath = file.getPath();
                     if (!filePath.startsWith("content/") || !filePath.endsWith(".png")) continue;
                     Path resourcePath = PathUtil.resourcePath(filePath, ".png");
-                    Path obfuscatedPath = Path.of(obfuscatedNamespace, namer.next());
+                    boolean trueResolution = false;
+                    try (InputStream inputStream = file.openInputStream()) {
+                        BufferedImage image = ImageIO.read(inputStream);
+                        trueResolution = image.getHeight() >= 16 && image.getWidth() >= 16;
+                    }
+                    String obfuscatedName = namer.next();
+                    if (trueResolution) {
+                        obfuscatedName = obfuscateTexturesAtlasesFolder + '/' + obfuscatedName;
+                    }
+                    Path obfuscatedPath = Path.of(obfuscatedNamespace, obfuscatedName);
                     io.getFiles().addFile(file.copyAs(PathUtil.assetsPath(obfuscatedPath, "textures") + ".png"));
                     pngMapping.put(resourcePath, obfuscatedPath);
                     io.getFiles().removeFile(filePath);

@@ -31,8 +31,8 @@ import me.nelonn.propack.builder.util.Extra;
 import me.nelonn.propack.core.builder.MeshesMapBuilder;
 import me.nelonn.propack.core.builder.asset.*;
 import me.nelonn.propack.core.util.LogManagerCompat;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.awt.*;
 import java.io.File;

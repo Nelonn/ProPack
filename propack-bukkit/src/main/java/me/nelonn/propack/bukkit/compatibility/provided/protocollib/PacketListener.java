@@ -35,9 +35,9 @@ import me.nelonn.propack.bukkit.Config;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.adapter.Adapter;
-import me.nelonn.propack.bukkit.adapter.WrappedCompoundTag;
-import me.nelonn.propack.bukkit.adapter.WrappedItemStack;
-import me.nelonn.propack.bukkit.adapter.WrappedListTag;
+import me.nelonn.propack.bukkit.adapter.MCompoundTag;
+import me.nelonn.propack.bukkit.adapter.MItemStack;
+import me.nelonn.propack.bukkit.adapter.MListTag;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +50,6 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("deprecation")
 public class PacketListener extends PacketAdapter {
-    private static final String CUSTOM_MODEL_FIELD = "CustomModel";
     private static final String CUSTOM_MODEL_DATA_FIELD = "CustomModelData";
     private final Adapter adapter;
     private final ProPackPlugin plugin;
@@ -94,7 +93,7 @@ public class PacketListener extends PacketAdapter {
         PacketType type = event.getPacketType();
         Object packet = event.getPacket().getHandle();
         if (type == PacketType.Play.Client.SET_CREATIVE_SLOT && plugin.config().get(Config.patchPacketItems)) {
-            adapter.patchSetCreativeSlot(packet, this::patchInItems);
+            patchInItems(adapter.adaptPacket1(packet).getItem());
         }
     }
 
@@ -106,9 +105,11 @@ public class PacketListener extends PacketAdapter {
         if (resourcePack.isEmpty()) return;
         final Resources resources = resourcePack.get().resources();
         if (plugin.config().get(Config.patchPacketItems)) {
-            BiConsumer<Object, Consumer<WrappedItemStack>> method;
+            BiConsumer<Object, Consumer<MItemStack>> method;
             if (type == PacketType.Play.Server.SET_SLOT) {
-                method = adapter::patchSetSlot;
+                method = (rawPacket, patcher) -> { // TEMP
+                    patcher.accept(adapter.adaptPacket2(rawPacket).getItem());
+                };
             } else if (type == PacketType.Play.Server.WINDOW_ITEMS) {
                 method = adapter::patchSetContent;
             } else if (type == PacketType.Play.Server.ENTITY_EQUIPMENT) {
@@ -134,18 +135,18 @@ public class PacketListener extends PacketAdapter {
         }
     }
 
-    private void patchInItems(WrappedItemStack itemStack) {
-        WrappedCompoundTag tag = itemStack.getTag();
+    private void patchInItems(MItemStack itemStack) {
+        MCompoundTag tag = itemStack.getTag();
         if (tag == null || !tag.contains(CUSTOM_MODEL_DATA_FIELD, NbtType.TAG_INT.getRawID()) ||
-                !tag.contains(CUSTOM_MODEL_FIELD, NbtType.TAG_STRING.getRawID())) return;
+                !tag.contains(ProPack.CUSTOM_MODEL, NbtType.TAG_STRING.getRawID())) return;
         tag.remove(CUSTOM_MODEL_DATA_FIELD);
     }
 
-    private void patchOutItems(@NotNull WrappedItemStack itemStack, @NotNull Resources resources) {
+    private void patchOutItems(@NotNull MItemStack itemStack, @NotNull Resources resources) {
         try {
-            WrappedCompoundTag tag = itemStack.getTag();
-            if (tag == null || !tag.contains(CUSTOM_MODEL_FIELD, NbtType.TAG_STRING.getRawID())) return;
-            String customModel = tag.getString(CUSTOM_MODEL_FIELD);
+            MCompoundTag tag = itemStack.getTag();
+            if (tag == null || !tag.contains(ProPack.CUSTOM_MODEL, NbtType.TAG_STRING.getRawID())) return;
+            String customModel = tag.getString(ProPack.CUSTOM_MODEL);
             if (customModel.isEmpty()) return;
             Path path;
             try {
@@ -159,10 +160,10 @@ public class PacketListener extends PacketAdapter {
             if (itemModel instanceof DefaultItemModel defaultItemModel) {
                 mesh = defaultItemModel.getMesh();
             } else if (itemModel instanceof CombinedItemModel combinedItemModel) {
-                WrappedListTag listTag = tag.getList("ModelElements", NbtType.TAG_STRING.getRawID());
+                MListTag listTag = tag.getList("ModelElements", NbtType.TAG_STRING.getRawID());
                 mesh = combinedItemModel.getMesh(listTag.asStringCollection().toArray(new String[0]));
             } else if (itemModel instanceof SlotItemModel slotItemModel) {
-                WrappedCompoundTag slotsTag = tag.getCompound("ModelSlots");
+                MCompoundTag slotsTag = tag.getCompound("ModelSlots");
                 Map<String, String> slots = new HashMap<>();
                 for (SlotItemModel.Slot slot : slotItemModel.getSlots()) {
                     String element = slotsTag.getString(slot.getName());

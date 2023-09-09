@@ -16,19 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.core.util;
+package me.nelonn.propack.bukkit.adapter.packet;
 
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import me.nelonn.propack.bukkit.adapter.MItemStack;
 
-public final class LogManagerCompat {
+public interface MClientboundContainerSetSlotPacket {
 
-    public static @NotNull Logger getLogger() {
-        return LoggerFactory.getLogger("ProPack");
-    }
+    int getContainerId();
 
-    private LogManagerCompat() {
-        throw new UnsupportedOperationException();
-    }
+    int getSlot();
+
+    MItemStack getItem();
+
+    int getStateId();
+
 }

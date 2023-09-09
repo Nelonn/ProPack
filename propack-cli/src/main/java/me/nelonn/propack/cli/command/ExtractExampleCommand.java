@@ -19,9 +19,9 @@
 package me.nelonn.propack.cli.command;
 
 import me.nelonn.propack.cli.CLI;
+import me.nelonn.propack.core.util.JarResources;
 import me.nelonn.propack.core.util.LogManagerCompat;
-import me.nelonn.propack.core.util.IOUtil;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -36,7 +36,7 @@ public class ExtractExampleCommand implements Runnable {
     @Override
     public void run() {
         File directory = dir != null ? new File(dir) : new File("./");
-        IOUtil.extractResources(CLI.class, "example/", new File(directory, "example"));
+        JarResources.extractDirectory(CLI.class, "resources/example/", new File(directory, "example"));
     }
 
 }

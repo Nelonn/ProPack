@@ -21,10 +21,9 @@ package me.nelonn.propack.bukkit.adapter.impl.v1_20_R1;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import me.nelonn.flint.path.Identifier;
-import me.nelonn.propack.bukkit.adapter.Adapter;
-import me.nelonn.propack.bukkit.adapter.WrappedCompoundTag;
-import me.nelonn.propack.bukkit.adapter.WrappedItemStack;
-import me.nelonn.propack.bukkit.adapter.WrappedListTag;
+import me.nelonn.propack.bukkit.adapter.*;
+import me.nelonn.propack.bukkit.adapter.packet.MClientboundContainerSetSlotPacket;
+import me.nelonn.propack.bukkit.adapter.packet.MServerboundSetCreativeModeSlotPacket;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -41,37 +40,90 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class PaperweightAdapter implements Adapter {
-    @Override
-    public void patchSetCreativeSlot(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher) {
-        ServerboundSetCreativeModeSlotPacket nms = (ServerboundSetCreativeModeSlotPacket) packet;
-        patcher.accept(new CraftItemStack(nms.getItem()));
-    }
 
-    @Override
-    public void patchSetSlot(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher) {
-        ClientboundContainerSetSlotPacket nms = (ClientboundContainerSetSlotPacket) packet;
-        patcher.accept(new CraftItemStack(nms.getItem()));
-    }
+    private static class CraftServerboundSetCreativeModeSlotPacket implements MServerboundSetCreativeModeSlotPacket {
+        public static @Nullable CraftServerboundSetCreativeModeSlotPacket of(final @Nullable ServerboundSetCreativeModeSlotPacket handle) {
+            return handle == null ? null : new CraftServerboundSetCreativeModeSlotPacket(handle);
+        }
 
-    @Override
-    public void patchSetContent(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher) {
-        ClientboundContainerSetContentPacket nms = (ClientboundContainerSetContentPacket) packet;
-        for (ItemStack itemStack : nms.getItems()) {
-            patcher.accept(new CraftItemStack(itemStack));
+        private final ServerboundSetCreativeModeSlotPacket handle;
+
+        private CraftServerboundSetCreativeModeSlotPacket(final @NotNull ServerboundSetCreativeModeSlotPacket handle) {
+            this.handle = handle;
+        }
+
+        @Override
+        public int getSlotNum() {
+            return handle.getSlotNum();
+        }
+
+        @Override
+        public MItemStack getItem() {
+            return CraftItemStack.of(handle.getItem());
         }
     }
 
     @Override
-    public void patchEntityEquipment(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher) {
+    public @NotNull MServerboundSetCreativeModeSlotPacket adaptPacket1(@NotNull Object packet) {
+        return CraftServerboundSetCreativeModeSlotPacket.of((ServerboundSetCreativeModeSlotPacket) packet);
+    }
+
+    private static class CraftClientboundContainerSetSlotPacket implements MClientboundContainerSetSlotPacket {
+        public static @Nullable CraftClientboundContainerSetSlotPacket of(final @Nullable ClientboundContainerSetSlotPacket handle) {
+            return handle == null ? null : new CraftClientboundContainerSetSlotPacket(handle);
+        }
+
+        private final ClientboundContainerSetSlotPacket handle;
+
+        private CraftClientboundContainerSetSlotPacket(final @NotNull ClientboundContainerSetSlotPacket handle) {
+            this.handle = handle;
+        }
+
+        @Override
+        public int getContainerId() {
+            return handle.getContainerId();
+        }
+
+        @Override
+        public int getSlot() {
+            return handle.getSlot();
+        }
+
+        @Override
+        public MItemStack getItem() {
+            return CraftItemStack.of(handle.getItem());
+        }
+
+        @Override
+        public int getStateId() {
+            return handle.getStateId();
+        }
+    }
+
+    @Override
+    public @NotNull MClientboundContainerSetSlotPacket adaptPacket2(@NotNull Object packet) {
+        return CraftClientboundContainerSetSlotPacket.of((ClientboundContainerSetSlotPacket) packet);
+    }
+
+    @Override
+    public void patchSetContent(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
+        ClientboundContainerSetContentPacket nms = (ClientboundContainerSetContentPacket) packet;
+        for (ItemStack itemStack : nms.getItems()) {
+            patcher.accept(CraftItemStack.of(itemStack));
+        }
+    }
+
+    @Override
+    public void patchEntityEquipment(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
         ClientboundSetEquipmentPacket nms = (ClientboundSetEquipmentPacket) packet;
         for (Pair<EquipmentSlot, ItemStack> slot : nms.getSlots()) {
-            patcher.accept(new CraftItemStack(slot.getSecond()));
+            patcher.accept(CraftItemStack.of(slot.getSecond()));
         }
     }
 
     // not tested
     @Override
-    public void patchSetEntityData(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher) {
+    public void patchSetEntityData(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
         ClientboundSetEntityDataPacket nms = (ClientboundSetEntityDataPacket) packet;
         List<SynchedEntityData.DataValue<?>> packetItems = nms.packedItems();
         List<SynchedEntityData.DataValue<?>> list = packetItems.stream()
@@ -80,13 +132,17 @@ public class PaperweightAdapter implements Adapter {
         for (SynchedEntityData.DataValue<?> entry : list) {
             packetItems.remove(entry);
             ItemStack itemStack = ((ItemStack) entry.value()).copy();
-            patcher.accept(new CraftItemStack(itemStack));
+            patcher.accept(CraftItemStack.of(itemStack));
             SynchedEntityData.DataValue<ItemStack> newItem = new SynchedEntityData.DataValue<>(entry.id(), EntityDataSerializers.ITEM_STACK, itemStack);
             packetItems.add(newItem);
         }
     }
 
-    private static class CraftItemStack implements WrappedItemStack {
+    private static class CraftItemStack implements MItemStack {
+        public static @Nullable CraftItemStack of(final @Nullable ItemStack handle) {
+            return handle == null ? null : new CraftItemStack(handle);
+        }
+
         private final ItemStack handle;
 
         public CraftItemStack(final @NotNull ItemStack handle) {
@@ -100,11 +156,15 @@ public class PaperweightAdapter implements Adapter {
 
         @Override
         public @Nullable CraftCompoundTag getTag() {
-            return handle.hasTag() ? new CraftCompoundTag(handle.getTag()) : null;
+            return CraftCompoundTag.of(handle.getTag());
         }
     }
 
-    private static class CraftCompoundTag implements WrappedCompoundTag {
+    private static class CraftCompoundTag implements MCompoundTag {
+        public static @Nullable CraftCompoundTag of(final @Nullable CompoundTag handle) {
+            return handle == null ? null : new CraftCompoundTag(handle);
+        }
+
         private final CompoundTag handle;
 
         public CraftCompoundTag(final @NotNull CompoundTag handle) {
@@ -128,12 +188,12 @@ public class PaperweightAdapter implements Adapter {
 
         @Override
         public @NotNull CraftCompoundTag getCompound(@NotNull String key) {
-            return new CraftCompoundTag(handle.getCompound(key));
+            return CraftCompoundTag.of(handle.getCompound(key));
         }
 
         @Override
         public @NotNull CraftListTag getList(@NotNull String key, int type) {
-            return new CraftListTag(handle.getList(key, type));
+            return CraftListTag.of(handle.getList(key, type));
         }
 
         @Override
@@ -142,7 +202,11 @@ public class PaperweightAdapter implements Adapter {
         }
     }
 
-    public static class CraftListTag implements WrappedListTag {
+    public static class CraftListTag implements MListTag {
+        public static @Nullable CraftListTag of(final @Nullable ListTag handle) {
+            return handle == null ? null : new CraftListTag(handle);
+        }
+        
         private final ListTag handle;
 
         public CraftListTag(final @NotNull ListTag handle) {

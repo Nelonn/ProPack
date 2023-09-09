@@ -18,9 +18,9 @@
 
 package me.nelonn.propack.module;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 
@@ -32,7 +32,7 @@ public class ModuleProviderContextImpl implements ModuleProviderContext {
     public ModuleProviderContextImpl(@NotNull ModuleDescription description, @NotNull Path dataDirectory) {
         this.description = description;
         this.dataDirectory = dataDirectory;
-        this.logger = LogManager.getLogger(description.getLoggerPrefix());
+        this.logger = LoggerFactory.getLogger(description.getLoggerPrefix());
     }
 
     @Override
