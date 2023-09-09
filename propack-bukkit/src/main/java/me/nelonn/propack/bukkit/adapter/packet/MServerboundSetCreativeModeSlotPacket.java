@@ -16,22 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.adapter;
+package me.nelonn.propack.bukkit.adapter.packet;
 
-import me.nelonn.propack.bukkit.adapter.packet.MClientboundContainerSetSlotPacket;
-import me.nelonn.propack.bukkit.adapter.packet.MServerboundSetCreativeModeSlotPacket;
-import org.jetbrains.annotations.NotNull;
+import me.nelonn.propack.bukkit.adapter.MItemStack;
 
-import java.util.function.Consumer;
+public interface MServerboundSetCreativeModeSlotPacket {
 
-public interface Adapter {
-    @NotNull MServerboundSetCreativeModeSlotPacket adaptPacket1(@NotNull Object packet);
+    int getSlotNum();
 
-    @NotNull MClientboundContainerSetSlotPacket adaptPacket2(@NotNull Object packet);
+    MItemStack getItem();
 
-    void patchSetContent(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
-
-    void patchEntityEquipment(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
-
-    void patchSetEntityData(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 }

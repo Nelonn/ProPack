@@ -93,7 +93,7 @@ public class PacketListener extends PacketAdapter {
         PacketType type = event.getPacketType();
         Object packet = event.getPacket().getHandle();
         if (type == PacketType.Play.Client.SET_CREATIVE_SLOT && plugin.config().get(Config.patchPacketItems)) {
-            adapter.patchSetCreativeSlot(packet, this::patchInItems);
+            patchInItems(adapter.adaptPacket1(packet).getItem());
         }
     }
 
@@ -107,7 +107,9 @@ public class PacketListener extends PacketAdapter {
         if (plugin.config().get(Config.patchPacketItems)) {
             BiConsumer<Object, Consumer<MItemStack>> method;
             if (type == PacketType.Play.Server.SET_SLOT) {
-                method = adapter::patchSetSlot;
+                method = (rawPacket, patcher) -> { // TEMP
+                    patcher.accept(adapter.adaptPacket2(rawPacket).getItem());
+                };
             } else if (type == PacketType.Play.Server.WINDOW_ITEMS) {
                 method = adapter::patchSetContent;
             } else if (type == PacketType.Play.Server.ENTITY_EQUIPMENT) {

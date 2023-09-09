@@ -21,10 +21,9 @@ package me.nelonn.propack.bukkit.adapter.impl.v1_19_R2;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import me.nelonn.flint.path.Identifier;
-import me.nelonn.propack.bukkit.adapter.Adapter;
-import me.nelonn.propack.bukkit.adapter.MCompoundTag;
-import me.nelonn.propack.bukkit.adapter.MItemStack;
-import me.nelonn.propack.bukkit.adapter.MListTag;
+import me.nelonn.propack.bukkit.adapter.*;
+import me.nelonn.propack.bukkit.adapter.packet.MClientboundContainerSetSlotPacket;
+import me.nelonn.propack.bukkit.adapter.packet.MServerboundSetCreativeModeSlotPacket;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -41,16 +40,69 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class PaperweightAdapter implements Adapter {
-    @Override
-    public void patchSetCreativeSlot(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
-        ServerboundSetCreativeModeSlotPacket nms = (ServerboundSetCreativeModeSlotPacket) packet;
-        patcher.accept(CraftItemStack.of(nms.getItem()));
+
+    private static class CraftServerboundSetCreativeModeSlotPacket implements MServerboundSetCreativeModeSlotPacket {
+        public static @Nullable CraftServerboundSetCreativeModeSlotPacket of(final @Nullable ServerboundSetCreativeModeSlotPacket handle) {
+            return handle == null ? null : new CraftServerboundSetCreativeModeSlotPacket(handle);
+        }
+
+        private final ServerboundSetCreativeModeSlotPacket handle;
+
+        private CraftServerboundSetCreativeModeSlotPacket(final @NotNull ServerboundSetCreativeModeSlotPacket handle) {
+            this.handle = handle;
+        }
+
+        @Override
+        public int getSlotNum() {
+            return handle.getSlotNum();
+        }
+
+        @Override
+        public MItemStack getItem() {
+            return CraftItemStack.of(handle.getItem());
+        }
     }
 
     @Override
-    public void patchSetSlot(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
-        ClientboundContainerSetSlotPacket nms = (ClientboundContainerSetSlotPacket) packet;
-        patcher.accept(CraftItemStack.of(nms.getItem()));
+    public @NotNull MServerboundSetCreativeModeSlotPacket adaptPacket1(@NotNull Object packet) {
+        return CraftServerboundSetCreativeModeSlotPacket.of((ServerboundSetCreativeModeSlotPacket) packet);
+    }
+
+    private static class CraftClientboundContainerSetSlotPacket implements MClientboundContainerSetSlotPacket {
+        public static @Nullable CraftClientboundContainerSetSlotPacket of(final @Nullable ClientboundContainerSetSlotPacket handle) {
+            return handle == null ? null : new CraftClientboundContainerSetSlotPacket(handle);
+        }
+
+        private final ClientboundContainerSetSlotPacket handle;
+
+        private CraftClientboundContainerSetSlotPacket(final @NotNull ClientboundContainerSetSlotPacket handle) {
+            this.handle = handle;
+        }
+
+        @Override
+        public int getContainerId() {
+            return handle.getContainerId();
+        }
+
+        @Override
+        public int getSlot() {
+            return handle.getSlot();
+        }
+
+        @Override
+        public MItemStack getItem() {
+            return CraftItemStack.of(handle.getItem());
+        }
+
+        @Override
+        public int getStateId() {
+            return handle.getStateId();
+        }
+    }
+
+    @Override
+    public @NotNull MClientboundContainerSetSlotPacket adaptPacket2(@NotNull Object packet) {
+        return CraftClientboundContainerSetSlotPacket.of((ClientboundContainerSetSlotPacket) packet);
     }
 
     @Override
