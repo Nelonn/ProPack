@@ -23,7 +23,7 @@ import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
 import me.nelonn.propack.bukkit.config.PluginConfig;
 import me.nelonn.propack.bukkit.dispatcher.ActivePackStore;
 import me.nelonn.propack.core.DevServer;
-import me.nelonn.propack.core.util.IOUtil;
+import me.nelonn.propack.core.util.JarResources;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
@@ -53,13 +53,13 @@ public final class ProPackPlugin extends JavaPlugin {
 
         File modulesDir = new File(getDataFolder(), "modules");
         if (!getDataFolder().exists()) {
-            IOUtil.extractResources(ProPackPlugin.class, "resources/example/", new File(getDataFolder(), "example"));
-            IOUtil.extractResource(ProPackPlugin.class, "resources/example.json", new File(getDataFolder(), "example.json"));
-            IOUtil.extractResource(ProPackPlugin.class, "resources/config.yml", new File(getDataFolder(), "config.yml"));
+            JarResources.extractDirectory(this, "resources/example/", new File(getDataFolder(), "example"));
+            JarResources.extractFile(this, "resources/example.json", new File(getDataFolder(), "example.json"));
+            JarResources.extractFile(this, "resources/config.yml", new File(getDataFolder(), "config.yml"));
             modulesDir.mkdirs();
         } else {
             if (!new File(getDataFolder(), "config.yml").exists()) {
-                IOUtil.extractResource(ProPackPlugin.class, "resources/config.yml", new File(getDataFolder(), "config.yml"));
+                JarResources.extractFile(this, "resources/config.yml", new File(getDataFolder(), "config.yml"));
             }
             if (!modulesDir.exists()) {
                 modulesDir.mkdirs();

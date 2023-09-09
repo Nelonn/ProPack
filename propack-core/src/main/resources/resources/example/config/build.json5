@@ -1,27 +1,28 @@
 {
   // Available options: false, 'warn', true
-  Strict: true,
+  "Strict": true,
   // Ignore directory regexps
-  DirIgnore: [
+  "DirIgnore": [
     "^\\.old$",
     "^\\.src$",
     "^\\.ignore$"
   ],
   // Ignore file regexps
-  FileIgnore: [
+  "FileIgnore": [
     "\\.old\\.png$",
     "\\.psd$",
     "\\.txt$",
     "\\.md$"
   ],
-  Obfuscation: {
-    Enabled: true,
-    Namespace: "obfuscated",
-    ShuffleSequence: true,
-    Meshes: true,
-    Textures: true,
-    Ogg: true,
-    Sounds: true,
-    Fonts: true
+  "Obfuscation": {
+    "Enabled": true,
+    "Namespace": "obfuscated",
+    "ShuffleSequence": true,
+    "Meshes": true,
+    "Textures": true,
+    "TexturesAtlasesFolder": "1",
+    "Ogg": true,
+    "Sounds": true,
+    "Fonts": true
   }
 }

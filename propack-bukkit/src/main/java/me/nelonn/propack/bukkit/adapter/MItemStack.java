@@ -22,8 +22,8 @@ import me.nelonn.flint.path.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface WrappedItemStack {
+public interface MItemStack {
     @NotNull Identifier getItemId();
 
-    @Nullable WrappedCompoundTag getTag();
+    @Nullable MCompoundTag getTag();
 }

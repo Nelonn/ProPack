@@ -203,12 +203,21 @@ public class ProjectLoader {
             boolean obfuscateShuffleSequence = GsonHelper.getBoolean(obfuscationObject, "ShuffleSequence", false);
             boolean obfuscateMeshes = GsonHelper.getBoolean(obfuscationObject, "Meshes", false);
             boolean obfuscateTextures = GsonHelper.getBoolean(obfuscationObject, "Textures", false);
+            String obfuscateTexturesAtlasesFolder = GsonHelper.getString(obfuscationObject, "TexturesAtlasesFolder", "1");
             boolean obfuscateOgg = GsonHelper.getBoolean(obfuscationObject, "Ogg", false);
             boolean obfuscateSounds = GsonHelper.getBoolean(obfuscationObject, "Sounds", false);
             boolean obfuscateFonts = GsonHelper.getBoolean(obfuscationObject, "Fonts", false);
 
+            if (obfuscateTexturesAtlasesFolder.startsWith("/")) {
+                obfuscateTexturesAtlasesFolder = obfuscateTexturesAtlasesFolder.substring(1);
+            }
+            if (obfuscateTexturesAtlasesFolder.endsWith("/")) {
+                obfuscateTexturesAtlasesFolder = obfuscateTexturesAtlasesFolder.substring(0, obfuscateTexturesAtlasesFolder.length() - 1);
+            }
+
             obfuscationConfiguration = new ObfuscationConfiguration(obfuscationEnabled, obfuscatedNamespace,
-                    obfuscateShuffleSequence, obfuscateMeshes, obfuscateTextures, obfuscateOgg, obfuscateSounds, obfuscateFonts);
+                    obfuscateShuffleSequence, obfuscateMeshes, obfuscateTextures, obfuscateTexturesAtlasesFolder,
+                    obfuscateOgg, obfuscateSounds, obfuscateFonts);
         } catch (Exception e) {
             throw new IllegalArgumentException("Something went wrong when loading 'config/build.json5'", e);
         }

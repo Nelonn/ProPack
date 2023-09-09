@@ -23,13 +23,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
 public interface Adapter {
-    void patchSetCreativeSlot(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
+    void patchSetCreativeSlot(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 
-    void patchSetSlot(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
+    void patchSetSlot(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 
-    void patchSetContent(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
+    void patchSetContent(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 
-    void patchEntityEquipment(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
+    void patchEntityEquipment(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 
-    void patchSetEntityData(@NotNull Object packet, @NotNull Consumer<WrappedItemStack> patcher);
+    void patchSetEntityData(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 }

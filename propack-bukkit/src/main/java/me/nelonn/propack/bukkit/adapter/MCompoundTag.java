@@ -20,10 +20,16 @@ package me.nelonn.propack.bukkit.adapter;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
+public interface MCompoundTag {
+    boolean contains(@NotNull String key, int type);
 
-public interface WrappedListTag {
+    void putInt(@NotNull String key, int value);
 
-    @NotNull Collection<String> asStringCollection();
+    @NotNull String getString(@NotNull String key);
 
+    @NotNull MCompoundTag getCompound(@NotNull String key);
+
+    @NotNull MListTag getList(@NotNull String key, int type);
+
+    void remove(@NotNull String key);
 }

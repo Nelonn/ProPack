@@ -22,16 +22,10 @@ import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.jar.JarInputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public final class IOUtil {
     public static byte[] readAllBytes(@NotNull InputStream in) throws IOException {
@@ -118,74 +112,6 @@ public final class IOUtil {
     public static String readString(@NotNull File file) throws IOException {
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
             return IOUtils.toString(fileInputStream, StandardCharsets.UTF_8);
-        }
-    }
-
-    /**
-     * Extract files from jar
-     *
-     * @param source the class from which to take jar
-     * @param from   directory in jar, example: "example/"
-     * @param to     output file
-     */
-    public static void extractResources(@NotNull Class<?> source, @NotNull String from, @NotNull File to) {
-        try {
-            ZipInputStream jar;
-            try {
-                jar = new JarInputStream(source.getProtectionDomain().getCodeSource().getLocation().openStream());
-            } catch (Exception e) {
-                throw new IllegalStateException("An error occurred browsing the zip", e);
-            }
-
-            ZipEntry entry = jar.getNextEntry();
-            while (entry != null) {
-                String absolutePath = entry.getName();
-                if (!entry.isDirectory() && absolutePath.startsWith(from)) {
-                    String relativePath = absolutePath.substring(from.length());
-                    File outFile = new File(to, relativePath);
-                    int lastIndex = relativePath.lastIndexOf('/');
-                    File outDir = new File(to, relativePath.substring(0, Math.max(lastIndex, 0)));
-                    if (!outDir.exists()) {
-                        outDir.mkdirs();
-                    }
-                    extractResource(source, absolutePath, outFile);
-                }
-                entry = jar.getNextEntry();
-            }
-            jar.closeEntry();
-            jar.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void extractResource(@NotNull Class<?> source, @NotNull String input, @NotNull File output) {
-        try {
-            URL url = source.getClassLoader().getResource(input);
-            if (url == null) {
-                throw new IllegalArgumentException("The embedded resource '" + input + "' cannot be found in jar");
-            }
-            URLConnection connection = url.openConnection();
-            connection.setUseCaches(false);
-            try (InputStream in = connection.getInputStream()) {
-                if (in == null) {
-                    throw new IllegalArgumentException("The embedded resource '" + input + "' cannot be found in jar");
-                }
-                try {
-                    if (output.exists()) return;
-                    try (OutputStream out = Files.newOutputStream(output.toPath())) {
-                        byte[] buffer = new byte[1024];
-                        int bytes;
-                        while ((bytes = in.read(buffer)) > 0) {
-                            out.write(buffer, 0, bytes);
-                        }
-                    }
-                } catch (IOException e) {
-                    //LOGGER.error("Could not save " + outFile.getName() + " to " + outFile, e);
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 
