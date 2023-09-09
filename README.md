@@ -120,7 +120,7 @@ Sound files must ends with `.sound.json`, eg. `scream.sound.json`
 
 Sound file paths can be relative, example `../folder/sound`.
 
-FFmpeg auto conversion is supported. Use `-Dpropack.ffmpeg=path` to indicate its location,
+FFmpeg auto conversion is supported. Optionally, use `-Dpropack.ffmpeg=path` to define its location,
 by default it `ffmpeg`
 
 
