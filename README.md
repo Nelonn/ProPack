@@ -14,7 +14,7 @@ Modern solution for minecraft resource pack development
 
 
 ## Example Project
-Look at the [example project](https://github.com/Nelonn/ProPack/blob/master/propack-core/src/main/resources/example)
+Look at the [example project](https://github.com/Nelonn/ProPack/blob/master/propack-core/src/main/resources/resources/example)
 
 
 ## Json specification
