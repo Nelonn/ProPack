@@ -9,6 +9,7 @@
   ],
   // Ignore file regexps
   "FileIgnore": [
+    "^\\.ds_store$",
     "\\.old\\.png$",
     "\\.psd$",
     "\\.txt$",
