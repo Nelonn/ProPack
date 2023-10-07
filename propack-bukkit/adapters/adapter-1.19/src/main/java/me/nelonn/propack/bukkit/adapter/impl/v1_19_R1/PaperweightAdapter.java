@@ -121,20 +121,14 @@ public class PaperweightAdapter implements Adapter {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void patchSetEntityData(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
         ClientboundSetEntityDataPacket nms = (ClientboundSetEntityDataPacket) packet;
-        List<SynchedEntityData.DataItem<?>> unpackedData = nms.getUnpackedData();
-        if (unpackedData == null) return;
-        List<SynchedEntityData.DataItem<?>> list = unpackedData.stream()
-                .filter(dataItem -> dataItem.getAccessor().getSerializer().equals(EntityDataSerializers.ITEM_STACK))
-                .toList();
-        for (SynchedEntityData.DataItem<?> entry : list) {
-            unpackedData.remove(entry);
-            SynchedEntityData.DataItem<ItemStack> newItem = (SynchedEntityData.DataItem<ItemStack>) entry.copy();
-            patcher.accept(CraftItemStack.of(newItem.getValue()));
-            unpackedData.add(newItem);
+        List<SynchedEntityData.DataItem<?>> dataValueList = nms.getUnpackedData();
+        if (dataValueList == null) return;
+        for (SynchedEntityData.DataItem<?> dataValue : dataValueList) {
+            if (!dataValue.getAccessor().getSerializer().equals(EntityDataSerializers.ITEM_STACK)) continue;
+            patcher.accept(CraftItemStack.of((ItemStack) dataValue.getValue()));
         }
     }
 

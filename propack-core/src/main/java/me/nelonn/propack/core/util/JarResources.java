@@ -34,7 +34,7 @@ import java.util.zip.ZipInputStream;
 public final class JarResources {
 
     public static void extractDirectory(@NotNull Object source, @NotNull String input, @NotNull File output) {
-        extractFile(source.getClass(), input, output);
+        extractDirectory(source.getClass(), input, output);
     }
 
     /**

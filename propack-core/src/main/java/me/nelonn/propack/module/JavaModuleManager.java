@@ -113,10 +113,12 @@ public class JavaModuleManager implements ModuleManager {
         InputStream stream = null;
         try {
             jar = new JarFile(file);
-            JarEntry entry = jar.getJarEntry("module.json");
-
+            JarEntry entry = jar.getJarEntry("propack_module.json");
             if (entry == null) {
-                throw new InvalidDescriptionException(new FileNotFoundException("Jar does not contain module.json"));
+                 entry = jar.getJarEntry("module.json");
+                if (entry == null) {
+                    throw new InvalidDescriptionException(new FileNotFoundException("Jar does not contain propack_module.json"));
+                }
             }
 
             stream = jar.getInputStream(entry);
