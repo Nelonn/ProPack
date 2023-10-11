@@ -22,6 +22,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import me.nelonn.bestvecs.ImmVec3f;
+import me.nelonn.bestvecs.Vec3f;
 import me.nelonn.propack.builder.task.TaskIO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,7 +57,7 @@ public final class Util {
         return new Vec2i(arr[0], arr[1]);
     }
 
-    public static Vec3f parseVec3f(@NotNull JsonObject json, @NotNull String key) {
+    public static ImmVec3f parseVec3f(@NotNull JsonObject json, @NotNull String key) {
         JsonArray jsonArray = GsonHelper.getArray(json, key);
         if (jsonArray.size() != 3) {
             throw new JsonParseException("Expected 3 '" + key + "' values, found: " + jsonArray.size());
@@ -64,10 +66,10 @@ public final class Util {
         for (int i = 0; i < arr.length; ++i) {
             arr[i] = GsonHelper.asFloat(jsonArray.get(i), key + '[' + i + ']');
         }
-        return new Vec3f(arr[0], arr[1], arr[2]);
+        return Vec3f.immutable(arr[0], arr[1], arr[2]);
     }
 
-    public static Vec3f parseVec3f(@NotNull JsonObject json, @NotNull String key, @Nullable Vec3f fallback) {
+    public static ImmVec3f parseVec3f(@NotNull JsonObject json, @NotNull String key, @Nullable ImmVec3f fallback) {
         if (!json.has(key)) return fallback;
         return parseVec3f(json, key);
     }
@@ -93,9 +95,9 @@ public final class Util {
 
     public static @NotNull JsonArray serializeVec3f(@NotNull Vec3f vec3f) {
         JsonArray jsonArray = new JsonArray();
-        jsonArray.add(vec3f.getX());
-        jsonArray.add(vec3f.getY());
-        jsonArray.add(vec3f.getZ());
+        jsonArray.add(vec3f.x());
+        jsonArray.add(vec3f.y());
+        jsonArray.add(vec3f.z());
         return jsonArray;
     }
 

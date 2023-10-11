@@ -18,6 +18,9 @@
 
 package me.nelonn.propack.bukkit.command;
 
+import me.nelonn.commandlib.Command;
+import me.nelonn.commandlib.CommandContext;
+import me.nelonn.commandlib.suggestion.Suggestions;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
@@ -28,30 +31,30 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
-public class BuildCommand extends Command {
+public class BuildCommand extends Command<CommandSender> {
     private final ProPackPlugin plugin;
 
     public BuildCommand(@NotNull ProPackPlugin plugin) {
         super("build");
-        setPermission("propack.admin");
+        requires(s -> s.hasPermission("propack.admin"));
         this.plugin = plugin;
     }
 
-    protected void onCommand(@NotNull CommandSender sender, @NotNull String s, @NotNull String[] args) {
-        if (args.length < 1) {
-            Util.send(sender, "<red>Usage: /" + s + " <project>");
-            return;
+    @Override
+    public boolean run(@NotNull CommandContext<CommandSender> context) {
+        CommandSender sender = context.getSource();
+        if (context.getArguments().length < 1) {
+            Util.send(sender, "<red>Usage: /" + context.getInput() + " <project>");
+            return false;
         }
-        PackDefinition definition = plugin.getCore().getPackManager().getDefinition(args[0]);
+        PackDefinition definition = plugin.getCore().getPackManager().getDefinition(context.getArguments()[0]);
         if (!(definition instanceof ProjectPack projectPack)) {
-            Util.send(sender, "<red>Resource pack '" + args[0] + "' is not project");
-            return;
+            Util.send(sender, "<red>Resource pack '" + context.getArguments()[0] + "' is not project");
+            return false;
         }
         new Thread(() -> {
             try {
@@ -71,14 +74,16 @@ public class BuildCommand extends Command {
                 e.printStackTrace();
             }
         }).start();
+        return true;
     }
 
     @Override
-    protected List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
-        if (args.length > 1) return Collections.emptyList();
-        String lower = args.length == 0 ? "" : args[0].toLowerCase(Locale.ROOT);
-        return plugin.getCore().getPackManager().getDefinitions().stream().filter(packDefinition -> {
-            return packDefinition instanceof ProjectPack && packDefinition.getName().startsWith(lower);
-        }).map(PackDefinition::getName).toList();
+    public @Nullable List<String> suggest(@NotNull CommandContext<CommandSender> context) {
+        if (context.getArguments().length > 1) return Suggestions.EMPTY;
+        List<String> values = new ArrayList<>(); // we don't want StreamAPI here because it is network thread
+        for (PackDefinition packDefinition : plugin.getCore().getPackManager().getDefinitions()) {
+            values.add(packDefinition.getName());
+        }
+        return Suggestions.util(context.getArguments()[0], values);
     }
 }

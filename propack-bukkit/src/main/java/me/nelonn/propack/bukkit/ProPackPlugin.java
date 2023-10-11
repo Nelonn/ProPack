@@ -18,9 +18,10 @@
 
 package me.nelonn.propack.bukkit;
 
+import me.nelonn.commandlib.bukkit.BukkitCommands;
+import me.nelonn.configlib.PluginConfig;
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
-import me.nelonn.propack.bukkit.config.PluginConfig;
 import me.nelonn.propack.bukkit.dispatcher.ActivePackStore;
 import me.nelonn.propack.core.DevServer;
 import me.nelonn.propack.core.util.JarResources;
@@ -84,7 +85,7 @@ public final class ProPackPlugin extends JavaPlugin {
         reloadConfig();
         reloadPacks();
 
-        new ProPackCommand(this).register(this);
+        BukkitCommands.register(this, new ProPackCommand(this));
 
         LOGGER.info("Successfully enabled");
 

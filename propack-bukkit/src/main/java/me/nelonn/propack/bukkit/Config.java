@@ -18,8 +18,8 @@
 
 package me.nelonn.propack.bukkit;
 
-import me.nelonn.propack.bukkit.config.ConfigValue;
-import me.nelonn.propack.bukkit.config.MiniMessageText;
+import me.nelonn.configlib.ConfigValue;
+import me.nelonn.configlib.MiniMessageText;
 
 public final class Config {
     public static final ConfigValue<String> dispatcherStore = new ConfigValue<>("dispatcher.store", "propack:memory_store");

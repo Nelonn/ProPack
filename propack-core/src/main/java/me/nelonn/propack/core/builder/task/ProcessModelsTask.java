@@ -22,6 +22,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import me.nelonn.bestvecs.ImmVec3f;
+import me.nelonn.bestvecs.Vec3f;
 import me.nelonn.flint.path.Identifier;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.asset.SlotItemModel;
@@ -284,11 +286,11 @@ public class ProcessModelsTask extends AbstractTask {
         Vec3f offset;
         if (GsonHelper.isString(jsonElement)) {
             elementMeshPath = PathUtil.resolve(jsonElement.getAsString(), resourcePath);
-            offset = Vec3f.ZERO;
+            offset = ImmVec3f.ZERO;
         } else {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
             elementMeshPath = PathUtil.resolve(GsonHelper.getString(jsonObject, "Mesh"), resourcePath);
-            offset = Util.parseVec3f(jsonObject, "Offset", Vec3f.ZERO);
+            offset = Util.parseVec3f(jsonObject, "Offset", ImmVec3f.ZERO);
         }
         File elementMeshFile = io.getFiles().getFile(PathUtil.contentPath(elementMeshPath) + ".mesh.json");
         if (!(elementMeshFile instanceof JsonFile)) {

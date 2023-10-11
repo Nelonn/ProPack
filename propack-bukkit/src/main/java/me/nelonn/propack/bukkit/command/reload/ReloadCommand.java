@@ -18,21 +18,25 @@
 
 package me.nelonn.propack.bukkit.command.reload;
 
+import me.nelonn.commandlib.Command;
+import me.nelonn.commandlib.CommandContext;
 import me.nelonn.propack.bukkit.ProPackPlugin;
-import me.nelonn.propack.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-public class ReloadCommand extends Command {
+public class ReloadCommand extends Command<CommandSender> {
     public ReloadCommand(@NotNull ProPackPlugin plugin) {
         super("reload");
-        setPermission("propack.admin");
-        addChildren(new ReloadConfigCommand(plugin), new ReloadPacksCommand(plugin), new ReloadModulesCommand(plugin));
+        requires(s -> s.hasPermission("propack.admin"));
+        children(new ReloadConfigCommand(plugin), new ReloadPacksCommand(plugin), new ReloadModulesCommand(plugin));
     }
 
-    protected void onCommand(@NotNull CommandSender sender, @NotNull String s, @NotNull String[] args) {
-        for (Command command : getChildren()) {
+    @Override
+    public boolean run(@NotNull CommandContext<CommandSender> commandContext) {
+        CommandSender sender = commandContext.getSource();
+        for (Command<CommandSender> command : getChildren()) {
             ((BaseReloadCommand) command).execute(sender);
         }
+        return true;
     }
 }

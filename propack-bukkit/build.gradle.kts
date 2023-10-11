@@ -37,6 +37,8 @@ dependencies {
     "implementation"(project(":propack-core")) {
         exclude(group = "net.kyori")
     }
+    "implementation"(files("../libs/commandlib-0.0.1.jar"))
+    "implementation"(files("../libs/configlib-0.0.1.jar"))
     "compileOnly"(files("../libs/lib-flint-path-0.0.1.jar"))
 
     /*"compileOnly"("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT") {

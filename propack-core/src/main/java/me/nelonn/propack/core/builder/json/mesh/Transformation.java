@@ -19,22 +19,23 @@
 package me.nelonn.propack.core.builder.json.mesh;
 
 import com.google.gson.*;
+import me.nelonn.bestvecs.ImmVec3f;
+import me.nelonn.bestvecs.Vec3f;
 import me.nelonn.propack.core.util.Util;
-import me.nelonn.propack.core.util.Vec3f;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
 
 public class Transformation {
-    public static final Transformation IDENTITY = new Transformation(Vec3f.ZERO, Vec3f.ZERO, new Vec3f(1.0F, 1.0F, 1.0F));
-    public final Vec3f rotation;
-    public final Vec3f translation;
-    public final Vec3f scale;
+    public static final Transformation IDENTITY = new Transformation(ImmVec3f.ZERO, ImmVec3f.ZERO, ImmVec3f.ONE);
+    public final ImmVec3f rotation;
+    public final ImmVec3f translation;
+    public final ImmVec3f scale;
 
     public Transformation(Vec3f rotation, Vec3f translation, Vec3f scale) {
-        this.rotation = rotation;
-        this.translation = translation;
-        this.scale = scale;
+        this.rotation = rotation.immutable();
+        this.translation = translation.immutable();
+        this.scale = scale.immutable();
     }
 
     @Override
@@ -51,18 +52,18 @@ public class Transformation {
     }
 
     protected static class Deserializer implements JsonDeserializer<Transformation>, JsonSerializer<Transformation> {
-        private static final Vec3f DEFAULT_ROTATION = new Vec3f(0.0F, 0.0F, 0.0F);
-        private static final Vec3f DEFAULT_TRANSLATION = new Vec3f(0.0F, 0.0F, 0.0F);
-        private static final Vec3f DEFAULT_SCALE = new Vec3f(1.0F, 1.0F, 1.0F);
+        private static final ImmVec3f DEFAULT_ROTATION = ImmVec3f.ZERO;
+        private static final ImmVec3f DEFAULT_TRANSLATION = ImmVec3f.ZERO;
+        private static final ImmVec3f DEFAULT_SCALE = ImmVec3f.ONE;
 
         protected Deserializer() {
         }
 
         public Transformation deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            Vec3f rotationVec = Util.parseVec3f(jsonObject, "rotation", DEFAULT_ROTATION);
-            Vec3f translationVec = Util.parseVec3f(jsonObject, "translation", DEFAULT_TRANSLATION);
-            Vec3f scaleVec = Util.parseVec3f(jsonObject, "scale", DEFAULT_SCALE);
+            ImmVec3f rotationVec = Util.parseVec3f(jsonObject, "rotation", DEFAULT_ROTATION);
+            ImmVec3f translationVec = Util.parseVec3f(jsonObject, "translation", DEFAULT_TRANSLATION);
+            ImmVec3f scaleVec = Util.parseVec3f(jsonObject, "scale", DEFAULT_SCALE);
             return new Transformation(rotationVec, translationVec, scaleVec);
         }
 

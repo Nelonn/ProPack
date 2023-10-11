@@ -18,25 +18,30 @@
 
 package me.nelonn.propack.bukkit.command;
 
+import me.nelonn.commandlib.Command;
+import me.nelonn.commandlib.CommandContext;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.Util;
 import me.nelonn.propack.bukkit.command.reload.ReloadCommand;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-public class ProPackCommand extends Command {
+public class ProPackCommand extends Command<CommandSender> {
     private final ProPackPlugin plugin;
 
     public ProPackCommand(@NotNull ProPackPlugin plugin) {
         super("propack");
-        addChildren(new HelpCommand(plugin), new ReloadCommand(plugin), new BuildCommand(plugin));
+        children(new HelpCommand(plugin), new ReloadCommand(plugin), new BuildCommand(plugin));
         this.plugin = plugin;
     }
 
-    protected void onCommand(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args) {
+    @Override
+    public boolean run(@NotNull CommandContext<CommandSender> commandContext) {
+        CommandSender sender = commandContext.getSource();
         Util.send(sender, "<white>" + plugin.getDescription().getName() + " <gray>v" + plugin.getDescription().getVersion());
         if (sender.hasPermission("propack.admin")) {
             Util.send(sender, "<gray>Run <white>/propack help <gray>to view usage information.");
         }
+        return true;
     }
 }

@@ -20,6 +20,8 @@ package me.nelonn.propack.core.builder.json.mesh;
 
 import com.google.common.collect.Maps;
 import com.google.gson.*;
+import me.nelonn.bestvecs.ImmVec3f;
+import me.nelonn.bestvecs.Vec3f;
 import me.nelonn.propack.core.util.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,8 +41,8 @@ public class ModelElement {
 
     public ModelElement(@NotNull Vec3f from, @NotNull Vec3f to, @NotNull Map<Direction, ModelElementFace> faces,
                         @Nullable ModelRotation rotation, boolean shade) {
-        this.from = from;
-        this.to = to;
+        this.from = from.immutable();
+        this.to = to.immutable();
         this.faces = new EnumMap<>(faces);
         this.rotation = rotation;
         this.shade = shade;
@@ -58,18 +60,18 @@ public class ModelElement {
     private float[] getRotatedMatrix(Direction direction) {
         switch (direction) {
             case DOWN:
-                return new float[]{this.from.getX(), 16.0F - this.to.getZ(), this.to.getX(), 16.0F - this.from.getZ()};
+                return new float[]{this.from.x(), 16.0F - this.to.z(), this.to.x(), 16.0F - this.from.z()};
             case UP:
-                return new float[]{this.from.getX(), this.from.getZ(), this.to.getX(), this.to.getZ()};
+                return new float[]{this.from.x(), this.from.z(), this.to.x(), this.to.z()};
             case NORTH:
             default:
-                return new float[]{16.0F - this.to.getX(), 16.0F - this.to.getY(), 16.0F - this.from.getX(), 16.0F - this.from.getY()};
+                return new float[]{16.0F - this.to.x(), 16.0F - this.to.y(), 16.0F - this.from.x(), 16.0F - this.from.y()};
             case SOUTH:
-                return new float[]{this.from.getX(), 16.0F - this.to.getY(), this.to.getX(), 16.0F - this.from.getY()};
+                return new float[]{this.from.x(), 16.0F - this.to.y(), this.to.x(), 16.0F - this.from.y()};
             case WEST:
-                return new float[]{this.from.getZ(), 16.0F - this.to.getY(), this.to.getZ(), 16.0F - this.from.getY()};
+                return new float[]{this.from.x(), 16.0F - this.to.y(), this.to.z(), 16.0F - this.from.y()};
             case EAST:
-                return new float[]{16.0F - this.to.getZ(), 16.0F - this.to.getY(), 16.0F - this.from.getZ(), 16.0F - this.from.getY()};
+                return new float[]{16.0F - this.to.z(), 16.0F - this.to.y(), 16.0F - this.from.z(), 16.0F - this.from.y()};
         }
     }
 
@@ -158,8 +160,8 @@ public class ModelElement {
 
         private Vec3f deserializeTo(JsonObject object) {
             Vec3f vec3f = Util.parseVec3f(object, "to");
-            if (!(vec3f.getX() < -16.0F) && !(vec3f.getY() < -16.0F) && !(vec3f.getZ() < -16.0F) &&
-                    !(vec3f.getX() > 32.0F) && !(vec3f.getY() > 32.0F) && !(vec3f.getZ() > 32.0F)) {
+            if (!(vec3f.x() < -16.0F) && !(vec3f.y() < -16.0F) && !(vec3f.z() < -16.0F) &&
+                    !(vec3f.x() > 32.0F) && !(vec3f.y() > 32.0F) && !(vec3f.z() > 32.0F)) {
                 return vec3f;
             } else {
                 throw new JsonParseException("'to' specifier exceeds the allowed boundaries: " + vec3f);
@@ -168,8 +170,8 @@ public class ModelElement {
 
         private Vec3f deserializeFrom(JsonObject object) {
             Vec3f vec3f = Util.parseVec3f(object, "from");
-            if (!(vec3f.getX() < -16.0F) && !(vec3f.getY() < -16.0F) && !(vec3f.getZ() < -16.0F) &&
-                    !(vec3f.getX() > 32.0F) && !(vec3f.getY() > 32.0F) && !(vec3f.getZ() > 32.0F)) {
+            if (!(vec3f.x() < -16.0F) && !(vec3f.y() < -16.0F) && !(vec3f.z() < -16.0F) &&
+                    !(vec3f.x() > 32.0F) && !(vec3f.y() > 32.0F) && !(vec3f.z() > 32.0F)) {
                 return vec3f;
             } else {
                 throw new JsonParseException("'from' specifier exceeds the allowed boundaries: " + vec3f);

@@ -17,6 +17,7 @@ repositories {
 dependencies {
     "implementation"(project(":propack-api"))
     "compileOnly"(files("../libs/lib-flint-path-0.0.1.jar"))
+    "implementation"(files("../libs/bestvecs-0.0.1.jar"))
 
     "compileOnly"("org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r")
 
