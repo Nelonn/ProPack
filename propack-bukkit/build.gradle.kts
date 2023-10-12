@@ -106,6 +106,9 @@ tasks.named<ShadowJar>("shadowJar") {
     relocate("net.kyori", "me.nelonn.propack.shaded.kyori") {
         exclude("net.kyori.adventure.key.*")
     }
+    relocate("me.nelonn.bestvecs", "me.nelonn.propack.shaded.bestvecs")
+    relocate("me.nelonn.commandlib", "me.nelonn.propack.shaded.commandlib")
+    relocate("me.nelonn.configlib", "me.nelonn.propack.shaded.configlib")
     exclude("net/kyori/adventure/key/**") // problems with different classes
     archiveClassifier.set("")
 }
