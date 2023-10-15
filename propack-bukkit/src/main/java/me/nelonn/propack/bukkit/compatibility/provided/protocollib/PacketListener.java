@@ -34,16 +34,13 @@ import me.nelonn.propack.asset.*;
 import me.nelonn.propack.bukkit.Config;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
-import me.nelonn.propack.bukkit.adapter.Adapter;
-import me.nelonn.propack.bukkit.adapter.MCompoundTag;
-import me.nelonn.propack.bukkit.adapter.MItemStack;
-import me.nelonn.propack.bukkit.adapter.MListTag;
-import org.bukkit.Bukkit;
+import me.nelonn.propack.bukkit.adapter.*;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -66,22 +63,7 @@ public class PacketListener extends PacketAdapter {
                 PacketType.Play.Server.CUSTOM_SOUND_EFFECT, // Removed in 1.19.3
                 PacketType.Play.Server.NAMED_SOUND_EFFECT);
         this.plugin = plugin;
-        try {
-            String craftBukkit = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-            String minecraft = Bukkit.getServer().getBukkitVersion().split("-")[0];
-            String nmsVersion = craftBukkit;
-            if (minecraft.equalsIgnoreCase("1.17.1")) {
-                nmsVersion += "_2";
-            }
-            Class<?> clazz = Class.forName("me.nelonn.propack.bukkit.adapter.impl." + nmsVersion + ".PaperweightAdapter");
-            if (Adapter.class.isAssignableFrom(clazz)) {
-                adapter = (Adapter) clazz.getDeclaredConstructor().newInstance();
-            } else {
-                throw new IllegalArgumentException("Class '" + clazz.getName() + "' must implement '" + Adapter.class.getName() + "'");
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to load bukkit adapter", e);
-        }
+        this.adapter = Objects.requireNonNull(AdapterLoader.ADAPTER, "Adapter not loaded");
     }
 
     public static void register(@NotNull ProPackPlugin plugin) {
