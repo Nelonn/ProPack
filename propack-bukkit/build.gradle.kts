@@ -24,7 +24,9 @@ repositories {
     mavenCentral()
     maven("https://repo.eclipse.org/content/groups/releases/") // JGit
     maven("https://repo.codemc.io/repository/maven-public/") // NBTAPI
+    maven("https://repo.codemc.io/repository/maven-releases/") // PacketEvents
     maven("https://repo.dmulloy2.net/repository/public/") // ProtocolLib
+
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
     maven("https://jitpack.io") // Oraxen
 
@@ -58,6 +60,7 @@ dependencies {
     "implementation"("net.kyori:adventure-platform-api:4.2.0")
     "implementation"("net.kyori:adventure-platform-bukkit:4.2.0")
 
+    "implementation"("com.github.retrooper.packetevents:spigot:2.0.2")
     "compileOnly"("com.comphenix.protocol:ProtocolLib:5.1.0")
     "compileOnly"("me.clip:placeholderapi:2.11.2")
     //"compileOnly"("com.github.oraxen:oraxen:-SNAPSHOT")
@@ -103,12 +106,14 @@ tasks.named<ShadowJar>("shadowJar") {
     exclude("LICENSE*")
     exclude("META-INF/maven/**")
     exclude("about.html")
-    relocate("net.kyori", "me.nelonn.propack.shaded.kyori") {
-        exclude("net.kyori.adventure.key.*")
-    }
     relocate("me.nelonn.bestvecs", "me.nelonn.propack.shaded.bestvecs")
     relocate("me.nelonn.commandlib", "me.nelonn.propack.shaded.commandlib")
     relocate("me.nelonn.configlib", "me.nelonn.propack.shaded.configlib")
+    relocate("com.github.retrooper.packetevents", "me.nelonn.propack.shaded.packetevents.api")
+    relocate("io.github.retrooper.packetevents", "me.nelonn.propack.shaded.packetevents.impl")
+    relocate("net.kyori", "me.nelonn.propack.shaded.kyori") {
+        exclude("net.kyori.adventure.key.*")
+    }
     exclude("net/kyori/adventure/key/**") // problems with different classes
     archiveClassifier.set("")
 }
