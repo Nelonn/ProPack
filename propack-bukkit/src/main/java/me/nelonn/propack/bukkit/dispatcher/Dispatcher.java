@@ -89,11 +89,10 @@ public class Dispatcher implements Listener {
      * @param resourcePack resource pack
      */
     public void sendOfferAsDefault(@NotNull Player player, @NotNull ResourcePack resourcePack) {
-        Optional<UploadedPack> uploadedPack = resourcePack.getUpload();
-        if (uploadedPack.isEmpty()) {
+        if (!resourcePack.isUploaded()) {
             throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not uploaded");
         }
-        sendOfferAsDefault(player, uploadedPack.get());
+        sendOfferAsDefault(player, resourcePack.getUpload$());
     }
 
     @EventHandler
@@ -110,10 +109,10 @@ public class Dispatcher implements Listener {
             LOGGER.warn("Resource pack '" + packName + "' not built");
             return;
         }
-        if (resourcePack.getUpload().isEmpty()) {
+        if (!resourcePack.isUploaded()) {
             throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not uploaded");
         }
-        UploadedPack uploadedPack = resourcePack.getUpload().get();
+        UploadedPack uploadedPack = resourcePack.getUpload$();
         Player player = event.getPlayer();
         ActivePack active = activePackStore.getActiveResourcePack(player.getUniqueId());
         if (active != null) {

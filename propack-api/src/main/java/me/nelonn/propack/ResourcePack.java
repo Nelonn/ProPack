@@ -19,8 +19,9 @@
 package me.nelonn.propack;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
+import java.util.Objects;
 
 public interface ResourcePack {
 
@@ -28,10 +29,14 @@ public interface ResourcePack {
 
     @NotNull Resources resources();
 
-    @NotNull Optional<UploadedPack> getUpload();
+    @Nullable UploadedPack getUpload();
+
+    default @NotNull UploadedPack getUpload$() {
+        return Objects.requireNonNull(this.getUpload());
+    }
 
     default boolean isUploaded() {
-        return getUpload().isPresent();
+        return getUpload() != null;
     }
 
 }

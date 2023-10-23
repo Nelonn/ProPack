@@ -27,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.Optional;
 
 public class BuiltResourcePack implements ResourcePack {
     private final Project project;
@@ -62,8 +61,8 @@ public class BuiltResourcePack implements ResourcePack {
     }
 
     @Override
-    public @NotNull Optional<UploadedPack> getUpload() {
-        return Optional.ofNullable(uploadedPack);
+    public @Nullable UploadedPack getUpload() {
+        return uploadedPack;
     }
 
     public @NotNull Project getProject() {
