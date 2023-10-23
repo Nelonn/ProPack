@@ -61,7 +61,7 @@ public class PacketPatcher {
             } catch (InvalidPathException ignored) {
                 return;
             }
-            ItemModel itemModel = resources.itemModelNullable(path);
+            ItemModel itemModel = resources.itemModel(path);
             if (itemModel == null) return;
             Path mesh;
             if (itemModel instanceof DefaultItemModel defaultItemModel) {

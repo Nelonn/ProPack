@@ -25,6 +25,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 public class ProPackExpansion extends PlaceholderExpansion {
     private final ProPackPlugin plugin;
 
@@ -63,7 +65,7 @@ public class ProPackExpansion extends PlaceholderExpansion {
         if (player != null) {
             // return in switches is 'yield'
             result = switch (params.toLowerCase()) {
-                case "resourcepack", "rp" -> plugin.getCore().getDispatcher().getAppliedResourcePack(player)
+                case "resourcepack", "rp" -> Optional.ofNullable(plugin.getCore().getDispatcher().getAppliedResourcePack(player))
                         .map(ResourcePack::getName).orElse("");
                 // TODO: glyphs
                 default -> null;

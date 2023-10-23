@@ -20,11 +20,16 @@ package me.nelonn.propack.bukkit.definition;
 
 import me.nelonn.propack.ResourcePack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
+import java.util.Objects;
 
 public interface PackDefinition {
     @NotNull String getName();
 
-    @NotNull Optional<ResourcePack> getResourcePack();
+    @Nullable ResourcePack getResourcePack();
+
+    default @NotNull ResourcePack getResourcePack$() {
+        return Objects.requireNonNull(this.getResourcePack());
+    }
 }

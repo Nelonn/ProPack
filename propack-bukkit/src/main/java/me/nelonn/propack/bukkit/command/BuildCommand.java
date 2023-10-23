@@ -59,11 +59,11 @@ public class BuildCommand extends Command<CommandSender> {
         new Thread(() -> {
             try {
                 projectPack.build();
-                ResourcePack resourcePack = projectPack.getResourcePack().orElseThrow();
+                ResourcePack resourcePack = projectPack.getResourcePack$();
                 if (resourcePack.isUploaded()) {
                     for (Player player : Bukkit.getOnlinePlayers()) {
-                        Optional<ResourcePack> playerPack = ProPack.getCore().getDispatcher().getAppliedResourcePack(player);
-                        if (playerPack.isPresent() && playerPack.get().getName().equals(resourcePack.getName())) {
+                        ResourcePack playerPack = ProPack.getCore().getDispatcher().getAppliedResourcePack(player);
+                        if (playerPack != null && playerPack.getName().equals(resourcePack.getName())) {
                             ProPack.getCore().getDispatcher().sendOfferAsDefault(player, resourcePack);
                         }
                     }

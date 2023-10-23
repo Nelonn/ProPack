@@ -22,9 +22,9 @@ import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.core.builder.InternalProject;
 import me.nelonn.propack.core.loader.ProjectLoader;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.Optional;
 
 public class ProjectPack implements PackDefinition {
     private final File file;
@@ -47,7 +47,7 @@ public class ProjectPack implements PackDefinition {
     }
 
     @Override
-    public @NotNull Optional<ResourcePack> getResourcePack() {
+    public @Nullable ResourcePack getResourcePack() {
         return project.getResourcePack();
     }
 
@@ -69,7 +69,7 @@ public class ProjectPack implements PackDefinition {
 
     public void loadOrBuild() {
         project = projectLoader.load(file, true);
-        if (project.getResourcePack().isEmpty()) {
+        if (project.getResourcePack() == null) {
             build0();
         }
     }

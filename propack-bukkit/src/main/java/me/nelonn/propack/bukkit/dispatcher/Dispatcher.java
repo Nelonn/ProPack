@@ -39,10 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class Dispatcher implements Listener {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -108,11 +105,11 @@ public class Dispatcher implements Listener {
             LOGGER.warn("Resource pack '" + packName + "' not found");
             return;
         }
-        if (definition.getResourcePack().isEmpty()) {
+        ResourcePack resourcePack = definition.getResourcePack();
+        if (resourcePack == null) {
             LOGGER.warn("Resource pack '" + packName + "' not built");
             return;
         }
-        ResourcePack resourcePack = definition.getResourcePack().get();
         if (resourcePack.getUpload().isEmpty()) {
             throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not uploaded");
         }
@@ -153,11 +150,15 @@ public class Dispatcher implements Listener {
         return pending.get(player.getUniqueId());
     }
 
-    public @NotNull Optional<ResourcePack> getAppliedResourcePack(@NotNull Player player) {
+    public @Nullable ResourcePack getAppliedResourcePack(@NotNull Player player) {
         ActivePack activePack = activePackStore.getActiveResourcePack(player.getUniqueId());
-        if (activePack == null) return Optional.empty();
+        if (activePack == null) return null;
         PackDefinition definition = plugin.getCore().getPackManager().getDefinition(activePack.name);
-        if (definition == null) return Optional.empty();
+        if (definition == null) return null;
         return definition.getResourcePack();
+    }
+
+    public @NotNull ResourcePack getAppliedResourcePack$(@NotNull Player player) {
+        return Objects.requireNonNull(this.getAppliedResourcePack(player));
     }
 }

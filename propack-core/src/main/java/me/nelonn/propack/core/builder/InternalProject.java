@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.Optional;
 
 public class InternalProject implements Project {
     public final String name;
@@ -92,8 +91,8 @@ public class InternalProject implements Project {
     }
 
     @Override
-    public @NotNull Optional<ResourcePack> getResourcePack() {
-        return Optional.ofNullable(resourcePack);
+    public @Nullable ResourcePack getResourcePack() {
+        return resourcePack;
     }
 
     public void build() {

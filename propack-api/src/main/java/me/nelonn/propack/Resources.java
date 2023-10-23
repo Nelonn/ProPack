@@ -51,48 +51,48 @@ public class Resources {
         this.meshes = meshes;
     }
 
-    public @Nullable ItemModel itemModelNullable(@NotNull Path path) {
+    public @Nullable ItemModel itemModel(@NotNull Path path) {
         return itemModels.get(path);
     }
 
-    public @NotNull ItemModel itemModel(@NotNull Path path) {
-        return Objects.requireNonNull(itemModelNullable(path));
+    public @NotNull ItemModel itemModel$(@NotNull Path path) {
+        return Objects.requireNonNull(itemModel(path));
     }
 
     public @NotNull Collection<ItemModel> getItemModels() {
         return Collections.unmodifiableCollection(itemModels.values());
     }
 
-    public @Nullable SoundAsset soundNullable(@NotNull Path path) {
+    public @Nullable SoundAsset sound(@NotNull Path path) {
         return sounds.get(path);
     }
 
-    public @NotNull SoundAsset sound(@NotNull Path path) {
-        return Objects.requireNonNull(soundNullable(path));
+    public @NotNull SoundAsset sound$(@NotNull Path path) {
+        return Objects.requireNonNull(sound(path));
     }
 
     public @NotNull Collection<SoundAsset> getSounds() {
         return Collections.unmodifiableCollection(sounds.values());
     }
 
-    public @Nullable ArmorTexture armorTextureNullable(@NotNull Path path) {
+    public @Nullable ArmorTexture armorTexture(@NotNull Path path) {
         return armorTextures.get(path);
     }
 
-    public @NotNull ArmorTexture armorTexture(@NotNull Path path) {
-        return Objects.requireNonNull(armorTextureNullable(path));
+    public @NotNull ArmorTexture armorTexture$(@NotNull Path path) {
+        return Objects.requireNonNull(armorTexture(path));
     }
 
     public @NotNull Collection<ArmorTexture> getArmorTextures() {
         return Collections.unmodifiableCollection(armorTextures.values());
     }
 
-    public @Nullable Font fontNullable(@NotNull Path path) {
+    public @Nullable Font font(@NotNull Path path) {
         return fonts.get(path);
     }
 
-    public @NotNull Font font(@NotNull Path path) {
-        return Objects.requireNonNull(fontNullable(path));
+    public @NotNull Font font$(@NotNull Path path) {
+        return Objects.requireNonNull(font(path));
     }
 
     public @NotNull Collection<Font> getFonts() {

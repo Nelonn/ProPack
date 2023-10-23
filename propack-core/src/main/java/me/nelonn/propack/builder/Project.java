@@ -22,9 +22,10 @@ import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.builder.file.VirtualFile;
 import me.nelonn.propack.core.builder.BuildConfiguration;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.Optional;
+import java.util.Objects;
 
 public interface Project {
 
@@ -44,6 +45,10 @@ public interface Project {
 
     ProjectBuilder createDefaultBuilder();
 
-    @NotNull Optional<ResourcePack> getResourcePack();
+    @Nullable ResourcePack getResourcePack();
+
+    default @NotNull ResourcePack getResourcePack$() {
+        return Objects.requireNonNull(this.getResourcePack());
+    }
 
 }

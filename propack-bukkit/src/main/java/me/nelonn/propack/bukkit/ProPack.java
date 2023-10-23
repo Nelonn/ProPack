@@ -24,8 +24,7 @@ import me.nelonn.propack.ResourcePack;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 
 public final class ProPack {
     public static final String CUSTOM_MODEL = "CustomModel";
@@ -46,7 +45,7 @@ public final class ProPack {
         return Identifier.of(material.getKey().toString());
     }
 
-    public static @NotNull Optional<ResourcePack> getAppliedResourcePack(@NotNull Player player) {
+    public static @Nullable ResourcePack getAppliedResourcePack(@NotNull Player player) {
         return getCore().getDispatcher().getAppliedResourcePack(player);
     }
 

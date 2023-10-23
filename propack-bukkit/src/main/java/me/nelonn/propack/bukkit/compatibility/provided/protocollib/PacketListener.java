@@ -38,7 +38,6 @@ import me.nelonn.propack.bukkit.packet.PacketPatcher;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -81,9 +80,9 @@ public class PacketListener extends PacketAdapter {
     public void onPacketSending(PacketEvent event) {
         PacketType type = event.getPacketType();
         Object packet = event.getPacket().getHandle();
-        Optional<ResourcePack> resourcePack = ProPack.getCore().getDispatcher().getAppliedResourcePack(event.getPlayer());
-        if (resourcePack.isEmpty()) return;
-        final Resources resources = resourcePack.get().resources();
+        ResourcePack resourcePack = ProPack.getCore().getDispatcher().getAppliedResourcePack(event.getPlayer());
+        if (resourcePack == null) return;
+        final Resources resources = resourcePack.resources();
         if (plugin.config().get(Config.patchPacketItems)) {
             BiConsumer<Object, Consumer<MItemStack>> method;
             if (type == PacketType.Play.Server.SET_SLOT) {
@@ -106,7 +105,7 @@ public class PacketListener extends PacketAdapter {
                         type == PacketType.Play.Server.NAMED_SOUND_EFFECT)) {
             MinecraftKey minecraftKey = event.getPacket().getMinecraftKeys().read(0);
             Path path = Path.of(minecraftKey.getPrefix(), minecraftKey.getKey());
-            SoundAsset sound = resources.soundNullable(path);
+            SoundAsset sound = resources.sound(path);
             if (sound != null) {
                 path = sound.realPath();
                 minecraftKey = new MinecraftKey(path.getNamespace(), path.getValue());
