@@ -55,8 +55,8 @@ public class Resources {
         return itemModels.get(path);
     }
 
-    public @NotNull Optional<ItemModel> itemModel(@NotNull Path path) {
-        return Optional.ofNullable(itemModelNullable(path));
+    public @NotNull ItemModel itemModel(@NotNull Path path) {
+        return Objects.requireNonNull(itemModelNullable(path));
     }
 
     public @NotNull Collection<ItemModel> getItemModels() {
@@ -67,8 +67,8 @@ public class Resources {
         return sounds.get(path);
     }
 
-    public @NotNull Optional<SoundAsset> sound(@NotNull Path path) {
-        return Optional.ofNullable(soundNullable(path));
+    public @NotNull SoundAsset sound(@NotNull Path path) {
+        return Objects.requireNonNull(soundNullable(path));
     }
 
     public @NotNull Collection<SoundAsset> getSounds() {
@@ -79,8 +79,8 @@ public class Resources {
         return armorTextures.get(path);
     }
 
-    public @NotNull Optional<ArmorTexture> armorTexture(@NotNull Path path) {
-        return Optional.ofNullable(armorTextureNullable(path));
+    public @NotNull ArmorTexture armorTexture(@NotNull Path path) {
+        return Objects.requireNonNull(armorTextureNullable(path));
     }
 
     public @NotNull Collection<ArmorTexture> getArmorTextures() {
@@ -91,8 +91,8 @@ public class Resources {
         return fonts.get(path);
     }
 
-    public @NotNull Optional<Font> font(@NotNull Path path) {
-        return Optional.ofNullable(fontNullable(path));
+    public @NotNull Font font(@NotNull Path path) {
+        return Objects.requireNonNull(fontNullable(path));
     }
 
     public @NotNull Collection<Font> getFonts() {
