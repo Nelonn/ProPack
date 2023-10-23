@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
 public interface Adapter {
-    @NotNull MServerboundSetCreativeModeSlotPacket adaptPacket1(@NotNull Object packet);
+    @NotNull MServerboundSetCreativeModeSlotPacket wrap_ServerboundSetCreativeModeSlotPacket(@NotNull Object packet);
 
-    @NotNull MClientboundContainerSetSlotPacket adaptPacket2(@NotNull Object packet);
+    @NotNull MClientboundContainerSetSlotPacket wrap_ClientboundContainerSetSlotPacket(@NotNull Object packet);
 
     void patchSetContent(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 

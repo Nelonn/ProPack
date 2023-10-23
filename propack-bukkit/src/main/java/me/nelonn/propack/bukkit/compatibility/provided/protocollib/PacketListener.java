@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,22 +24,19 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.MinecraftKey;
-import com.comphenix.protocol.wrappers.nbt.NbtType;
-import me.nelonn.flint.path.Identifier;
-import me.nelonn.flint.path.InvalidPathException;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.Resources;
-import me.nelonn.propack.asset.*;
+import me.nelonn.propack.asset.SoundAsset;
 import me.nelonn.propack.bukkit.Config;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
-import me.nelonn.propack.bukkit.adapter.*;
-import org.bukkit.Material;
+import me.nelonn.propack.bukkit.adapter.Adapter;
+import me.nelonn.propack.bukkit.adapter.AdapterLoader;
+import me.nelonn.propack.bukkit.adapter.MItemStack;
+import me.nelonn.propack.bukkit.packet.PacketPatcher;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -47,9 +44,9 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("deprecation")
 public class PacketListener extends PacketAdapter {
-    private static final String CUSTOM_MODEL_DATA_FIELD = "CustomModelData";
-    private final Adapter adapter;
     private final ProPackPlugin plugin;
+    private final Adapter adapter;
+    private final PacketPatcher packetPatcher;
 
     public PacketListener(@NotNull ProPackPlugin plugin) {
         super(plugin, ListenerPriority.HIGHEST, // priority is inverted
@@ -64,6 +61,7 @@ public class PacketListener extends PacketAdapter {
                 PacketType.Play.Server.NAMED_SOUND_EFFECT);
         this.plugin = plugin;
         this.adapter = Objects.requireNonNull(AdapterLoader.ADAPTER, "Adapter not loaded");
+        this.packetPatcher = plugin.getPacketPatcher();
     }
 
     public static void register(@NotNull ProPackPlugin plugin) {
@@ -75,7 +73,7 @@ public class PacketListener extends PacketAdapter {
         PacketType type = event.getPacketType();
         Object packet = event.getPacket().getHandle();
         if (type == PacketType.Play.Client.SET_CREATIVE_SLOT && plugin.config().get(Config.patchPacketItems)) {
-            patchInItems(adapter.adaptPacket1(packet).getItem());
+            packetPatcher.patchServerboundItems(adapter.wrap_ServerboundSetCreativeModeSlotPacket(packet).getItem());
         }
     }
 
@@ -89,8 +87,8 @@ public class PacketListener extends PacketAdapter {
         if (plugin.config().get(Config.patchPacketItems)) {
             BiConsumer<Object, Consumer<MItemStack>> method;
             if (type == PacketType.Play.Server.SET_SLOT) {
-                method = (rawPacket, patcher) -> { // TEMP
-                    patcher.accept(adapter.adaptPacket2(rawPacket).getItem());
+                method = (rawPacket, patcher) -> {
+                    patcher.accept(adapter.wrap_ClientboundContainerSetSlotPacket(rawPacket).getItem());
                 };
             } else if (type == PacketType.Play.Server.WINDOW_ITEMS) {
                 method = adapter::patchSetContent;
@@ -101,7 +99,7 @@ public class PacketListener extends PacketAdapter {
             } else {
                 return;
             }
-            method.accept(packet, stack -> patchOutItems(stack, resources));
+            method.accept(packet, stack -> packetPatcher.patchClientboundItems(stack, resources));
         }
         if (plugin.config().get(Config.patchPacketSounds) &&
                 (type == PacketType.Play.Server.CUSTOM_SOUND_EFFECT ||
@@ -114,58 +112,6 @@ public class PacketListener extends PacketAdapter {
                 minecraftKey = new MinecraftKey(path.getNamespace(), path.getValue());
                 event.getPacket().getMinecraftKeys().write(0, minecraftKey);
             }
-        }
-    }
-
-    private void patchInItems(MItemStack itemStack) {
-        MCompoundTag tag = itemStack.getTag();
-        if (tag == null || !tag.contains(CUSTOM_MODEL_DATA_FIELD, NbtType.TAG_INT.getRawID()) ||
-                !tag.contains(ProPack.CUSTOM_MODEL, NbtType.TAG_STRING.getRawID())) return;
-        tag.remove(CUSTOM_MODEL_DATA_FIELD);
-    }
-
-    private void patchOutItems(@NotNull MItemStack itemStack, @NotNull Resources resources) {
-        try {
-            MCompoundTag tag = itemStack.getTag();
-            if (tag == null || !tag.contains(ProPack.CUSTOM_MODEL, NbtType.TAG_STRING.getRawID())) return;
-            String customModel = tag.getString(ProPack.CUSTOM_MODEL);
-            if (customModel.isEmpty()) return;
-            Path path;
-            try {
-                path = Path.of(customModel);
-            } catch (InvalidPathException ignored) {
-                return;
-            }
-            ItemModel itemModel = resources.itemModelNullable(path);
-            if (itemModel == null) return;
-            Path mesh;
-            if (itemModel instanceof DefaultItemModel defaultItemModel) {
-                mesh = defaultItemModel.getMesh();
-            } else if (itemModel instanceof CombinedItemModel combinedItemModel) {
-                MListTag listTag = tag.getList("ModelElements", NbtType.TAG_STRING.getRawID());
-                mesh = combinedItemModel.getMesh(listTag.asStringCollection().toArray(new String[0]));
-            } else if (itemModel instanceof SlotItemModel slotItemModel) {
-                MCompoundTag slotsTag = tag.getCompound("ModelSlots");
-                Map<String, String> slots = new HashMap<>();
-                for (SlotItemModel.Slot slot : slotItemModel.getSlots()) {
-                    String element = slotsTag.getString(slot.getName());
-                    if (!element.isEmpty()) {
-                        slots.put(slot.getName(), element);
-                    }
-                }
-                mesh = slotItemModel.getMesh(slots);
-            } else {
-                return;
-            }
-            Material material = Material.matchMaterial(itemStack.getItemId().toString());
-            assert material != null;
-            Identifier itemType = ProPack.adapt(material);
-            if (!itemModel.getTargetItems().contains(itemType)) return;
-            Integer cmd = resources.getMeshes().getCustomModelData(mesh, itemType);
-            if (cmd == null) return;
-            tag.putInt(CUSTOM_MODEL_DATA_FIELD, cmd);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }

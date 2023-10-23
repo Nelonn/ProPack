@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import me.nelonn.configlib.PluginConfig;
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
 import me.nelonn.propack.bukkit.dispatcher.ActivePackStore;
+import me.nelonn.propack.bukkit.packet.PacketPatcher;
 import me.nelonn.propack.core.DevServer;
 import me.nelonn.propack.core.util.JarResources;
 import me.nelonn.propack.core.util.LogManagerCompat;
@@ -45,6 +46,7 @@ public final class ProPackPlugin extends JavaPlugin {
 
     private BukkitAudiences adventure;
     private BukkitProPackCore core;
+    private PacketPatcher packetPatcher;
     private DevServer devServer;
     private PluginConfig config;
 
@@ -80,6 +82,7 @@ public final class ProPackPlugin extends JavaPlugin {
 
         core = new BukkitProPackCore(this);
         ProPack.setCore(core);
+        packetPatcher = new PacketPatcher();
         config = new PluginConfig(this, "resources/config.yml", "config.yml");
         reloadModules();
         reloadConfig();
@@ -155,6 +158,10 @@ public final class ProPackPlugin extends JavaPlugin {
     @NotNull
     public PluginConfig config() {
         return config;
+    }
+
+    public PacketPatcher getPacketPatcher() {
+        return packetPatcher;
     }
 
     public BukkitProPackCore getCore() {

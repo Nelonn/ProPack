@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ public class PaperweightAdapter implements Adapter {
     }
 
     @Override
-    public @NotNull MServerboundSetCreativeModeSlotPacket adaptPacket1(@NotNull Object packet) {
+    public @NotNull MServerboundSetCreativeModeSlotPacket wrap_ServerboundSetCreativeModeSlotPacket(@NotNull Object packet) {
         return CraftServerboundSetCreativeModeSlotPacket.of((ServerboundSetCreativeModeSlotPacket) packet);
     }
 
@@ -104,7 +104,7 @@ public class PaperweightAdapter implements Adapter {
     }
 
     @Override
-    public @NotNull MClientboundContainerSetSlotPacket adaptPacket2(@NotNull Object packet) {
+    public @NotNull MClientboundContainerSetSlotPacket wrap_ClientboundContainerSetSlotPacket(@NotNull Object packet) {
         return CraftClientboundContainerSetSlotPacket.of((ClientboundContainerSetSlotPacket) packet);
     }
 

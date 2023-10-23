@@ -8,6 +8,7 @@ description: Modern solution for minecraft resource pack development
 website: 'https://github.com/Nelonn/ProPack'
 softdepend:
   - PlaceholderAPI
+
   - ProtocolLib
   - ProtocolSupport
   - ViaVersion
