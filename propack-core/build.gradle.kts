@@ -1,9 +1,7 @@
-import org.cadixdev.gradle.licenser.LicenseExtension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     `java-library`
-    id("org.cadixdev.licenser")
     id("com.github.johnrengelman.shadow")
 }
 
@@ -14,20 +12,20 @@ repositories {
     maven("https://repo.eclipse.org/content/groups/releases/") // JGit
 }
 
+var adventureVersion = "4.14.0"
+
 dependencies {
     "implementation"(project(":propack-api"))
     "compileOnly"(files("../libs/lib-flint-path-0.0.1.jar"))
     "implementation"(files("../libs/bestvecs-0.0.1.jar"))
 
-    "compileOnly"("org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r")
-
     "compileOnly"("org.slf4j:slf4j-api:2.0.7")
 
-    "compileOnly"("net.kyori:adventure-api:4.12.0")
-    "compileOnly"("net.kyori:adventure-text-minimessage:4.12.0")
-    "compileOnly"("net.kyori:adventure-text-serializer-plain:4.12.0")
-    "compileOnly"("net.kyori:adventure-text-serializer-legacy:4.12.0")
-    "compileOnly"("net.kyori:adventure-text-serializer-gson:4.12.0")
+    "compileOnly"("net.kyori:adventure-api:$adventureVersion")
+    "compileOnly"("net.kyori:adventure-text-minimessage:$adventureVersion")
+    "compileOnly"("net.kyori:adventure-text-serializer-plain:$adventureVersion")
+    "compileOnly"("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
+    "compileOnly"("net.kyori:adventure-text-serializer-gson:$adventureVersion")
 
     "compileOnly"("com.google.code.gson:gson:2.10.1")
     "compileOnly"("com.google.guava:guava:31.1-jre")
@@ -66,9 +64,4 @@ tasks.withType<Javadoc> {
 java {
     withSourcesJar()
     withJavadocJar()
-}
-
-configure<LicenseExtension> {
-    header(rootProject.file("HEADER.txt"))
-    include("**/*.java")
 }

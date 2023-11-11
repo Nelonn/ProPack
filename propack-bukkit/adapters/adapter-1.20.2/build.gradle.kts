@@ -1,8 +1,5 @@
-import org.cadixdev.gradle.licenser.LicenseExtension
-
 plugins {
     `java-library`
-    id("org.cadixdev.licenser")
     id("io.papermc.paperweight.userdev")
 }
 
@@ -19,9 +16,4 @@ dependencies {
 
 tasks.named("assemble") {
     dependsOn("reobfJar")
-}
-
-configure<LicenseExtension> {
-    header(rootProject.file("HEADER.txt"))
-    include("**/*.java")
 }

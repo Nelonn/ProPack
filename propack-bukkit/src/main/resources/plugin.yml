@@ -1,17 +1,24 @@
-name: ProPack
 main: me.nelonn.propack.bukkit.ProPackPlugin
+name: ProPack
 version: ${version}
 api-version: 1.17
 author: Nelonn
 load: STARTUP
 description: Modern solution for minecraft resource pack development
 website: 'https://github.com/Nelonn/ProPack'
+folia-supported: true
 softdepend:
   - PlaceholderAPI
-
+  # All below provided by PacketEvents
   - ProtocolLib
   - ProtocolSupport
   - ViaVersion
   - ViaBackwards
   - ViaRewind
   - Geyser-Spigot
+libraries:
+  - 'net.kyori:adventure-text-minimessage:4.14.0'
+  - 'net.kyori:adventure-text-serializer-plain:4.14.0'
+  - 'net.kyori:adventure-text-serializer-legacy:4.14.0'
+  - 'net.kyori:adventure-text-serializer-gson:4.14.0'
+  - 'net.kyori:adventure-platform-bukkit:4.3.1'

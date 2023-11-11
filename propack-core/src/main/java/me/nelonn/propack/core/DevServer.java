@@ -56,7 +56,7 @@ public final class DevServer extends Hosting implements Closeable {
     @Override
     public void close() throws IOException {
         runner.close();
-        LOGGER.info("Server is turned off");
+        LOGGER.info("DevServer is turned off");
     }
 
     @Override

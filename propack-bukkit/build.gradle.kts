@@ -1,10 +1,8 @@
-import org.cadixdev.gradle.licenser.LicenseExtension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.paperweight.userdev.attribute.Obfuscation
 
 plugins {
     `java-library`
-    id("org.cadixdev.licenser")
     id("com.github.johnrengelman.shadow")
 }
 
@@ -30,44 +28,39 @@ repositories {
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
     maven("https://jitpack.io") // Oraxen
 
-    maven("https://hub.spigotmc.org/nexus/content/groups/public")
-    maven("https://papermc.io/repo/repository/maven-public/")
+    maven("https://hub.spigotmc.org/nexus/content/groups/public") // SpigotAPI
+    maven("https://papermc.io/repo/repository/maven-public/") // PaperAPI
 }
+
+var adventureVersion = "4.14.0"
 
 dependencies {
     "implementation"(project(":propack-api"))
-    "implementation"(project(":propack-core")) {
-        exclude(group = "net.kyori")
-    }
+    "implementation"(project(":propack-core"))
     "implementation"(files("../libs/commandlib-0.0.1.jar"))
     "implementation"(files("../libs/configlib-0.0.1.jar"))
     "compileOnly"(files("../libs/lib-flint-path-0.0.1.jar"))
 
-    /*"compileOnly"("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT") {
-        exclude("junit", "junit")
-    }*/
-    "compileOnly"("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT") {
-        exclude("org.slf4j", "slf4j-api")
-        exclude("junit", "junit")
+    "compileOnly"("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
+    //"compileOnly"("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
+
+    "compileOnly"("net.kyori:adventure-api:$adventureVersion")
+    "compileOnly"("net.kyori:adventure-text-minimessage:$adventureVersion")
+    "compileOnly"("net.kyori:adventure-text-serializer-plain:$adventureVersion")
+    "compileOnly"("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
+    "compileOnly"("net.kyori:adventure-text-serializer-gson:$adventureVersion")
+    "compileOnly"("net.kyori:adventure-platform-bukkit:4.3.1")
+
+    "implementation"("com.github.retrooper.packetevents:spigot:2.0.2") {
         exclude(group = "net.kyori")
+        exclude(group = "org.jetbrains")
     }
-
-    "implementation"("net.kyori:adventure-api:4.12.0")
-    "implementation"("net.kyori:adventure-text-minimessage:4.12.0")
-    "implementation"("net.kyori:adventure-text-serializer-plain:4.12.0")
-    "implementation"("net.kyori:adventure-text-serializer-legacy:4.12.0")
-    "implementation"("net.kyori:adventure-text-serializer-gson:4.12.0")
-    "implementation"("net.kyori:adventure-platform-api:4.2.0")
-    "implementation"("net.kyori:adventure-platform-bukkit:4.2.0")
-
-    "implementation"("com.github.retrooper.packetevents:spigot:2.0.2")
     "compileOnly"("com.comphenix.protocol:ProtocolLib:5.1.0")
     "compileOnly"("me.clip:placeholderapi:2.11.2")
     //"compileOnly"("com.github.oraxen:oraxen:-SNAPSHOT")
 
     "compileOnly"("org.slf4j:slf4j-api:2.0.7")
 
-    "implementation"("org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r")
     "implementation"("commons-io:commons-io:2.11.0")
     "implementation"("org.apache.commons:commons-lang3:3.12.0")
 
@@ -90,6 +83,8 @@ tasks.named<Copy>("processResources") {
     }
 }
 
+var shadedPackage = "me.nelonn.propack.shaded"
+
 tasks.named<ShadowJar>("shadowJar") {
     dependsOn(project.project(":propack-core").tasks.named("build"))
     dependsOn(project.project(":propack-bukkit:adapters").subprojects.map { it.tasks.named("assemble") })
@@ -106,15 +101,14 @@ tasks.named<ShadowJar>("shadowJar") {
     exclude("LICENSE*")
     exclude("META-INF/maven/**")
     exclude("about.html")
-    relocate("me.nelonn.bestvecs", "me.nelonn.propack.shaded.bestvecs")
-    relocate("me.nelonn.commandlib", "me.nelonn.propack.shaded.commandlib")
-    relocate("me.nelonn.configlib", "me.nelonn.propack.shaded.configlib")
-    relocate("com.github.retrooper.packetevents", "me.nelonn.propack.shaded.packetevents.api")
-    relocate("io.github.retrooper.packetevents", "me.nelonn.propack.shaded.packetevents.impl")
-    relocate("net.kyori", "me.nelonn.propack.shaded.kyori") {
-        exclude("net.kyori.adventure.key.*")
-    }
-    exclude("net/kyori/adventure/key/**") // problems with different classes
+    exclude("plugin.properties") // JGit
+    relocate("me.nelonn.bestvecs", "$shadedPackage.bestvecs")
+    relocate("me.nelonn.commandlib", "$shadedPackage.commandlib")
+    relocate("me.nelonn.configlib", "$shadedPackage.configlib")
+    relocate("com.github.retrooper.packetevents", "$shadedPackage.packetevents.api")
+    relocate("io.github.retrooper.packetevents", "$shadedPackage.packetevents.impl")
+    //relocate("com.google.gson", "$shadedPackage.gson")
+    relocate("org.apache.commons", "$shadedPackage.commons")
     archiveClassifier.set("")
 }
 
@@ -133,9 +127,4 @@ tasks.withType<Javadoc> {
 java {
     withSourcesJar()
     withJavadocJar()
-}
-
-configure<LicenseExtension> {
-    header(rootProject.file("HEADER.txt"))
-    include("**/*.java")
 }

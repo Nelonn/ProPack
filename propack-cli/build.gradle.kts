@@ -1,9 +1,7 @@
-import org.cadixdev.gradle.licenser.LicenseExtension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     `java-library`
-    id("org.cadixdev.licenser")
     id("com.github.johnrengelman.shadow")
 }
 
@@ -65,9 +63,4 @@ tasks.named<ShadowJar>("shadowJar") {
 
 tasks.named("assemble").configure {
     dependsOn("shadowJar")
-}
-
-configure<LicenseExtension> {
-    header(rootProject.file("HEADER.txt"))
-    include("**/*.java")
 }

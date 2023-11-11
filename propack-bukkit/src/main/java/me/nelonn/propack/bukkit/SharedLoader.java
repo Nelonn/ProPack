@@ -35,7 +35,7 @@ public final class SharedLoader {
 
     public SharedLoader(@NotNull Plugin plugin) {
         this.plugin = plugin;
-        File rootDir = Bukkit.getServer().getPluginsFolder().getParentFile();
+        File rootDir = Bukkit.getServer().getUpdateFolderFile().getParentFile().getParentFile();
         sharedDir = new File(rootDir, DIRECTORY + "/" + DOT_SHARED);
     }
 

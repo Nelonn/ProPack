@@ -103,6 +103,7 @@ public class GatherSourcesTask extends AbstractTask {
                 io.getFiles().addFile(new RealFile(path, file));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new IllegalArgumentException("Something went wrong when adding '" + fileName + "'", e);
         }
     }
