@@ -6,6 +6,7 @@ Modern solution for minecraft resource pack development
 
 
 ## Features
+
 - [Models generating](#meshes--models)
 - [Auto CustomModelData](#auto-custommodeldata)
 - [Auto sounds FFmpeg conversion](#sounds)
@@ -14,28 +15,34 @@ Modern solution for minecraft resource pack development
 
 
 ## Example Project
+
 Look at the [example project](https://github.com/Nelonn/ProPack/blob/master/propack-core/src/main/resources/resources/example)
 
 
 ## Json specification
+
 Json is used in lenient mode, possible file extensions:
 - json
 - [json5](https://json5.org/)
 - jsonc
 
-Some futures from json 5 will not work due to [GSON](https://github.com/google/gson) flaws
+Some features of json5 will not work due to [GSON](https://github.com/google/gson) flaws
 
 
 ## Meshes & Models
-[Java Block/Item models](https://minecraft.fandom.com/wiki/Model) in the ProPack are called *meshes*.
+
+[Java Block/Item models](https://minecraft.fandom.com/wiki/Model) in the ProPack are called **meshes**.
 Their files should end with `.mesh.json`.
+
+In order for your **mesh** to be applied to an item, you need to create a model configuration
 
 Models configuration file name should end with `.model.json`. 
 
-Currently implemented model types:
-
 <br>
-DefaultItemModel, example:
+
+### Currently implemented model types:
+
+**DefaultItemModel**, example:
 
 ```json
 {
@@ -46,7 +53,8 @@ DefaultItemModel, example:
 ```
 
 <br>
-CombinedItemModel, example:
+
+**CombinedItemModel**, example:
 
 ```json
 {
@@ -64,7 +72,8 @@ CombinedItemModel, example:
 ```
 
 <br>
-SlotItemModel, example:
+
+**SlotItemModel**, example:
 
 ```json
 {
@@ -93,10 +102,15 @@ SlotItemModel, example:
 }
 ```
 
-`Target` - this is an indication of the items for which you need to [Auto CustomModelData](#auto-custommodeldata) of the specified model.
+### Fields
+
+- `Type` - the type of model presented above
+- `Mesh` - basic **mesh**, the path can be specified relative to (`./`)
+- `Target` - this is a list of items for which you want to [Auto CustomModelData](#auto-custommodeldata) of the specified model.
 
 
 ## Auto CustomModelData
+
 When building resource pack ProPack takes the default model from the folder `include/assets/minecraft/models/item/<item>.json`
 and adds the necessary elements to override.
 
