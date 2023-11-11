@@ -27,7 +27,7 @@ public final class Config {
     public static final ConfigValue<Boolean> dispatcherReplace = new ConfigValue<>("dispatcher.replace", false);
     public static final ConfigValue<String> dispatcherPack = new ConfigValue<>("dispatcher.pack");
     public static final ConfigValue<Integer> dispatcherDelay = new ConfigValue<>("dispatcher.delay", 0);
-    public static final ConfigValue<Boolean> dispatcherRequired = new ConfigValue<>("dispatcher.replace", false);
+    public static final ConfigValue<Boolean> dispatcherRequired = new ConfigValue<>("dispatcher.required", false);
     public static final ConfigValue<MiniMessageText> dispatcherPrompt = new ConfigValue<>("dispatcher.prompt", MiniMessageText.DESERIALIZER.deserialize("&#fa4943Accept the pack to enjoy a full experience"), MiniMessageText.DESERIALIZER);
 
     public static final ConfigValue<Boolean> devServerEnabled = new ConfigValue<>("dev_server.enabled", false);
