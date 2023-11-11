@@ -44,14 +44,14 @@ import java.util.*;
 public class Dispatcher implements Listener {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final ProPackPlugin plugin;
-    private final ProtocolPackSender packSender;
+    private final PackSender packSender;
     private final Map<UUID, ActivePack> pending = new HashMap<>();
     private final ActivePackStore fallbackActivePackStore;
     private ActivePackStore activePackStore;
 
     public Dispatcher(@NotNull ProPackPlugin plugin, @NotNull MemoryActivePackStore memoryStore) {
         this.plugin = plugin;
-        packSender = new ProtocolPackSender();
+        packSender = PaperPackSender.INSTANCE != null ? PaperPackSender.INSTANCE : new ProtocolPackSender();
         Bukkit.getPluginManager().registerEvents(this, plugin);
         fallbackActivePackStore = memoryStore;
         activePackStore = fallbackActivePackStore;
