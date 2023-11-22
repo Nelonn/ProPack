@@ -20,11 +20,15 @@ package me.nelonn.propack.bukkit.command;
 
 import me.nelonn.commandlib.Command;
 import me.nelonn.commandlib.CommandContext;
+import me.nelonn.commandlib.suggestion.Suggestions;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.Util;
 import me.nelonn.propack.bukkit.command.reload.ReloadCommand;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ProPackCommand extends Command<CommandSender> {
     private final ProPackPlugin plugin;
@@ -43,5 +47,10 @@ public class ProPackCommand extends Command<CommandSender> {
             Util.send(sender, "<gray>Run <white>/propack help <gray>to view usage information.");
         }
         return true;
+    }
+
+    @Override
+    public @Nullable List<String> suggest(@NotNull CommandContext<CommandSender> context) {
+        return Suggestions.children(context);
     }
 }

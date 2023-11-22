@@ -20,9 +20,13 @@ package me.nelonn.propack.bukkit.command.reload;
 
 import me.nelonn.commandlib.Command;
 import me.nelonn.commandlib.CommandContext;
+import me.nelonn.commandlib.suggestion.Suggestions;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ReloadCommand extends Command<CommandSender> {
     public ReloadCommand(@NotNull ProPackPlugin plugin) {
@@ -38,5 +42,10 @@ public class ReloadCommand extends Command<CommandSender> {
             ((BaseReloadCommand) command).execute(sender);
         }
         return true;
+    }
+
+    @Override
+    public @Nullable List<String> suggest(@NotNull CommandContext<CommandSender> context) {
+        return Suggestions.children(context);
     }
 }
