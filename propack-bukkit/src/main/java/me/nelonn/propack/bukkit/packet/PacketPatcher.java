@@ -18,8 +18,7 @@
 
 package me.nelonn.propack.bukkit.packet;
 
-import me.nelonn.flint.path.Identifier;
-import me.nelonn.flint.path.InvalidPathException;
+import me.nelonn.flint.path.Key;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.Resources;
 import me.nelonn.propack.asset.CombinedItemModel;
@@ -33,6 +32,7 @@ import me.nelonn.propack.bukkit.adapter.MListTag;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.InvalidPathException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,7 +84,7 @@ public class PacketPatcher {
             }
             Material material = Material.matchMaterial(itemStack.getItemId().toString());
             assert material != null;
-            Identifier itemType = ProPack.adapt(material);
+            Key itemType = ProPack.adapt(material);
             if (!itemModel.getTargetItems().contains(itemType)) return;
             Integer cmd = resources.getMeshes().getCustomModelData(mesh, itemType);
             if (cmd == null) return;

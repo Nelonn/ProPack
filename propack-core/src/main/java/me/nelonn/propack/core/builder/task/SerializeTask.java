@@ -20,7 +20,7 @@ package me.nelonn.propack.core.builder.task;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.asset.SlotItemModel;
 import me.nelonn.propack.builder.Project;
@@ -72,7 +72,7 @@ public class SerializeTask extends AbstractTask {
                 itemModelObject.addProperty("Type", "DefaultItemModel");
                 itemModelObject.addProperty("Mesh", defaultModel.getMesh().toString());
                 JsonArray targetItems = new JsonArray();
-                for (Identifier targetItemId : defaultModel.getTargetItems()) {
+                for (Key targetItemId : defaultModel.getTargetItems()) {
                     targetItems.add(targetItemId.toString());
                 }
                 itemModelObject.add("Target", targetItems);
@@ -84,7 +84,7 @@ public class SerializeTask extends AbstractTask {
                 combinedModel.getElements().forEach(elementsArray::add);
                 itemModelObject.add("Elements", elementsArray);
                 JsonArray targetItems = new JsonArray();
-                for (Identifier targetItemId : combinedModel.getTargetItems()) {
+                for (Key targetItemId : combinedModel.getTargetItems()) {
                     targetItems.add(targetItemId.toString());
                 }
                 itemModelObject.add("Target", targetItems);
@@ -100,7 +100,7 @@ public class SerializeTask extends AbstractTask {
                     slotsObject.add(slot.getName(), slotEntries);
                 }
                 JsonArray targetItems = new JsonArray();
-                for (Identifier targetItemId : slotModel.getTargetItems()) {
+                for (Key targetItemId : slotModel.getTargetItems()) {
                     targetItems.add(targetItemId.toString());
                 }
                 itemModelObject.add("Target", targetItems);

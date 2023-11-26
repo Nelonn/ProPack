@@ -20,7 +20,7 @@ package me.nelonn.propack.core.builder;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.MeshesMap;
 import org.jetbrains.annotations.NotNull;
@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MeshesMapBuilder {
-    private final Map<Identifier, ItemEntry> mappers = new HashMap<>();
+    private final Map<Key, ItemEntry> mappers = new HashMap<>();
 
-    public @NotNull MeshesMapBuilder.ItemEntry getMapper(@NotNull Identifier itemId) {
+    public @NotNull MeshesMapBuilder.ItemEntry getMapper(@NotNull Key itemId) {
         return mappers.computeIfAbsent(itemId, ItemEntry::new);
     }
 
@@ -43,7 +43,7 @@ public class MeshesMapBuilder {
     }
 
     public @NotNull MeshesMap build() {
-        Map<Identifier, Map<Path, Integer>> map = new HashMap<>();
+        Map<Key, Map<Path, Integer>> map = new HashMap<>();
         for (ItemEntry itemEntry : getMappers()) {
             map.put(itemEntry.getItemId(), new HashMap<>(itemEntry.getMap().inverse()));
         }
@@ -51,16 +51,16 @@ public class MeshesMapBuilder {
     }
 
     public static class ItemEntry {
-        private final Identifier itemId;
+        private final Key itemId;
         private final BiMap<Integer, Path> map = HashBiMap.create();
         private final AtomicInteger integer = new AtomicInteger(1);
 
-        public ItemEntry(@NotNull Identifier itemId) {
+        public ItemEntry(@NotNull Key itemId) {
             this.itemId = itemId;
         }
 
         @NotNull
-        public Identifier getItemId() {
+        public Key getItemId() {
             return itemId;
         }
 

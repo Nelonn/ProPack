@@ -145,13 +145,13 @@ public class ProcessArmorTextures extends AbstractTask {
             return null;
         }
         Path path = PathUtil.resolve(layerImagePath, contentPath);
-        String pathValue = path.getValue();
+        String pathValue = path.value();
         if (!pathValue.endsWith(".png")) {
             pathValue += ".png";
         }
-        File pngFile = io.getFiles().getFile(PathUtil.join("content", path.getNamespace(), pathValue));
+        File pngFile = io.getFiles().getFile(PathUtil.join("content", path.namespace(), pathValue));
         if (pngFile == null) {
-            String assetsPath = PathUtil.join("assets", path.getNamespace(), "textures", pathValue);
+            String assetsPath = PathUtil.join("assets", path.namespace(), "textures", pathValue);
             pngFile = io.getFiles().getFile(assetsPath);
             if (pngFile == null) {
                 pngFile = io.getFiles().getFile("include/" + assetsPath);

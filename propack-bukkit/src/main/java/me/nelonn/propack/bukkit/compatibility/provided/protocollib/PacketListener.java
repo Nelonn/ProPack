@@ -108,7 +108,7 @@ public class PacketListener extends PacketAdapter {
             SoundAsset sound = resources.sound(path);
             if (sound != null) {
                 path = sound.realPath();
-                minecraftKey = new MinecraftKey(path.getNamespace(), path.getValue());
+                minecraftKey = new MinecraftKey(path.namespace(), path.value());
                 event.getPacket().getMinecraftKeys().write(0, minecraftKey);
             }
         }

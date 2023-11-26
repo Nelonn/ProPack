@@ -21,7 +21,7 @@ package me.nelonn.propack.core.builder.json.mesh;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.propack.core.util.GsonHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,15 +48,15 @@ public class ModelOverride {
     }
 
     public static class Condition {
-        private final Identifier type;
+        private final Key type;
         private final float threshold;
 
-        public Condition(@NotNull Identifier type, float threshold) {
+        public Condition(@NotNull Key type, float threshold) {
             this.type = type;
             this.threshold = threshold;
         }
 
-        public @NotNull Identifier getType() {
+        public @NotNull Key getType() {
             return this.type;
         }
 
@@ -77,10 +77,10 @@ public class ModelOverride {
         }
 
         protected List<Condition> deserializeMinPropertyValues(JsonObject object) {
-            Map<Identifier, Float> map = Maps.newLinkedHashMap();
+            Map<Key, Float> map = Maps.newLinkedHashMap();
             JsonObject jsonObject = GsonHelper.getObject(object, "predicate");
             for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-                map.put(Identifier.of(entry.getKey()), GsonHelper.asFloat(entry.getValue(), entry.getKey()));
+                map.put(Key.of(entry.getKey()), GsonHelper.asFloat(entry.getValue(), entry.getKey()));
             }
             return map.entrySet().stream().map(entry -> new Condition(entry.getKey(), entry.getValue())).collect(ImmutableList.toImmutableList());
         }

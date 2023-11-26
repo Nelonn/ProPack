@@ -62,14 +62,14 @@ public class ProcessLanguagesTask extends AbstractTask {
                 io.getFiles().removeFile(filePath);
                 JsonObject jsonObject = ((JsonFile) file).getContent();
                 Path resourcePath = PathUtil.resourcePath(filePath);
-                String langCode = resourcePath.getValue();
+                String langCode = resourcePath.value();
                 langCode = langCode.substring(langCode.indexOf('/') + 1, langCode.length() - ".font.json".length());
-                String langPath = "assets/" + resourcePath.getNamespace() + "/lang/" + langCode + ".json";
+                String langPath = "assets/" + resourcePath.namespace() + "/lang/" + langCode + ".json";
                 JsonFile langJsonFile = languageFiles.computeIfAbsent(langPath, key -> new JsonFile(key, new JsonObject()));
                 for (String key : jsonObject.keySet()) {
                     String translation = GsonHelper.getString(jsonObject, key);
-                    key = key.replace("<namespace>", resourcePath.getNamespace());
-                    translation = translation.replace("<namespace>", resourcePath.getNamespace());
+                    key = key.replace("<namespace>", resourcePath.namespace());
+                    translation = translation.replace("<namespace>", resourcePath.namespace());
                     langJsonFile.getContent().addProperty(key, translation);
                 }
             } catch (Exception e) {

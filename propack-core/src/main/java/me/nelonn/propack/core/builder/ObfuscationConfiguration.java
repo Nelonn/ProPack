@@ -18,6 +18,7 @@
 
 package me.nelonn.propack.core.builder;
 
+import me.nelonn.flint.path.Path;
 import me.nelonn.flint.path.PathImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +42,7 @@ public class ObfuscationConfiguration {
                                     boolean ogg,
                                     boolean sounds,
                                     boolean fonts) {
-        if (!PathImpl.isValidNamespace(namespace)) {
+        if (Path.checkNamespace(namespace).isPresent()) {
             throw new IllegalArgumentException("Illegal namespace: " + namespace);
         }
         this.enabled = enabled;

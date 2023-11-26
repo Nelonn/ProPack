@@ -19,6 +19,8 @@
 package me.nelonn.propack.core.builder.task;
 
 import com.google.gson.JsonObject;
+import me.nelonn.flint.path.Path;
+import me.nelonn.flint.path.PathException;
 import me.nelonn.flint.path.PathImpl;
 import me.nelonn.propack.builder.Project;
 import me.nelonn.propack.builder.StrictMode;
@@ -55,7 +57,7 @@ public class GatherSourcesTask extends AbstractTask {
     }
 
     public void addDir(@NotNull TaskIO io, @NotNull String to, @NotNull File directory) {
-        if (!PathImpl.isValidValue(to)) {
+        if (Path.check(to, Path::isAllowedInPathValue).isPresent()) {
             throw new IllegalArgumentException("Non [a-z0-9/._-] character in path '" + to + "'");
         }
         File[] files = directory.listFiles();
@@ -65,7 +67,7 @@ public class GatherSourcesTask extends AbstractTask {
             Pattern pattern = file.isFile() ? getProject().getBuildConfiguration().getFileIgnore() :
                     getProject().getBuildConfiguration().getDirIgnore();
             if (pattern != null && pattern.matcher(fileName).matches()) continue;
-            if (!PathImpl.isValidNamespace(fileName)) {
+            if (Path.checkNamespace(fileName).isPresent()) {
                 String message = to + '/' + fileName + ": Non [a-z0-9._-] character in file name";
                 if (getProject().getBuildConfiguration().getStrictMode() == StrictMode.ENABLED) {
                     throw new IllegalArgumentException(message);
@@ -84,11 +86,11 @@ public class GatherSourcesTask extends AbstractTask {
 
     private void addFile(@NotNull TaskIO io, @NotNull String to, @NotNull File file) {
         String fileName = file.getName().toLowerCase();
-        if (!PathImpl.isValidValue(to)) {
-            throw new IllegalArgumentException("Non [a-z0-9/._-] character in path '" + to + "'");
+        if (Path.check(to, Path::isAllowedInPathValue).isPresent()) {
+            throw new IllegalArgumentException("Invalid directory '" + to + "'");
         }
-        if (!PathImpl.isValidNamespace(fileName)) {
-            throw new IllegalArgumentException("Non [a-z0-9._-] character in file '" + to + "/" + fileName + "'");
+        if (Path.checkNamespace(fileName).isPresent()) {
+            throw new IllegalArgumentException("Invalid file name '" + fileName + "'");
         }
         Pattern pattern = getProject().getBuildConfiguration().getFileIgnore();
         if (pattern != null && pattern.matcher(fileName).matches()) return;

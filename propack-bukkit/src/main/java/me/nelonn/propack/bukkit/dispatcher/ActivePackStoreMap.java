@@ -18,7 +18,7 @@
 
 package me.nelonn.propack.bukkit.dispatcher;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,31 +26,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ActivePackStoreMap {
-    private final Map<Identifier, ActivePackStore> knownStores = new HashMap<>();
+    private final Map<Key, ActivePackStore> knownStores = new HashMap<>();
 
-    public boolean register(@NotNull Identifier id, @NotNull ActivePackStore activePackStore) {
+    public boolean register(@NotNull Key id, @NotNull ActivePackStore activePackStore) {
         if (knownStores.containsKey(id)) return false;
         knownStores.put(id, activePackStore);
         return true;
     }
 
     public boolean register(@NotNull String id, @NotNull ActivePackStore activePackStore) {
-        return register(Identifier.ofWithFallback(id, "propack"), activePackStore);
+        return register(Key.withFallback(id, "propack"), activePackStore);
     }
 
-    public boolean unregister(@NotNull Identifier id) {
+    public boolean unregister(@NotNull Key id) {
         return knownStores.remove(id) != null;
     }
 
     public boolean unregister(@NotNull String id) {
-        return unregister(Identifier.ofWithFallback(id, "propack"));
+        return unregister(Key.withFallback(id, "propack"));
     }
 
-    public @Nullable ActivePackStore get(@NotNull Identifier id) {
+    public @Nullable ActivePackStore get(@NotNull Key id) {
         return knownStores.get(id);
     }
 
     public @Nullable ActivePackStore get(@NotNull String id) {
-        return get(Identifier.ofWithFallback(id, "propack"));
+        return get(Key.withFallback(id, "propack"));
     }
 }

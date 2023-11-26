@@ -18,7 +18,7 @@
 
 package me.nelonn.propack.core;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.propack.builder.hosting.Hosting;
 import me.nelonn.propack.builder.hosting.HostingMap;
 import org.jetbrains.annotations.NotNull;
@@ -27,13 +27,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SimpleHostingMap implements HostingMap {
-    protected final Map<Identifier, Hosting> knownHostings = new HashMap<>();
+    protected final Map<Key, Hosting> knownHostings = new HashMap<>();
 
     public SimpleHostingMap() {
     }
 
     @Override
-    public boolean register(@NotNull Identifier id, @NotNull Hosting hosting) {
+    public boolean register(@NotNull Key id, @NotNull Hosting hosting) {
         if (hosting.register(this, id)) {
             knownHostings.put(id, hosting);
             return true;
@@ -42,7 +42,7 @@ public class SimpleHostingMap implements HostingMap {
     }
 
     @Override
-    public boolean unregister(@NotNull Identifier id) {
+    public boolean unregister(@NotNull Key id) {
         Hosting hosting = knownHostings.get(id);
         if (hosting == null || !hosting.unregister(this)) return false;
         knownHostings.remove(id);
@@ -50,12 +50,12 @@ public class SimpleHostingMap implements HostingMap {
     }
 
     @Override
-    public @NotNull Hosting getHosting(@NotNull Identifier id) {
+    public @NotNull Hosting getHosting(@NotNull Key id) {
         return knownHostings.get(id);
     }
 
     @Override
-    public @NotNull Map<Identifier, Hosting> getKnownHostings() {
+    public @NotNull Map<Key, Hosting> getKnownHostings() {
         return knownHostings;
     }
 }

@@ -20,7 +20,7 @@ package me.nelonn.propack.bukkit.adapter.impl.v1_20_R1;
 
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.propack.bukkit.adapter.*;
 import me.nelonn.propack.bukkit.adapter.packet.MClientboundContainerSetSlotPacket;
 import me.nelonn.propack.bukkit.adapter.packet.MServerboundSetCreativeModeSlotPacket;
@@ -143,8 +143,8 @@ public class PaperweightAdapter implements Adapter {
         }
 
         @Override
-        public @NotNull Identifier getItemId() {
-            return Identifier.of(handle.getItem().toString());
+        public @NotNull Key getItemId() {
+            return Key.of(handle.getItem().toString());
         }
 
         @Override

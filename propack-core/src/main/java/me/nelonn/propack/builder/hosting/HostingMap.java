@@ -18,29 +18,29 @@
 
 package me.nelonn.propack.builder.hosting;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
 public interface HostingMap {
-    boolean register(@NotNull Identifier id, @NotNull Hosting hosting);
+    boolean register(@NotNull Key id, @NotNull Hosting hosting);
 
     default boolean register(@NotNull String id, @NotNull Hosting hosting) {
-        return register(Identifier.ofWithFallback(id, "propack"), hosting);
+        return register(Key.withFallback(id, "propack"), hosting);
     }
 
-    boolean unregister(@NotNull Identifier id);
+    boolean unregister(@NotNull Key id);
 
     default boolean unregister(@NotNull String id) {
-        return unregister(Identifier.ofWithFallback(id, "propack"));
+        return unregister(Key.withFallback(id, "propack"));
     }
 
     default boolean unregister(@NotNull Hosting hosting) {
         return unregister(hosting.getId());
     }
 
-    @NotNull Hosting getHosting(@NotNull Identifier id);
+    @NotNull Hosting getHosting(@NotNull Key id);
 
-    @NotNull Map<Identifier, Hosting> getKnownHostings();
+    @NotNull Map<Key, Hosting> getKnownHostings();
 }

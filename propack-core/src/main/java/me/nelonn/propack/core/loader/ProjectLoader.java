@@ -20,7 +20,7 @@ package me.nelonn.propack.core.loader;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.*;
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.Resources;
 import me.nelonn.propack.builder.StrictMode;
@@ -280,7 +280,7 @@ public class ProjectLoader {
             String uploadConfigContent = IOUtil.readString(uploadConfigFile);
             JsonObject uploadConfigObject = GsonHelper.getGson().fromJson(uploadConfigContent, JsonObject.class);
             if (GsonHelper.getBoolean(uploadConfigObject, "Enabled")) {
-                Identifier to = Identifier.ofWithFallback(GsonHelper.getString(uploadConfigObject, "To"), "propack");
+                Key to = Key.withFallback(GsonHelper.getString(uploadConfigObject, "To"), "propack");
                 hosting = core.getHostingMap().getHosting(to);
                 JsonObject optionsObject = GsonHelper.getObject(uploadConfigObject, "Options");
                 uploadOptions = toOptions(optionsObject);

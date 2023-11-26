@@ -20,7 +20,7 @@ package me.nelonn.propack.bukkit.adapter.impl.v1_17_R1_2;
 
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.propack.bukkit.adapter.Adapter;
 import me.nelonn.propack.bukkit.adapter.MCompoundTag;
 import me.nelonn.propack.bukkit.adapter.MItemStack;
@@ -147,8 +147,8 @@ public class PaperweightAdapter implements Adapter {
         }
 
         @Override
-        public @NotNull Identifier getItemId() {
-            return Identifier.of(handle.getItem().toString());
+        public @NotNull Key getItemId() {
+            return Key.of(handle.getItem().toString());
         }
 
         @Override

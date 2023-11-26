@@ -37,6 +37,6 @@ public class SoundAsset extends AbstractAsset implements RealAsset, Sound.Type {
 
     @Override
     public @NotNull Key key() {
-        return realPath();
+        return Key.key(realPath().value(), realPath().namespace());
     }
 }

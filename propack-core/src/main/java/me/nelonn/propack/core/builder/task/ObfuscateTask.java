@@ -303,7 +303,7 @@ public class ObfuscateTask extends AbstractTask {
             JsonObject obfuscatedSounds = new JsonObject();
             List<String> filesToRemove = new ArrayList<>();
             for (SoundAssetBuilder soundAsset : io.getAssets().getSounds()) {
-                String soundsFilePath = "assets/" + soundAsset.getPath().getNamespace() + "/sounds.json";
+                String soundsFilePath = "assets/" + soundAsset.getPath().namespace() + "/sounds.json";
                 File soundsFile = io.getFiles().getFile(soundsFilePath);
                 if (!(soundsFile instanceof JsonFile)) {
                     throw new IllegalStateException("sounds.json file not found for '" + soundAsset.getPath() + "'");
@@ -312,9 +312,9 @@ public class ObfuscateTask extends AbstractTask {
                     filesToRemove.add(soundsFilePath);
                 }
                 JsonObject soundsObject = ((JsonFile) soundsFile).getContent();
-                JsonObject soundObject = soundsObject.getAsJsonObject(soundAsset.getSoundPath().getValue());
+                JsonObject soundObject = soundsObject.getAsJsonObject(soundAsset.getSoundPath().value());
                 Path obfuscatedSoundPath = Path.of(obfuscatedNamespace, namer.next());
-                obfuscatedSounds.add(obfuscatedSoundPath.getValue(), soundObject);
+                obfuscatedSounds.add(obfuscatedSoundPath.value(), soundObject);
                 soundAsset.setSoundPath(obfuscatedSoundPath);
             }
             for (String fileToRemove : filesToRemove) {
@@ -326,7 +326,7 @@ public class ObfuscateTask extends AbstractTask {
         if (conf.isFonts()) {
             namer.reset();
             for (FontBuilder font : io.getAssets().getFonts()) {
-                String fontFilePath = "assets/" + font.getFontPath().getNamespace() + "/font/" + font.getFontPath().getValue() + ".json";
+                String fontFilePath = "assets/" + font.getFontPath().namespace() + "/font/" + font.getFontPath().value() + ".json";
                 File fontFile = io.getFiles().removeFile(fontFilePath);
                 if (!(fontFile instanceof JsonFile)) {
                     throw new IllegalStateException("font file not found for '" + font.getPath() + "'");

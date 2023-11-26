@@ -18,13 +18,13 @@
 
 package me.nelonn.propack.asset;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
 public interface ItemModel extends Asset {
 
-    @NotNull Set<Identifier> getTargetItems();
+    @NotNull Set<Key> getTargetItems();
 
 }

@@ -16,7 +16,7 @@ var adventureVersion = "4.14.0"
 
 dependencies {
     "implementation"(project(":propack-api"))
-    "compileOnly"(files("../libs/lib-flint-path-0.0.1.jar"))
+    "compileOnly"(files("../libs/flint-path-0.0.1.jar"))
     "implementation"(files("../libs/bestvecs-0.0.1.jar"))
 
     "compileOnly"("org.slf4j:slf4j-api:2.0.7")

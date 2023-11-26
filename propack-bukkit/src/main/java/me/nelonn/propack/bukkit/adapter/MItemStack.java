@@ -18,12 +18,12 @@
 
 package me.nelonn.propack.bukkit.adapter;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface MItemStack {
-    @NotNull Identifier getItemId();
+    @NotNull Key getItemId();
 
     @Nullable MCompoundTag getTag();
 }

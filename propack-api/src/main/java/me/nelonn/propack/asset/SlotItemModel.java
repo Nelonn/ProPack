@@ -18,7 +18,7 @@
 
 package me.nelonn.propack.asset;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.flint.path.Path;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class SlotItemModel extends MultiItemModel {
     private final Map<String, Slot> slots;
 
-    public SlotItemModel(@NotNull Path path, @NotNull Set<Identifier> targetItems,
+    public SlotItemModel(@NotNull Path path, @NotNull Set<Key> targetItems,
                             @NotNull Path baseMesh, @NotNull Map<String, Slot> slots) {
         super(path, targetItems, baseMesh);
         this.slots = Collections.unmodifiableMap(slots);
@@ -68,7 +68,7 @@ public class SlotItemModel extends MultiItemModel {
         }
         if (empty) return getBaseMesh();
         String hex = Integer.toHexString(sb.toString().hashCode());
-        return Path.of(getBaseMesh().getNamespace(), getBaseMesh().getValue() + '-' + hex);
+        return Path.of(getBaseMesh().namespace(), getBaseMesh().value() + '-' + hex);
     }
 
     public @NotNull Collection<Slot> getSlots() {

@@ -30,7 +30,7 @@ public final class PathUtil {
     public static @NotNull Path resolve(@NotNull String input, @NotNull String curNamespace, @NotNull String curPath) {
         input = input.replace("<namespace>", curNamespace);
         if (!input.startsWith("./") && !input.startsWith("../")) {
-            return Path.ofWithFallback(input, curNamespace);
+            return Path.withFallback(input, curNamespace);
         }
         List<String> path = new ArrayList<>(Arrays.asList(curPath.split("/")));
         String[] relative = input.split("/");
@@ -45,7 +45,7 @@ public final class PathUtil {
     }
 
     public static @NotNull Path resolve(@NotNull String input, @NotNull Path contentPath) {
-        return resolve(input, contentPath.getNamespace(), parentDirectory(contentPath));
+        return resolve(input, contentPath.namespace(), parentDirectory(contentPath));
     }
 
     public static @NotNull String parentDirectory(@NotNull String filePath) {
@@ -53,7 +53,7 @@ public final class PathUtil {
     }
 
     public static @NotNull String parentDirectory(@NotNull Path filePath) {
-        return parentDirectory(filePath.getValue());
+        return parentDirectory(filePath.value());
     }
 
     public static @NotNull Path resourcePath(@NotNull String input) {
@@ -69,15 +69,15 @@ public final class PathUtil {
     }
 
     public static @NotNull String contentPath(@NotNull Path path) {
-        return "content/" + path.getNamespace() + '/' + path.getValue();
+        return "content/" + path.namespace() + '/' + path.value();
     }
 
     public static @NotNull String assetsPath(@NotNull Path path, @NotNull String type) {
-        return "assets/" + path.getNamespace() + '/' + type + '/' + path.getValue();
+        return "assets/" + path.namespace() + '/' + type + '/' + path.value();
     }
 
     public static @NotNull Path append(@NotNull Path path, @NotNull String string) {
-        return Path.of(path.getNamespace(), path.getValue() + string);
+        return Path.of(path.namespace(), path.value() + string);
     }
 
     public static @NotNull String format(@NotNull String path) {

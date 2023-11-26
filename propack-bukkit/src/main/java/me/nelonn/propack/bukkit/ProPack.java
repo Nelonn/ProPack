@@ -19,7 +19,7 @@
 package me.nelonn.propack.bukkit;
 
 import com.google.common.base.Preconditions;
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.propack.ResourcePack;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -41,8 +41,8 @@ public final class ProPack {
         ProPack.core = core;
     }
 
-    public static @NotNull Identifier adapt(@NotNull Material material) {
-        return Identifier.of(material.getKey().toString());
+    public static @NotNull Key adapt(@NotNull Material material) {
+        return Key.of(material.getKey().toString());
     }
 
     public static @Nullable ResourcePack getAppliedResourcePack(@NotNull Player player) {

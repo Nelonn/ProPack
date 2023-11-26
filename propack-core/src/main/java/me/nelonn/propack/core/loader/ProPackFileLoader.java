@@ -21,7 +21,7 @@ package me.nelonn.propack.core.loader;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.MeshesMap;
 import me.nelonn.propack.Resources;
@@ -70,12 +70,12 @@ public class ProPackFileLoader {
                 if (type.equals("DefaultItemModel")) {
                     Path mesh = Path.of(GsonHelper.getString(modelObject, "Mesh"));
                     JsonArray targetArray = GsonHelper.getArray(modelObject, "Target");
-                    Set<Identifier> targetItems = parseTargetItems(targetArray);
+                    Set<Key> targetItems = parseTargetItems(targetArray);
                     itemModels.put(path, new DefaultItemModelBuilder(path).setMesh(mesh).setTargetItems(targetItems));
                 } else if (type.equals("CombinedItemModel")) {
                     Path mesh = Path.of(GsonHelper.getString(modelObject, "Mesh"));
                     JsonArray targetArray = GsonHelper.getArray(modelObject, "Target");
-                    Set<Identifier> targetItems = parseTargetItems(targetArray);
+                    Set<Key> targetItems = parseTargetItems(targetArray);
                     JsonArray elementsArray = GsonHelper.getArray(modelObject, "Elements");
                     Set<String> elements = new HashSet<>();
                     Util.forEachStringArray(elementsArray, "Elements", elements::add);
@@ -84,7 +84,7 @@ public class ProPackFileLoader {
                 } else if (type.equals("SlotItemModel")) {
                     Path mesh = Path.of(GsonHelper.getString(modelObject, "Mesh"));
                     JsonArray targetArray = GsonHelper.getArray(modelObject, "Target");
-                    Set<Identifier> targetItems = parseTargetItems(targetArray);
+                    Set<Key> targetItems = parseTargetItems(targetArray);
                     JsonObject slotsObject = GsonHelper.getObject(modelObject, "Slots");
                     Map<String, SlotItemModel.Slot> slots = new HashMap<>();
                     for (Map.Entry<String, JsonElement> slotEntry : slotsObject.entrySet()) {
@@ -127,9 +127,9 @@ public class ProPackFileLoader {
             }
 
             JsonObject meshMappingObject = GsonHelper.getObject(resources, "mesh_mapping");
-            Map<Identifier, Map<Path, Integer>> map = new HashMap<>();
+            Map<Key, Map<Path, Integer>> map = new HashMap<>();
             for (Map.Entry<String, JsonElement> entry : meshMappingObject.entrySet()) {
-                Identifier itemId = Identifier.of(entry.getKey());
+                Key itemId = Key.of(entry.getKey());
                 JsonObject jsonObject = GsonHelper.asObject(entry.getValue(), entry.getKey());
                 Map<Path, Integer> meshMap = new HashMap<>();
                 for (Map.Entry<String, JsonElement> meshEntry : jsonObject.entrySet()) {
@@ -152,10 +152,10 @@ public class ProPackFileLoader {
         }
     }
 
-    private Set<Identifier> parseTargetItems(JsonArray jsonArray) {
-        HashSet<Identifier> output = new HashSet<>();
+    private Set<Key> parseTargetItems(JsonArray jsonArray) {
+        HashSet<Key> output = new HashSet<>();
         Util.forEachStringArray(jsonArray, "Target", s -> {
-            output.add(Identifier.of(s));
+            output.add(Key.of(s));
         });
         return output;
     }
