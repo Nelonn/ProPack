@@ -32,10 +32,20 @@ public final class PathUtil {
         if (!input.startsWith("./") && !input.startsWith("../")) {
             return Path.withFallback(input, curNamespace);
         }
-        List<String> path = new ArrayList<>(Arrays.asList(curPath.split("/")));
+        List<String> path;
+        if (curPath.isEmpty()) {
+            path = new ArrayList<>();
+        } else {
+            path = new ArrayList<>(Arrays.asList(curPath.split("/")));
+        }
         String[] relative = input.split("/");
         for (String s : relative) {
             if (s.equals("..")) {
+                if (path.isEmpty()) {
+                    throw new IllegalArgumentException("Cannot move to parent directory (namespace: '" + curNamespace
+                            + "', parent: '" + curPath
+                            + ", input: '" + input + "')");
+                }
                 path.remove(path.size() - 1);
             } else if (!s.isEmpty() && !s.equals(".")) {
                 path.add(s);

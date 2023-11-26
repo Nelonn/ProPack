@@ -67,13 +67,17 @@ public class ProcessModelsTask extends AbstractTask {
         for (File file : io.getFiles()) {
             try {
                 String filePath = file.getPath();
-                if (!filePath.startsWith("content/") || !filePath.endsWith(".model.json") || !(file instanceof JsonFile)) continue;
+                if (!filePath.startsWith("content/") || !filePath.endsWith(".model.json")) continue;
                 io.getFiles().removeFile(filePath);
+                if (!(file instanceof JsonFile)) {
+                    LOGGER.error("{} :: model file is not Json", filePath);
+                    continue;
+                }
                 JsonObject rootJson = ((JsonFile) file).getContent();
                 Path resourcePath = PathUtil.resourcePath(filePath, ".model.json");
                 String type = GsonHelper.getString(rootJson, "Type");
-                String mesh = GsonHelper.getString(rootJson, "Mesh");
-                Path meshPath = PathUtil.resolve(mesh, resourcePath);
+                String rawMeshPath = GsonHelper.getString(rootJson, "Mesh");
+                Path meshPath = PathUtil.resolve(rawMeshPath, resourcePath);
                 Set<Key> targetItems = parseTarget(rootJson);
                 ItemModelBuilder builder;
                 if (type.equals("DefaultItemModel")) {
@@ -81,15 +85,12 @@ public class ProcessModelsTask extends AbstractTask {
                 } else if (type.equals("CombinedItemModel")) {
                     File meshFile = io.getFiles().getFile(PathUtil.contentPath(meshPath) + ".mesh.json");
                     if (!(meshFile instanceof JsonFile)) {
-                        throw new IllegalArgumentException("Mesh not found: " + meshPath);
+                        LOGGER.error("{} :: mesh not found: {}", filePath, rawMeshPath);
+                        continue;
                     }
                     JsonModel baseMesh = JsonModel.deserialize(((JsonFile) meshFile).getContent());
                     Map<String, String> baseTextureMap = baseMesh.getTextureMap();
-                    for (Map.Entry<String, String> textureEntry : baseTextureMap.entrySet()) {
-                        String texture = textureEntry.getValue();
-                        if (texture.startsWith("#")) continue;
-                        textureEntry.setValue(PathUtil.resolve(texture, resourcePath).toString());
-                    }
+                    processTextureMap(baseTextureMap, resourcePath);
                     JsonObject elementsObject = GsonHelper.getObject(rootJson, "Elements");
                     Map<String, JsonModel> combinationElements = new HashMap<>();
                     for (Map.Entry<String, JsonElement> elementEntry : elementsObject.entrySet()) {
@@ -129,7 +130,8 @@ public class ProcessModelsTask extends AbstractTask {
                 } else if (type.equals("SlotItemModel")) {
                     File meshFile = io.getFiles().getFile(PathUtil.contentPath(meshPath) + ".mesh.json");
                     if (!(meshFile instanceof JsonFile)) {
-                        throw new IllegalArgumentException("Mesh not found: " + meshPath);
+                        LOGGER.error("{} :: mesh not found: {}", filePath, rawMeshPath);
+                        continue;
                     }
                     JsonModel baseMesh = JsonModel.deserialize(((JsonFile) meshFile).getContent());
                     Map<String, String> baseTextureMap = baseMesh.getTextureMap();
@@ -200,7 +202,8 @@ public class ProcessModelsTask extends AbstractTask {
                     }
                     builder = new SlotItemModelBuilder(resourcePath).setMesh(meshPath).setSlots(resultSlots);
                 } else {
-                    throw new IllegalArgumentException("Unknown model type: " + type);
+                    LOGGER.error("{} :: Unknown model type: '{}'", filePath, type);
+                    continue;
                 }
                 Set<Key> toOverride = meshesToOverride.computeIfAbsent(meshPath, key -> new HashSet<>());
                 toOverride.addAll(targetItems);
@@ -213,8 +216,12 @@ public class ProcessModelsTask extends AbstractTask {
         for (File file : io.getFiles()) {
             try {
                 String filePath = file.getPath();
-                if (!filePath.startsWith("content/") || !filePath.endsWith(".mesh.json") || !(file instanceof JsonFile)) continue;
+                if (!filePath.startsWith("content/") || !filePath.endsWith(".mesh.json")) continue;
                 io.getFiles().removeFile(filePath);
+                if (!(file instanceof JsonFile)) {
+                    LOGGER.error("{} :: mesh file is not Json", filePath);
+                    continue;
+                }
                 Path resourcePath = PathUtil.resourcePath(filePath, ".mesh.json");
                 JsonModel jsonModel = JsonModel.deserialize(((JsonFile) file).getContent());
                 String parent = jsonModel.getParent();
@@ -222,11 +229,7 @@ public class ProcessModelsTask extends AbstractTask {
                     parent = PathUtil.resolve(parent, resourcePath).toString();
                 }
                 Map<String, String> textureMap = jsonModel.getTextureMap();
-                for (Map.Entry<String, String> textureEntry : textureMap.entrySet()) {
-                    String texture = textureEntry.getValue();
-                    if (texture.startsWith("#")) continue;
-                    textureEntry.setValue(PathUtil.resolve(texture, resourcePath).toString());
-                }
+                processTextureMap(textureMap, resourcePath);
                 jsonModel = new JsonModel(parent, jsonModel.getTextureSize(), textureMap, jsonModel.getElements(),
                         jsonModel.useAmbientOcclusion(), jsonModel.getGuiLight(), jsonModel.getTransformations(),
                         jsonModel.getOverrides());
@@ -259,6 +262,14 @@ public class ProcessModelsTask extends AbstractTask {
                         .get());
             }
             jsonObject.add("overrides", overrides);
+        }
+    }
+
+    private void processTextureMap(@NotNull Map<String, String> textureMap, @NotNull Path resourcePath) {
+        for (Map.Entry<String, String> textureEntry : textureMap.entrySet()) {
+            String texture = textureEntry.getValue();
+            if (texture.startsWith("#")) continue;
+            textureEntry.setValue(PathUtil.resolve(texture, resourcePath).toString());
         }
     }
 
@@ -298,11 +309,7 @@ public class ProcessModelsTask extends AbstractTask {
         }
         JsonModel elementMesh = JsonModel.deserialize(((JsonFile) elementMeshFile).getContent());
         Map<String, String> textureMap = elementMesh.getTextureMap();
-        for (Map.Entry<String, String> textureEntry : textureMap.entrySet()) {
-            String texture = textureEntry.getValue();
-            if (texture.startsWith("#")) continue;
-            textureEntry.setValue(PathUtil.resolve(texture, elementMeshPath).toString());
-        }
+        processTextureMap(textureMap, elementMeshPath);
         List<ModelElement> modelElements = elementMesh.getElements();
         for (ModelElement modelElement : modelElements) {
             modelElement.from = modelElement.from.add(offset);
