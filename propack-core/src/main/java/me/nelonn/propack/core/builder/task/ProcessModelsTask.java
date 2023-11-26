@@ -244,7 +244,7 @@ public class ProcessModelsTask extends AbstractTask {
         }
         // overriding default models (custom_model_data)
         for (MeshesMapBuilder.ItemEntry itemEntry : meshesMapBuilder.getMappers()) {
-            String path = "include/assets/minecraft/models/item/" + itemEntry.getItemId().value() + ".json";
+            String path = "include/assets/" + itemEntry.getItemId().namespace() + "/models/item/" + itemEntry.getItemId().value() + ".json";
             File file = io.getFiles().getFile(path);
             if (!(file instanceof JsonFile)) {
                 LOGGER.error("Default model not found: {}", path);
