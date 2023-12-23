@@ -37,6 +37,7 @@ var adventureVersion = "4.14.0"
 dependencies {
     "implementation"(project(":propack-api"))
     "implementation"(project(":propack-core"))
+    "implementation"(project(":propack-builder-java"))
     "implementation"(files("../libs/commandlib-0.0.1.jar"))
     "implementation"(files("../libs/configlib-0.0.1.jar"))
     "compileOnly"(files("../libs/flint-path-0.0.1.jar"))
@@ -86,7 +87,7 @@ tasks.named<Copy>("processResources") {
 var shadedPackage = "me.nelonn.propack.shaded"
 
 tasks.named<ShadowJar>("shadowJar") {
-    dependsOn(project.project(":propack-core").tasks.named("build"))
+    dependsOn(project.project(":propack-core").tasks.named("assemble"))
     dependsOn(project.project(":propack-bukkit:adapters").subprojects.map { it.tasks.named("assemble") })
     from(Callable {
         adapters.resolve()

@@ -24,7 +24,6 @@ import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
 import me.nelonn.propack.bukkit.dispatcher.ActivePackStore;
 import me.nelonn.propack.bukkit.packet.PacketPatcher;
-import me.nelonn.propack.core.DevServer;
 import me.nelonn.propack.core.util.JarResources;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;

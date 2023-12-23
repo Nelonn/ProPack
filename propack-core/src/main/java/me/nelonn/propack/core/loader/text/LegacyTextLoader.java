@@ -19,7 +19,6 @@
 package me.nelonn.propack.core.loader.text;
 
 import com.google.gson.JsonObject;
-import me.nelonn.propack.builder.loader.TextLoader;
 import me.nelonn.propack.core.util.GsonHelper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;

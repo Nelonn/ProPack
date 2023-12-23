@@ -24,12 +24,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import me.nelonn.bestvecs.ImmVec3f;
 import me.nelonn.bestvecs.Vec3f;
-import me.nelonn.propack.builder.task.TaskIO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.io.File;
 import java.util.function.Consumer;
 
 public final class Util {
@@ -123,12 +121,6 @@ public final class Util {
 
     public static @NotNull String substringLast(@NotNull String string, @NotNull String cut) {
         return substringLast(string, cut.length());
-    }
-
-    public static @NotNull File tempFile(@NotNull TaskIO io, @NotNull String path) {
-        File file = new File(io.getTempDirectory(), path);
-        file.getParentFile().mkdirs();
-        return file;
     }
 
     private Util() {

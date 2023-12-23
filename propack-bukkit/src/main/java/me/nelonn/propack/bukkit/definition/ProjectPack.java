@@ -19,8 +19,8 @@
 package me.nelonn.propack.bukkit.definition;
 
 import me.nelonn.propack.ResourcePack;
-import me.nelonn.propack.core.builder.InternalProject;
-import me.nelonn.propack.core.loader.ProjectLoader;
+import me.nelonn.propack.builder.impl.InternalProject;
+import me.nelonn.propack.builder.impl.ProjectLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

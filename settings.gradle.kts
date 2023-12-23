@@ -11,6 +11,8 @@ include("propack-api")
 
 include("propack-core")
 
+include("propack-builder-java")
+
 include("propack-cli")
 
 include("propack-bukkit")

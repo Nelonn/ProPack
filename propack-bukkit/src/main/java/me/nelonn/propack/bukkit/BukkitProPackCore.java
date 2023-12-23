@@ -18,12 +18,12 @@
 
 package me.nelonn.propack.bukkit;
 
+import me.nelonn.propack.builder.impl.ProPackCore;
 import me.nelonn.propack.bukkit.definition.DefinitionTypeMap;
 import me.nelonn.propack.bukkit.definition.PackManager;
 import me.nelonn.propack.bukkit.dispatcher.ActivePackStoreMap;
 import me.nelonn.propack.bukkit.dispatcher.Dispatcher;
 import me.nelonn.propack.bukkit.dispatcher.MemoryActivePackStore;
-import me.nelonn.propack.core.ProPackCore;
 import org.jetbrains.annotations.NotNull;
 
 public class BukkitProPackCore extends ProPackCore {

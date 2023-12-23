@@ -21,7 +21,7 @@ package me.nelonn.propack.bukkit.definition;
 import com.google.gson.JsonObject;
 import me.nelonn.flint.path.Key;
 import me.nelonn.propack.bukkit.BukkitProPackCore;
-import me.nelonn.propack.core.loader.ProjectLoader;
+import me.nelonn.propack.builder.impl.ProjectLoader;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.Util;
