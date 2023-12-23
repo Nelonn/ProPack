@@ -8,9 +8,11 @@ repositories {
     mavenCentral()
 }
 
+var adventureVersion = "4.15.0"
+
 dependencies {
     "compileOnly"(files("../libs/flint-path-0.0.1.jar"))
-    "compileOnly"("net.kyori:adventure-api:4.12.0")
+    "compileOnly"("net.kyori:adventure-api:$adventureVersion")
     "compileOnly"("org.jetbrains:annotations:23.1.0")
     "compileOnly"("org.slf4j:slf4j-api:2.0.7")
 }

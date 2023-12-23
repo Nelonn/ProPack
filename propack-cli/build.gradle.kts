@@ -11,6 +11,8 @@ repositories {
     mavenCentral()
 }
 
+var adventureVersion = "4.15.0"
+
 dependencies {
     "implementation"(project(":propack-api"))
     "implementation"(project(":propack-core"))
@@ -26,14 +28,14 @@ dependencies {
     "implementation"("org.apache.logging.log4j:log4j-api:2.19.0")
     "implementation"("org.apache.logging.log4j:log4j-to-slf4j:2.19.0")
 
-    "implementation"("net.kyori:adventure-api:4.12.0")
-    "implementation"("net.kyori:adventure-text-minimessage:4.12.0")
-    "implementation"("net.kyori:adventure-text-serializer-plain:4.12.0")
-    "implementation"("net.kyori:adventure-text-serializer-legacy:4.12.0")
-    "implementation"("net.kyori:adventure-text-serializer-gson:4.12.0")
+    "implementation"("net.kyori:adventure-api:$adventureVersion")
+    "implementation"("net.kyori:adventure-text-minimessage:$adventureVersion")
+    "implementation"("net.kyori:adventure-text-serializer-plain:$adventureVersion")
+    "implementation"("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
+    "implementation"("net.kyori:adventure-text-serializer-gson:$adventureVersion")
 
     "implementation"("com.google.code.gson:gson:2.10.1")
-    "implementation"("com.google.guava:guava:31.1-jre")
+    "implementation"("com.google.guava:guava:33.0.0-jre")
     "implementation"("commons-io:commons-io:2.11.0")
     "implementation"("org.apache.commons:commons-lang3:3.12.0")
 

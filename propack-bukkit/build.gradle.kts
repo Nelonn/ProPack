@@ -32,7 +32,7 @@ repositories {
     maven("https://papermc.io/repo/repository/maven-public/") // PaperAPI
 }
 
-var adventureVersion = "4.14.0"
+var adventureVersion = "4.15.0"
 
 dependencies {
     "implementation"(project(":propack-api"))
@@ -50,7 +50,7 @@ dependencies {
     "compileOnly"("net.kyori:adventure-text-serializer-plain:$adventureVersion")
     "compileOnly"("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
     "compileOnly"("net.kyori:adventure-text-serializer-gson:$adventureVersion")
-    "compileOnly"("net.kyori:adventure-platform-bukkit:4.3.1")
+    "compileOnly"("net.kyori:adventure-platform-bukkit:4.3.2")
 
     "implementation"("com.github.retrooper.packetevents:spigot:2.0.2") {
         exclude(group = "net.kyori")
