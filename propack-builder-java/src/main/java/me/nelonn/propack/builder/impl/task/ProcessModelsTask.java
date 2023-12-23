@@ -269,6 +269,9 @@ public class ProcessModelsTask extends AbstractTask {
         for (Map.Entry<String, String> textureEntry : textureMap.entrySet()) {
             String texture = textureEntry.getValue();
             if (texture.startsWith("#")) continue;
+            if (!texture.contains(":") && !texture.contains("/") && !texture.startsWith(".")) { // TODO: improve
+                texture = "./" + texture;
+            }
             textureEntry.setValue(PathUtil.resolve(texture, resourcePath).toString());
         }
     }
