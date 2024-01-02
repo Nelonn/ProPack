@@ -18,6 +18,7 @@
 
 package me.nelonn.propack.builder.impl.task;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.builder.api.Project;
@@ -28,13 +29,16 @@ import me.nelonn.propack.builder.api.task.AbstractTask;
 import me.nelonn.propack.builder.api.task.FileProcessingException;
 import me.nelonn.propack.builder.api.task.TaskBootstrap;
 import me.nelonn.propack.core.util.GsonHelper;
+import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ProcessLanguagesTask extends AbstractTask {
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     public static final TaskBootstrap BOOTSTRAP = ProcessLanguagesTask::new;
 
     public ProcessLanguagesTask(@NotNull Project project) {
@@ -58,18 +62,21 @@ public class ProcessLanguagesTask extends AbstractTask {
         for (File file : io.getFiles()) {
             try {
                 String filePath = file.getPath();
-                if (!filePath.startsWith("content/") || !filePath.endsWith(".lang.json") || !(file instanceof JsonFile)) continue;
+                if (!filePath.startsWith("content/") || !filePath.endsWith(".lang.json")) continue;
                 io.getFiles().removeFile(filePath);
-                JsonObject jsonObject = ((JsonFile) file).getContent();
+                if (!(file instanceof JsonFile)) {
+                    LOGGER.error("{} :: lang file is not Json", filePath);
+                    continue;
+                }
+                JsonObject json = ((JsonFile) file).getContent();
                 Path resourcePath = PathUtil.resourcePath(filePath);
                 String langCode = resourcePath.value();
                 langCode = langCode.substring(langCode.indexOf('/') + 1, langCode.length() - ".font.json".length());
                 String langPath = "assets/" + resourcePath.namespace() + "/lang/" + langCode + ".json";
                 JsonFile langJsonFile = languageFiles.computeIfAbsent(langPath, key -> new JsonFile(key, new JsonObject()));
-                for (String key : jsonObject.keySet()) {
-                    String translation = GsonHelper.getString(jsonObject, key);
+                for (String key : json.keySet()) {
+                    String translation = GsonHelper.getString(json, key);
                     key = key.replace("<namespace>", resourcePath.namespace());
-                    translation = translation.replace("<namespace>", resourcePath.namespace());
                     langJsonFile.getContent().addProperty(key, translation);
                 }
             } catch (Exception e) {
