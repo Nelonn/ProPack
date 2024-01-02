@@ -19,17 +19,27 @@
 package me.nelonn.propack.bukkit.definition;
 
 import me.nelonn.propack.ResourcePack;
+import me.nelonn.propack.Resources;
+import me.nelonn.propack.builder.impl.BuiltResourcePack;
 import me.nelonn.propack.builder.impl.InternalProject;
 import me.nelonn.propack.builder.impl.ProjectLoader;
+import me.nelonn.propack.bukkit.SimpleResourcePack;
+import me.nelonn.propack.core.loader.LoadedResourcePack;
+import me.nelonn.propack.core.loader.ProPackFileLoader;
+import me.nelonn.propack.core.util.LogManagerCompat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.io.File;
 
 public class ProjectPack implements PackDefinition {
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final File file;
+    private String name;
     private InternalProject project;
     private ProjectLoader projectLoader;
+    private ResourcePack resourcePack;
 
     public ProjectPack(@NotNull File file, @NotNull ProjectLoader projectLoader, boolean tryLoadBuilt) {
         this.file = file;
@@ -43,12 +53,12 @@ public class ProjectPack implements PackDefinition {
 
     @Override
     public @NotNull String getName() {
-        return project.getName();
+        return name;
     }
 
     @Override
     public @Nullable ResourcePack getResourcePack() {
-        return project.getResourcePack();
+        return resourcePack;
     }
 
     public @NotNull File getFile() {
@@ -69,17 +79,32 @@ public class ProjectPack implements PackDefinition {
 
     public void loadOrBuild() {
         project = projectLoader.load(file, true);
+        name = project.name;
         if (project.getResourcePack() == null) {
             build0();
+        } else {
+            resourcePack = project.getResourcePack$();
         }
     }
 
     public void build() {
+        LOGGER.info("Running builder...");
         project = projectLoader.load(file, false);
+        name = project.name;
         build0();
     }
 
     private void build0() {
-        project.build(); // TODO: improve
+        project.build();
+        LOGGER.info("Trying to load output file...");
+        File builtResourcePack = new File(project.getBuildDir(), project.name + ".propack");
+        if (!builtResourcePack.exists()) {
+            throw new IllegalStateException("ProPack file not found, is the resource pack really built?");
+        }
+        ProPackFileLoader proPackFileLoader = new ProPackFileLoader();
+        Resources resources = proPackFileLoader.load(builtResourcePack);
+        BuiltResourcePack builtResourcePack1 = (BuiltResourcePack) project.getResourcePack();
+        resourcePack = new SimpleResourcePack(project.name, resources, builtResourcePack, builtResourcePack1.getSha1(), builtResourcePack1.getUpload());
+        LOGGER.info("Done");
     }
 }

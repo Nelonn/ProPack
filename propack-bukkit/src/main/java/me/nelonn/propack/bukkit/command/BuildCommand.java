@@ -73,7 +73,7 @@ public class BuildCommand extends Command<CommandSender> {
                 Util.send(sender, "<red>Check console for additional info");
                 e.printStackTrace();
             }
-        }).start();
+        }, "ProPack Build").start();
         return true;
     }
 
