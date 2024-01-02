@@ -29,6 +29,24 @@ Json is used in lenient mode, possible file extensions:
 Some features of json5 will not work due to [GSON](https://github.com/google/gson) flaws
 
 
+## Path to content
+
+Thanks to this table, you can clearly see how content paths work
+
+Context is always important in this way, right now we are in the 'foo:bar/baz' folder
+
+
+
+| What the user wrote | What does it turn into |
+|---------------------|------------------------|
+| `foo:bar/baz`       | `foo:bar/baz`          |
+| `:bar/baz`          | `foo:bar/baz`          |
+| `:bar/../bar/baz`   | `foo:bar/baz`          |
+| `:bar/./baz`        | `foo:bar/baz`          |
+| `./`                | `foo:bar/baz`          |
+| `../baz`            | `foo:bar/baz`          |
+
+
 ## Meshes & Models
 
 [Java Block/Item models](https://minecraft.fandom.com/wiki/Model) in the ProPack are called **meshes**.

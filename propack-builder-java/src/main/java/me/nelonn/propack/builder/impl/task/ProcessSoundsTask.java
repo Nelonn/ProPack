@@ -100,9 +100,12 @@ public class ProcessSoundsTask extends AbstractTask {
         for (File file : io.getFiles()) {
             try {
                 String filePath = file.getPath();
-                if (!filePath.startsWith("content/") || !filePath.endsWith(".sound.json") || !(file instanceof JsonFile))
-                    continue;
+                if (!filePath.startsWith("content/") || !filePath.endsWith(".sound.json")) continue;
                 io.getFiles().removeFile(filePath);
+                if (!(file instanceof JsonFile)) {
+                    LOGGER.error("{} :: sound file is not Json", filePath);
+                    continue;
+                }
                 JsonObject jsonObject = ((JsonFile) file).getContent();
                 Path resourcePath = PathUtil.resourcePath(filePath, ".sound.json");
                 SoundEntry soundEntryIn = SoundEntryDeserializer.INSTANCE.deserialize(jsonObject, null, null);

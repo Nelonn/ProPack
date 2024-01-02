@@ -28,8 +28,11 @@ import java.util.Locale;
 
 public final class PathUtil {
     public static @NotNull Path resolve(@NotNull String input, @NotNull String curNamespace, @NotNull String curPath) {
-        input = input.replace("<namespace>", curNamespace);
-        if (!input.startsWith("./") && !input.startsWith("../")) {
+        //input = input.replace("<namespace>", curNamespace);
+        if (input.startsWith(":")) {
+            input = curNamespace + input;
+        }
+        if (!input.contains("./") && !input.contains("../")) {
             return Path.withFallback(input, curNamespace);
         }
         List<String> path;
