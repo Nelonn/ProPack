@@ -51,9 +51,9 @@ public class PacketPatcher {
 
     public void patchClientboundItems(@NotNull MItemStack itemStack, @NotNull Resources resources) {
         try {
-            MCompoundTag tag = itemStack.getTag();
-            if (tag == null || !tag.contains(ProPack.CUSTOM_MODEL, TAG_STRING)) return;
-            String customModel = tag.getString(ProPack.CUSTOM_MODEL);
+            MCompoundTag rootTag = itemStack.getTag();
+            if (rootTag == null || !rootTag.contains(ProPack.CUSTOM_MODEL, TAG_STRING)) return;
+            String customModel = rootTag.getString(ProPack.CUSTOM_MODEL);
             if (customModel.isEmpty()) return;
             Path path;
             try {
@@ -67,16 +67,15 @@ public class PacketPatcher {
             if (itemModel instanceof DefaultItemModel defaultItemModel) {
                 mesh = defaultItemModel.getMesh();
             } else if (itemModel instanceof CombinedItemModel combinedItemModel) {
-                MListTag listTag = tag.getList("ModelElements", TAG_STRING);
-                mesh = combinedItemModel.getMesh(listTag.asStringCollection().toArray(new String[0]));
+                MListTag listTag = rootTag.getList("CombinedItemModel", TAG_STRING);
+                mesh = combinedItemModel.getMesh(listTag.asStringCollection().toArray(String[]::new));
             } else if (itemModel instanceof SlotItemModel slotItemModel) {
-                MCompoundTag slotsTag = tag.getCompound("ModelSlots");
+                MCompoundTag compoundTag = rootTag.getCompound("SlotItemModel");
                 Map<String, String> slots = new HashMap<>();
                 for (SlotItemModel.Slot slot : slotItemModel.getSlots()) {
-                    String element = slotsTag.getString(slot.getName());
-                    if (!element.isEmpty()) {
-                        slots.put(slot.getName(), element);
-                    }
+                    String element = compoundTag.getString(slot.getName());
+                    if (element.isEmpty()) continue;
+                    slots.put(slot.getName(), element);
                 }
                 mesh = slotItemModel.getMesh(slots);
             } else {
@@ -88,7 +87,7 @@ public class PacketPatcher {
             if (!itemModel.getTargetItems().contains(itemType)) return;
             Integer cmd = resources.getMeshes().getCustomModelData(mesh, itemType);
             if (cmd == null) return;
-            tag.putInt(CUSTOM_MODEL_DATA, cmd);
+            rootTag.putInt(CUSTOM_MODEL_DATA, cmd);
         } catch (Exception e) {
             e.printStackTrace();
         }

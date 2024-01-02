@@ -56,6 +56,8 @@ In order for your **mesh** to be applied to an item, you need to create a model 
 
 Models configuration file name should end with `.model.json`. 
 
+**WARNING**: Offset works wrong, not recommended to use
+
 <br>
 
 ### Currently implemented model types:
@@ -81,7 +83,10 @@ Models configuration file name should end with `.model.json`.
   "Elements": {
     "element1": "./mesh1",
     "element2": {
-      "Mesh": "./mesh2",
+      "Mesh": "./mesh2"
+    },
+    "element3": {
+      "Mesh": "./mesh3",
       "Offset": [0.1, 0.2, 0.3]
     }
   },
@@ -133,17 +138,15 @@ When building resource pack ProPack takes the default model from the folder `inc
 and adds the necessary elements to override.
 
 Using ProtocolLib, it takes the model path from the NBT tag `CustomModel` and automatically specifies its CustomModelData.
-<br>
 
 Example NBT tag for DefaultItemModel: 
-`{CustomModel:"example:models/example_defaultmodel"}`
-<br>
+- `{CustomModel:"example:models/example_defaultmodel"}`
 
 Example NBT tag for CombinedItemModel:
-`{CustomModel:"example:models/example_combinedmodel",ModelElements:["element1","element2"]}`
-<br>
+- `{CustomModel:"example:models/example_combinedmodel",CombinedItemModel:["element1","element3"]}`
 
-Example NBT tag for SlotItemModel: `{CustomModel:"example:models/example_slotmodel",ModelSlots:{scope:"holographic"}}`
+Example NBT tag for SlotItemModel:
+- `{CustomModel:"example:models/example_slotmodel",SlotItemModel:[scope:"holographic",magazine:"exists"]}`
 
 
 ## Sounds

@@ -41,14 +41,17 @@ public class SlotItemModel extends MultiItemModel {
 
     public @NotNull Path getMesh(Map<String, String> slots) {
         for (Map.Entry<String, String> slotElement : slots.entrySet()) {
-            Slot slot = this.slots.get(slotElement.getKey());
+            String slotKey = slotElement.getKey();
+            if (slotKey == null) continue;
+            Slot slot = this.slots.get(slotKey);
             if (slot == null) {
-                throw new IllegalArgumentException(this + " does not contain slot '" + slotElement.getKey() + "'");
+                throw new IllegalArgumentException(this + " does not contain slot '" + slotKey + "'");
             }
-            if (slotElement.getValue().isEmpty()) {
+            String value = slotElement.getValue();
+            if (value == null || value.isEmpty()) {
                 continue;
             }
-            if (!slot.hasEntry(slotElement.getValue())) {
+            if (!slot.hasEntry(value)) {
                 throw new IllegalArgumentException(this + " slot '" + slotElement.getKey() + "' does not contain entry '" + slotElement.getValue() + "'");
             }
         }
