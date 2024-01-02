@@ -134,20 +134,16 @@ public class ProcessModelsTask extends AbstractTask {
                         continue;
                     }
                     JsonModel baseMesh = JsonModel.deserialize(((JsonFile) meshFile).getContent());
-                    Map<String, String> baseTextureMap = baseMesh.getTextureMap();
-                    for (Map.Entry<String, String> textureEntry : baseTextureMap.entrySet()) {
-                        String texture = textureEntry.getValue();
-                        if (texture.startsWith("#")) continue;
-                        textureEntry.setValue(PathUtil.resolve(texture, resourcePath).toString());
-                    }
-                    JsonObject slotsObject = GsonHelper.getObject(rootJson, "Slots");
+                    Map<String, String> rootTextureMap = baseMesh.getTextureMap();
+                    processTextureMap(rootTextureMap, meshPath);
+                    JsonObject slotsJson = GsonHelper.getObject(rootJson, "Slots");
                     Map<String, Map<String, JsonModel>> slots = new HashMap<>();
-                    for (Map.Entry<String, JsonElement> slotEntry : slotsObject.entrySet()) {
-                        JsonObject slotObject = slotEntry.getValue().getAsJsonObject();
+                    for (Map.Entry<String, JsonElement> slotEntry : slotsJson.entrySet()) {
+                        JsonObject slotJson = slotEntry.getValue().getAsJsonObject();
                         Map<String, JsonModel> slotElements = new HashMap<>();
-                        for (Map.Entry<String, JsonElement> elementEntry : slotObject.entrySet()) {
-                            JsonElement jsonElement = elementEntry.getValue();
-                            JsonModel elementMesh = parseGeneratingMesh(jsonElement, resourcePath, io);
+                        for (Map.Entry<String, JsonElement> elementEntry : slotJson.entrySet()) {
+                            JsonElement elementJson = elementEntry.getValue();
+                            JsonModel elementMesh = parseGeneratingMesh(elementJson, resourcePath, io);
                             slotElements.put(elementEntry.getKey(), elementMesh);
                         }
                         slots.put(slotEntry.getKey(), slotElements);
@@ -159,7 +155,7 @@ public class ProcessModelsTask extends AbstractTask {
                     for (Map<String, String> combination : CombinationUtil.generateSlotCombinations(slotsMap)) {
                         StringBuilder sb = new StringBuilder();
                         AtomicBoolean empty = new AtomicBoolean(true);
-                        Map<String, String> textureMap = new HashMap<>(baseTextureMap);
+                        Map<String, String> textureMap = new HashMap<>(rootTextureMap);
                         List<ModelElement> modelElements = baseMesh.getElements();
                         combination.keySet().stream().sorted().forEach(slotName -> {
                             if (sb.length() > 0) {
@@ -268,7 +264,8 @@ public class ProcessModelsTask extends AbstractTask {
     private void processTextureMap(@NotNull Map<String, String> textureMap, @NotNull Path resourcePath) {
         for (Map.Entry<String, String> textureEntry : textureMap.entrySet()) {
             String texture = textureEntry.getValue();
-            if (texture.startsWith("#")) continue;
+            if (texture.startsWith("#")) continue; // TODO: Maybe rework that?
+            // BlockBench mesh export workaround
             if (!texture.contains(":") && !texture.contains("/") && !texture.startsWith(".")) { // TODO: improve
                 texture = "./" + texture;
             }
