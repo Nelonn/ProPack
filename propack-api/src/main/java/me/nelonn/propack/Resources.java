@@ -55,20 +55,12 @@ public class Resources {
         return itemModels.get(path);
     }
 
-    public @NotNull ItemModel itemModel$(@NotNull Path path) {
-        return Objects.requireNonNull(itemModel(path));
-    }
-
     public @NotNull Collection<ItemModel> getItemModels() {
         return Collections.unmodifiableCollection(itemModels.values());
     }
 
     public @Nullable SoundAsset sound(@NotNull Path path) {
         return sounds.get(path);
-    }
-
-    public @NotNull SoundAsset sound$(@NotNull Path path) {
-        return Objects.requireNonNull(sound(path));
     }
 
     public @NotNull Collection<SoundAsset> getSounds() {
@@ -79,20 +71,12 @@ public class Resources {
         return armorTextures.get(path);
     }
 
-    public @NotNull ArmorTexture armorTexture$(@NotNull Path path) {
-        return Objects.requireNonNull(armorTexture(path));
-    }
-
     public @NotNull Collection<ArmorTexture> getArmorTextures() {
         return Collections.unmodifiableCollection(armorTextures.values());
     }
 
     public @Nullable Font font(@NotNull Path path) {
         return fonts.get(path);
-    }
-
-    public @NotNull Font font$(@NotNull Path path) {
-        return Objects.requireNonNull(font(path));
     }
 
     public @NotNull Collection<Font> getFonts() {

@@ -92,7 +92,7 @@ public class Dispatcher implements Listener {
         if (!resourcePack.isUploaded()) {
             throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not uploaded");
         }
-        sendOfferAsDefault(player, resourcePack.getUpload$());
+        sendOfferAsDefault(player, resourcePack.getUpload());
     }
 
     @EventHandler
@@ -112,7 +112,7 @@ public class Dispatcher implements Listener {
         if (!resourcePack.isUploaded()) {
             throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not uploaded");
         }
-        UploadedPack uploadedPack = resourcePack.getUpload$();
+        UploadedPack uploadedPack = resourcePack.getUpload();
         Player player = event.getPlayer();
         ActivePack active = activePackStore.getActiveResourcePack(player.getUniqueId());
         if (active != null) {

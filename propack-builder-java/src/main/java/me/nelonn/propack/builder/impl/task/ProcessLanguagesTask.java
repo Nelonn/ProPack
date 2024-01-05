@@ -18,7 +18,6 @@
 
 package me.nelonn.propack.builder.impl.task;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.builder.api.Project;

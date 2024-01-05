@@ -21,8 +21,6 @@ package me.nelonn.propack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-
 public interface ResourcePack {
 
     @NotNull String getName();
@@ -30,10 +28,6 @@ public interface ResourcePack {
     @NotNull Resources resources();
 
     @Nullable UploadedPack getUpload();
-
-    default @NotNull UploadedPack getUpload$() {
-        return Objects.requireNonNull(this.getUpload());
-    }
 
     default boolean isUploaded() {
         return getUpload() != null;
