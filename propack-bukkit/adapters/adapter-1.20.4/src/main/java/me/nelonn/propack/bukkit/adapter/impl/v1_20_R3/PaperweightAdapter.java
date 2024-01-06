@@ -111,6 +111,7 @@ public class PaperweightAdapter implements Adapter {
         for (ItemStack itemStack : nms.getItems()) {
             patcher.accept(CraftItemStack.of(itemStack));
         }
+        patcher.accept(CraftItemStack.of(nms.getCarriedItem()));
     }
 
     @Override
