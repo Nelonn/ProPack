@@ -57,21 +57,27 @@ public class ProcessFontsTask extends AbstractTask {
                 JsonArray providersArray = jsonObject.getAsJsonArray("providers");
                 if (providersArray != null) {
                     for (JsonElement jsonElement : providersArray) {
-                        JsonObject providerObject = jsonElement.getAsJsonObject();
-                        if (GsonHelper.hasString(providerObject, "type")) {
-                            String type = GsonHelper.getString(providerObject, "type");
+                        JsonObject providerJson = jsonElement.getAsJsonObject();
+                        if (GsonHelper.hasString(providerJson, "type")) {
+                            String type = GsonHelper.getString(providerJson, "type");
                             if (type.equalsIgnoreCase("bitmap")) {
-                                int ascent = GsonHelper.getInt(providerObject, "ascent");
-                                int height = GsonHelper.getInt(providerObject, "height", 0);
+                                int ascent = GsonHelper.getInt(providerJson, "ascent");
+                                int height = GsonHelper.getInt(providerJson, "height", 0);
                                 if (ascent > height) {
-                                    LOGGER.warn("Ascent {} higher than height {}", ascent, height);
+                                    LOGGER.warn(filePath + ": Ascent {} higher than height {}", ascent, height);
+                                }
+                            } else if (type.equalsIgnoreCase("reference")) {
+                                if (GsonHelper.hasString(providerJson, "id")) {
+                                    String path = GsonHelper.getString(providerJson, "id");
+                                    path = PathUtil.resolve(path, resourcePath).toString();
+                                    providerJson.addProperty("id", path);
                                 }
                             }
                         }
-                        if (GsonHelper.hasString(providerObject, "file")) {
-                            String path = GsonHelper.getString(providerObject, "file");
+                        if (GsonHelper.hasString(providerJson, "file")) {
+                            String path = GsonHelper.getString(providerJson, "file");
                             path = PathUtil.resolve(path, resourcePath).toString();
-                            providerObject.addProperty("file", path);
+                            providerJson.addProperty("file", path);
                         }
                     }
                 }
