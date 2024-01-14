@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,22 +39,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class Dispatcher implements Listener {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final ProPackPlugin plugin;
-    private final ProtocolPackSender packSender;
+    private final PackSender packSender;
     private final Map<UUID, ActivePack> pending = new HashMap<>();
     private final ActivePackStore fallbackActivePackStore;
     private ActivePackStore activePackStore;
 
     public Dispatcher(@NotNull ProPackPlugin plugin, @NotNull MemoryActivePackStore memoryStore) {
         this.plugin = plugin;
-        packSender = new ProtocolPackSender();
+        packSender = PaperPackSender.INSTANCE != null ? PaperPackSender.INSTANCE : new ProtocolPackSender();
         Bukkit.getPluginManager().registerEvents(this, plugin);
         fallbackActivePackStore = memoryStore;
         activePackStore = fallbackActivePackStore;
@@ -92,11 +89,10 @@ public class Dispatcher implements Listener {
      * @param resourcePack resource pack
      */
     public void sendOfferAsDefault(@NotNull Player player, @NotNull ResourcePack resourcePack) {
-        Optional<UploadedPack> uploadedPack = resourcePack.getUpload();
-        if (uploadedPack.isEmpty()) {
+        if (!resourcePack.isUploaded()) {
             throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not uploaded");
         }
-        sendOfferAsDefault(player, uploadedPack.get());
+        sendOfferAsDefault(player, resourcePack.getUpload());
     }
 
     @EventHandler
@@ -108,15 +104,15 @@ public class Dispatcher implements Listener {
             LOGGER.warn("Resource pack '" + packName + "' not found");
             return;
         }
-        if (definition.getResourcePack().isEmpty()) {
+        ResourcePack resourcePack = definition.getResourcePack();
+        if (resourcePack == null) {
             LOGGER.warn("Resource pack '" + packName + "' not built");
             return;
         }
-        ResourcePack resourcePack = definition.getResourcePack().get();
-        if (resourcePack.getUpload().isEmpty()) {
+        if (!resourcePack.isUploaded()) {
             throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not uploaded");
         }
-        UploadedPack uploadedPack = resourcePack.getUpload().get();
+        UploadedPack uploadedPack = resourcePack.getUpload();
         Player player = event.getPlayer();
         ActivePack active = activePackStore.getActiveResourcePack(player.getUniqueId());
         if (active != null) {
@@ -153,11 +149,15 @@ public class Dispatcher implements Listener {
         return pending.get(player.getUniqueId());
     }
 
-    public @NotNull Optional<ResourcePack> getAppliedResourcePack(@NotNull Player player) {
+    public @Nullable ResourcePack getAppliedResourcePack(@NotNull Player player) {
         ActivePack activePack = activePackStore.getActiveResourcePack(player.getUniqueId());
-        if (activePack == null) return Optional.empty();
+        if (activePack == null) return null;
         PackDefinition definition = plugin.getCore().getPackManager().getDefinition(activePack.name);
-        if (definition == null) return Optional.empty();
+        if (definition == null) return null;
         return definition.getResourcePack();
+    }
+
+    public @NotNull ResourcePack getAppliedResourcePack$(@NotNull Player player) {
+        return Objects.requireNonNull(this.getAppliedResourcePack(player));
     }
 }

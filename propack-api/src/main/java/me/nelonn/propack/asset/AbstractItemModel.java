@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 package me.nelonn.propack.asset;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.flint.path.Path;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,15 +26,15 @@ import java.util.Collections;
 import java.util.Set;
 
 public abstract class AbstractItemModel extends AbstractAsset implements ItemModel {
-    private final Set<Identifier> targetItems;
+    private final Set<Key> targetItems;
 
-    protected AbstractItemModel(@NotNull Path path, @NotNull Set<Identifier> targetItems) {
+    protected AbstractItemModel(@NotNull Path path, @NotNull Set<Key> targetItems) {
         super(path);
         this.targetItems = Collections.unmodifiableSet(targetItems);
     }
 
     @Override
-    public @NotNull Set<Identifier> getTargetItems() {
+    public @NotNull Set<Key> getTargetItems() {
         return targetItems;
     }
 }

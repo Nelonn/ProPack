@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,20 +18,18 @@
 
 package me.nelonn.propack.bukkit.adapter;
 
-import me.nelonn.propack.bukkit.adapter.packet.MClientboundContainerSetSlotPacket;
-import me.nelonn.propack.bukkit.adapter.packet.MServerboundSetCreativeModeSlotPacket;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
 public interface Adapter {
-    @NotNull MServerboundSetCreativeModeSlotPacket adaptPacket1(@NotNull Object packet);
+    void patchServerboundSetCreativeModeSlotPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 
-    @NotNull MClientboundContainerSetSlotPacket adaptPacket2(@NotNull Object packet);
+    void patchClientboundContainerSetSlotPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 
-    void patchSetContent(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
+    void patchClientboundContainerSetContentPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 
-    void patchEntityEquipment(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
+    void patchClientboundSetEntityEquipmentPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 
-    void patchSetEntityData(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
+    void patchClientboundSetEntityDataPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 }

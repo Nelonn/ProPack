@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,7 @@
 package me.nelonn.propack;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 
 public interface ResourcePack {
 
@@ -28,10 +27,10 @@ public interface ResourcePack {
 
     @NotNull Resources resources();
 
-    @NotNull Optional<UploadedPack> getUpload();
+    @Nullable UploadedPack getUpload();
 
     default boolean isUploaded() {
-        return getUpload().isPresent();
+        return getUpload() != null;
     }
 
 }

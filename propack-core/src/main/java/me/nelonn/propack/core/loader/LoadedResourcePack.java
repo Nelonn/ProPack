@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,7 @@ import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.Resources;
 import me.nelonn.propack.UploadedPack;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 
 public class LoadedResourcePack implements ResourcePack {
     private final String name;
@@ -45,7 +44,7 @@ public class LoadedResourcePack implements ResourcePack {
     }
 
     @Override
-    public @NotNull Optional<UploadedPack> getUpload() {
-        return Optional.empty();
+    public @Nullable UploadedPack getUpload() {
+        return null;
     }
 }

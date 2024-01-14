@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,28 @@
 
 package me.nelonn.propack.bukkit.command;
 
+import me.nelonn.commandlib.Command;
+import me.nelonn.commandlib.CommandContext;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.Util;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-public class HelpCommand extends Command {
+public class HelpCommand extends Command<CommandSender> {
     private final ProPackPlugin plugin;
 
     public HelpCommand(@NotNull ProPackPlugin plugin) {
         super("help");
-        setPermission("propack.admin");
+        requires(s -> s.hasPermission("propack.admin"));
         this.plugin = plugin;
     }
 
-    protected void onCommand(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args) {
+    @Override
+    public boolean run(@NotNull CommandContext<CommandSender> commandContext) {
+        CommandSender sender = commandContext.getSource();
         Util.send(sender, "<white>" + plugin.getDescription().getName() + " <gray>v" + plugin.getDescription().getVersion());
         Util.send(sender, "<gray>/propack build <project>");
         Util.send(sender, "<gray>/propack reload [config|modules|packs]");
+        return true;
     }
 }

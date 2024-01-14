@@ -6,6 +6,7 @@ Modern solution for minecraft resource pack development
 
 
 ## Features
+
 - [Models generating](#meshes--models)
 - [Auto CustomModelData](#auto-custommodeldata)
 - [Auto sounds FFmpeg conversion](#sounds)
@@ -14,28 +15,54 @@ Modern solution for minecraft resource pack development
 
 
 ## Example Project
+
 Look at the [example project](https://github.com/Nelonn/ProPack/blob/master/propack-core/src/main/resources/resources/example)
 
 
 ## Json specification
+
 Json is used in lenient mode, possible file extensions:
 - json
 - [json5](https://json5.org/)
 - jsonc
 
-Some futures from json 5 will not work due to [GSON](https://github.com/google/gson) flaws
+Some features of json5 will not work due to [GSON](https://github.com/google/gson) flaws
+
+
+## Path to content
+
+Thanks to this table, you can clearly see how content paths work
+
+Context is always important in this way, right now we are in the 'foo:bar/baz' folder
+
+
+
+| What the user wrote | What does it turn into |
+|---------------------|------------------------|
+| `foo:bar/baz`       | `foo:bar/baz`          |
+| `:bar/baz`          | `foo:bar/baz`          |
+| `:bar/../bar/baz`   | `foo:bar/baz`          |
+| `:bar/./baz`        | `foo:bar/baz`          |
+| `./`                | `foo:bar/baz`          |
+| `../baz`            | `foo:bar/baz`          |
 
 
 ## Meshes & Models
-[Java Block/Item models](https://minecraft.fandom.com/wiki/Model) in the ProPack are called *meshes*.
+
+[Java Block/Item models](https://minecraft.fandom.com/wiki/Model) in the ProPack are called **meshes**.
 Their files should end with `.mesh.json`.
+
+In order for your **mesh** to be applied to an item, you need to create a model configuration
 
 Models configuration file name should end with `.model.json`. 
 
-Currently implemented model types:
+**WARNING**: Offset works wrong, not recommended to use
 
 <br>
-DefaultItemModel, example:
+
+### Currently implemented model types:
+
+**DefaultItemModel**, example:
 
 ```json
 {
@@ -46,7 +73,8 @@ DefaultItemModel, example:
 ```
 
 <br>
-CombinedItemModel, example:
+
+**CombinedItemModel**, example:
 
 ```json
 {
@@ -55,7 +83,10 @@ CombinedItemModel, example:
   "Elements": {
     "element1": "./mesh1",
     "element2": {
-      "Mesh": "./mesh2",
+      "Mesh": "./mesh2"
+    },
+    "element3": {
+      "Mesh": "./mesh3",
       "Offset": [0.1, 0.2, 0.3]
     }
   },
@@ -64,7 +95,8 @@ CombinedItemModel, example:
 ```
 
 <br>
-SlotItemModel, example:
+
+**SlotItemModel**, example:
 
 ```json
 {
@@ -93,25 +125,28 @@ SlotItemModel, example:
 }
 ```
 
-`Target` - this is an indication of the items for which you need to [Auto CustomModelData](#auto-custommodeldata) of the specified model.
+### Fields
+
+- `Type` - the type of model presented above
+- `Mesh` - basic **mesh**, the path can be specified relative to (`./`)
+- `Target` - this is a list of items for which you want to [Auto CustomModelData](#auto-custommodeldata) of the specified model.
 
 
 ## Auto CustomModelData
+
 When building resource pack ProPack takes the default model from the folder `include/assets/minecraft/models/item/<item>.json`
 and adds the necessary elements to override.
 
 Using ProtocolLib, it takes the model path from the NBT tag `CustomModel` and automatically specifies its CustomModelData.
-<br>
 
 Example NBT tag for DefaultItemModel: 
-`{CustomModel:"example:models/example_defaultmodel"}`
-<br>
+- `{CustomModel:"example:models/example_defaultmodel"}`
 
 Example NBT tag for CombinedItemModel:
-`{CustomModel:"example:models/example_combinedmodel",ModelElements:["element1","element2"]}`
-<br>
+- `{CustomModel:"example:models/example_combinedmodel",CombinedItemModel:["element1","element3"]}`
 
-Example NBT tag for SlotItemModel: `{CustomModel:"example:models/example_slotmodel",ModelSlots:{scope:"holographic"}}`
+Example NBT tag for SlotItemModel:
+- `{CustomModel:"example:models/example_slotmodel",SlotItemModel:[scope:"holographic",magazine:"exists"]}`
 
 
 ## Sounds
@@ -186,12 +221,12 @@ The settings for this function are in [`config/build.json5`](https://github.com/
 
 
 ## Planned in the future
-- [ ] Rewrite builder to **Rust** as cross-platform binary executable for all archs.
+- [ ] **(PREPARING TO START!)** Rewrite builder to **Rust** or **Go** as cross-platform binary executable for all archs.
 - [ ] Integration into [ItemsAdder](https://www.spigotmc.org/resources/%E2%9C%A8itemsadder%E2%AD%90emotes-mobs-items-armors-hud-gui-emojis-blocks-wings-hats-liquids.73355/), [Oraxen](https://www.spigotmc.org/resources/%E2%98%84%EF%B8%8F-oraxen-add-items-blocks-armors-hats-food-furnitures-plants-and-gui.72448/), [Model Engine](https://www.spigotmc.org/resources/conxeptworks-model-engine—ultimate-custom-entity-model-manager-1-16-5-1-19-3.79477/), etc.
 - [ ] Fonts generating (auto symbol mapping, etc.)
-- [ ] **(ALMOST DONE)** Resource pack CI/CD using [Redis](https://redis.io/), etc. (for multi server)
+- [ ] **(ALMOST DONE)** Global player resource pack memory using [Redis](https://redis.io/) and CI/CD. (for multi server)
 - [ ] Improve the quality of the code and API.
-- [ ] Mod for [Fabric](https://fabricmc.net/).
+- [ ] Vanilla minecraft support for [Fabric](https://fabricmc.net/) and [Quilt](https://quiltmc.org/).
 
 
 ## License

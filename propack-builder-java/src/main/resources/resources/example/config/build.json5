@@ -1,0 +1,29 @@
+{
+  // Available options: false, 'warn', true
+  "Strict": true,
+  // Ignore directory regexps
+  "DirIgnore": [
+    "^\\.old$",
+    "^\\.src$",
+    "^\\.ignore$"
+  ],
+  // Ignore file regexps
+  "FileIgnore": [
+    "^\\.ds_store$",
+    "\\.old\\.png$",
+    "\\.psd$",
+    "\\.txt$",
+    "\\.md$"
+  ],
+  "Obfuscation": {
+    "Enabled": true,
+    "Namespace": "obf",
+    "ShuffleSequence": true,
+    "Meshes": true,
+    "Textures": true,
+    "TexturesAtlasesFolder": "t",
+    "Ogg": true,
+    "Sounds": true,
+    "Fonts": true
+  }
+}

@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,12 @@
 
 package me.nelonn.propack.bukkit;
 
+import me.nelonn.commandlib.bukkit.BukkitCommands;
+import me.nelonn.configlib.PluginConfig;
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
-import me.nelonn.propack.bukkit.config.PluginConfig;
 import me.nelonn.propack.bukkit.dispatcher.ActivePackStore;
-import me.nelonn.propack.core.DevServer;
+import me.nelonn.propack.bukkit.packet.PacketPatcher;
 import me.nelonn.propack.core.util.JarResources;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -36,7 +37,7 @@ import java.io.File;
 
 public final class ProPackPlugin extends JavaPlugin {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static final SharedLoader.Library library = new SharedLoader.Library("flint-path-0.0.1.jar", "me.nelonn.flint.path.Path");
+    private static final DependencyManager.JarLibrary library = new DependencyManager.JarLibrary("flint-path-0.0.1.jar", "me.nelonn.flint.path.Path");
 
     public static ProPackPlugin getInstance() {
         return (ProPackPlugin) Bukkit.getPluginManager().getPlugin("ProPack");
@@ -44,12 +45,13 @@ public final class ProPackPlugin extends JavaPlugin {
 
     private BukkitAudiences adventure;
     private BukkitProPackCore core;
+    private PacketPatcher packetPatcher;
     private DevServer devServer;
     private PluginConfig config;
 
     @Override
     public void onLoad() {
-        new SharedLoader(this).loadIfNotExists(library);
+        new DependencyManager(this).addLibrary(library);
 
         File modulesDir = new File(getDataFolder(), "modules");
         if (!getDataFolder().exists()) {
@@ -79,12 +81,13 @@ public final class ProPackPlugin extends JavaPlugin {
 
         core = new BukkitProPackCore(this);
         ProPack.setCore(core);
+        packetPatcher = new PacketPatcher();
         config = new PluginConfig(this, "resources/config.yml", "config.yml");
         reloadModules();
         reloadConfig();
         reloadPacks();
 
-        new ProPackCommand(this).register(this);
+        BukkitCommands.register(this, new ProPackCommand(this));
 
         LOGGER.info("Successfully enabled");
 
@@ -154,6 +157,10 @@ public final class ProPackPlugin extends JavaPlugin {
     @NotNull
     public PluginConfig config() {
         return config;
+    }
+
+    public PacketPatcher getPacketPatcher() {
+        return packetPatcher;
     }
 
     public BukkitProPackCore getCore() {

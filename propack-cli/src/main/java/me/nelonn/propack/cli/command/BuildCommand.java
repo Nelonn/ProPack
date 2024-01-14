@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 
 package me.nelonn.propack.cli.command;
 
-import me.nelonn.propack.core.ProPackCore;
-import me.nelonn.propack.core.builder.InternalProject;
+import me.nelonn.propack.builder.impl.InternalProject;
+import me.nelonn.propack.builder.impl.ProPackCore;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import org.slf4j.Logger;
 import picocli.CommandLine;

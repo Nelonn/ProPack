@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 
 package me.nelonn.propack.bukkit;
 
+import me.nelonn.propack.builder.impl.ProPackCore;
 import me.nelonn.propack.bukkit.definition.DefinitionTypeMap;
 import me.nelonn.propack.bukkit.definition.PackManager;
 import me.nelonn.propack.bukkit.dispatcher.ActivePackStoreMap;
 import me.nelonn.propack.bukkit.dispatcher.Dispatcher;
 import me.nelonn.propack.bukkit.dispatcher.MemoryActivePackStore;
-import me.nelonn.propack.core.ProPackCore;
 import org.jetbrains.annotations.NotNull;
 
 public class BukkitProPackCore extends ProPackCore {

@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,13 +19,12 @@
 package me.nelonn.propack.bukkit;
 
 import com.google.common.base.Preconditions;
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.propack.ResourcePack;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 
 public final class ProPack {
     public static final String CUSTOM_MODEL = "CustomModel";
@@ -42,11 +41,11 @@ public final class ProPack {
         ProPack.core = core;
     }
 
-    public static @NotNull Identifier adapt(@NotNull Material material) {
-        return Identifier.of(material.getKey().toString());
+    public static @NotNull Key adapt(@NotNull Material material) {
+        return Key.of(material.getKey().toString());
     }
 
-    public static @NotNull Optional<ResourcePack> getAppliedResourcePack(@NotNull Player player) {
+    public static @Nullable ResourcePack getAppliedResourcePack(@NotNull Player player) {
         return getCore().getDispatcher().getAppliedResourcePack(player);
     }
 

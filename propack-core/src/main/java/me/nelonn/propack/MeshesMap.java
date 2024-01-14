@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 package me.nelonn.propack;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.flint.path.Path;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,15 +27,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MeshesMap implements Meshes {
-    private final Map<Identifier, Map<Path, Integer>> map;
+    private final Map<Key, Map<Path, Integer>> map;
 
-    public MeshesMap(Map<Identifier, Map<Path, Integer>> map) {
+    public MeshesMap(Map<Key, Map<Path, Integer>> map) {
         this.map = new HashMap<>(map);
         this.map.replaceAll((k, v) -> new HashMap<>(v)); // deep copy
     }
 
     @Override
-    public @Nullable Integer getCustomModelData(@NotNull Path mesh, @NotNull Identifier itemId) {
+    public @Nullable Integer getCustomModelData(@NotNull Path mesh, @NotNull Key itemId) {
         Map<Path, Integer> itemMap = map.get(itemId);
         if (itemMap == null) return null;
         return itemMap.get(mesh);

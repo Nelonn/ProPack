@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 package me.nelonn.propack.bukkit.definition;
 
 import com.google.gson.JsonObject;
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.propack.bukkit.BukkitProPackCore;
-import me.nelonn.propack.core.loader.ProjectLoader;
+import me.nelonn.propack.builder.impl.ProjectLoader;
 import me.nelonn.propack.core.util.GsonHelper;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.Util;
@@ -73,7 +73,7 @@ public class PackManager {
                 } else if (type.equalsIgnoreCase("File")) {
                     throw new UnsupportedOperationException("Resource pack definition type 'File' currently not supported");
                 } else {
-                    Identifier id = Identifier.of(type);
+                    Key id = Key.of(type);
                     DefinitionType definitionType = core.getDefinitionTypeMap().get(id);
                     if (definitionType == null) {
                         throw new NullPointerException("Pack type '" + id + "' not found");

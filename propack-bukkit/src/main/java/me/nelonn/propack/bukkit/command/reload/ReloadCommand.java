@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,21 +18,34 @@
 
 package me.nelonn.propack.bukkit.command.reload;
 
+import me.nelonn.commandlib.Command;
+import me.nelonn.commandlib.CommandContext;
+import me.nelonn.commandlib.suggestion.Suggestions;
 import me.nelonn.propack.bukkit.ProPackPlugin;
-import me.nelonn.propack.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ReloadCommand extends Command {
+import java.util.List;
+
+public class ReloadCommand extends Command<CommandSender> {
     public ReloadCommand(@NotNull ProPackPlugin plugin) {
         super("reload");
-        setPermission("propack.admin");
-        addChildren(new ReloadConfigCommand(plugin), new ReloadPacksCommand(plugin), new ReloadModulesCommand(plugin));
+        requires(s -> s.hasPermission("propack.admin"));
+        children(new ReloadConfigCommand(plugin), new ReloadPacksCommand(plugin), new ReloadModulesCommand(plugin));
     }
 
-    protected void onCommand(@NotNull CommandSender sender, @NotNull String s, @NotNull String[] args) {
-        for (Command command : getChildren()) {
+    @Override
+    public boolean run(@NotNull CommandContext<CommandSender> commandContext) {
+        CommandSender sender = commandContext.getSource();
+        for (Command<CommandSender> command : getChildren()) {
             ((BaseReloadCommand) command).execute(sender);
         }
+        return true;
+    }
+
+    @Override
+    public @Nullable List<String> suggest(@NotNull CommandContext<CommandSender> context) {
+        return Suggestions.children(context);
     }
 }

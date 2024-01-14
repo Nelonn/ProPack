@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@ import me.nelonn.propack.bukkit.ProPackPlugin;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class ProPackExpansion extends PlaceholderExpansion {
     private final ProPackPlugin plugin;
@@ -63,7 +65,7 @@ public class ProPackExpansion extends PlaceholderExpansion {
         if (player != null) {
             // return in switches is 'yield'
             result = switch (params.toLowerCase()) {
-                case "resourcepack", "rp" -> plugin.getCore().getDispatcher().getAppliedResourcePack(player)
+                case "resourcepack", "rp" -> Optional.ofNullable(plugin.getCore().getDispatcher().getAppliedResourcePack(player))
                         .map(ResourcePack::getName).orElse("");
                 // TODO: glyphs
                 default -> null;

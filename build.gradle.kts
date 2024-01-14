@@ -1,3 +1,4 @@
+import org.cadixdev.gradle.licenser.LicenseExtension
 
 repositories {
     mavenCentral()
@@ -8,4 +9,13 @@ repositories {
     maven("https://repo.eclipse.org/content/groups/releases/")
     // NBTAPI
     maven("https://repo.codemc.org/repository/maven-public/")
+}
+
+allprojects {
+    apply(plugin = "org.cadixdev.licenser")
+
+    configure<LicenseExtension> {
+        header(rootProject.file("HEADER.txt"))
+        include("**/*.java")
+    }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,13 +29,14 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class ProtocolPackSender {
+public class ProtocolPackSender implements PackSender {
     private final ProtocolManager protocolManager;
 
     public ProtocolPackSender() {
         protocolManager = ProtocolLibrary.getProtocolManager();
     }
 
+    @Override
     public void send(@NotNull Player player, @NotNull ResourcePackOffer packOffer) {
         //player.setResourcePack(packOffer.getUpload().getUrl(), packOffer.getUpload().getSha1String(), packOffer.getShouldForce(), packOffer.getPrompt());
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.RESOURCE_PACK_SEND);

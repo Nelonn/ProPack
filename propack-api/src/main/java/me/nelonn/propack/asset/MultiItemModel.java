@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 package me.nelonn.propack.asset;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import me.nelonn.flint.path.Path;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +27,7 @@ import java.util.Set;
 public abstract class MultiItemModel extends AbstractItemModel {
     protected final Path baseMesh;
 
-    protected MultiItemModel(@NotNull Path path, @NotNull Set<Identifier> targetItems, @NotNull Path baseMesh) {
+    protected MultiItemModel(@NotNull Path path, @NotNull Set<Key> targetItems, @NotNull Path baseMesh) {
         super(path, targetItems);
         this.baseMesh = baseMesh;
     }

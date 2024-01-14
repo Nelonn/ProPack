@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,14 +28,27 @@ import java.util.Locale;
 
 public final class PathUtil {
     public static @NotNull Path resolve(@NotNull String input, @NotNull String curNamespace, @NotNull String curPath) {
-        input = input.replace("<namespace>", curNamespace);
-        if (!input.startsWith("./") && !input.startsWith("../")) {
-            return Path.ofWithFallback(input, curNamespace);
+        //input = input.replace("<namespace>", curNamespace);
+        if (input.startsWith(":")) {
+            input = curNamespace + input;
         }
-        List<String> path = new ArrayList<>(Arrays.asList(curPath.split("/")));
+        if (!input.contains("./") && !input.contains("../")) {
+            return Path.withFallback(input, curNamespace);
+        }
+        List<String> path;
+        if (curPath.isEmpty()) {
+            path = new ArrayList<>();
+        } else {
+            path = new ArrayList<>(Arrays.asList(curPath.split("/")));
+        }
         String[] relative = input.split("/");
         for (String s : relative) {
             if (s.equals("..")) {
+                if (path.isEmpty()) {
+                    throw new IllegalArgumentException("Cannot move to parent directory (namespace: '" + curNamespace
+                            + "', parent: '" + curPath
+                            + ", input: '" + input + "')");
+                }
                 path.remove(path.size() - 1);
             } else if (!s.isEmpty() && !s.equals(".")) {
                 path.add(s);
@@ -45,7 +58,7 @@ public final class PathUtil {
     }
 
     public static @NotNull Path resolve(@NotNull String input, @NotNull Path contentPath) {
-        return resolve(input, contentPath.getNamespace(), parentDirectory(contentPath));
+        return resolve(input, contentPath.namespace(), parentDirectory(contentPath));
     }
 
     public static @NotNull String parentDirectory(@NotNull String filePath) {
@@ -53,7 +66,7 @@ public final class PathUtil {
     }
 
     public static @NotNull String parentDirectory(@NotNull Path filePath) {
-        return parentDirectory(filePath.getValue());
+        return parentDirectory(filePath.value());
     }
 
     public static @NotNull Path resourcePath(@NotNull String input) {
@@ -69,15 +82,15 @@ public final class PathUtil {
     }
 
     public static @NotNull String contentPath(@NotNull Path path) {
-        return "content/" + path.getNamespace() + '/' + path.getValue();
+        return "content/" + path.namespace() + '/' + path.value();
     }
 
     public static @NotNull String assetsPath(@NotNull Path path, @NotNull String type) {
-        return "assets/" + path.getNamespace() + '/' + type + '/' + path.getValue();
+        return "assets/" + path.namespace() + '/' + type + '/' + path.value();
     }
 
     public static @NotNull Path append(@NotNull Path path, @NotNull String string) {
-        return Path.of(path.getNamespace(), path.getValue() + string);
+        return Path.of(path.namespace(), path.value() + string);
     }
 
     public static @NotNull String format(@NotNull String path) {

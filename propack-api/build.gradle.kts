@@ -1,8 +1,5 @@
-import org.cadixdev.gradle.licenser.LicenseExtension
-
 plugins {
     `java-library`
-    id("org.cadixdev.licenser")
 }
 
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(8))
@@ -11,9 +8,11 @@ repositories {
     mavenCentral()
 }
 
+var adventureVersion = "4.15.0"
+
 dependencies {
-    "compileOnly"(files("../libs/lib-flint-path-0.0.1.jar"))
-    "compileOnly"("net.kyori:adventure-api:4.12.0")
+    "compileOnly"(files("../libs/flint-path-0.0.1.jar"))
+    "compileOnly"("net.kyori:adventure-api:$adventureVersion")
     "compileOnly"("org.jetbrains:annotations:23.1.0")
     "compileOnly"("org.slf4j:slf4j-api:2.0.7")
 }
@@ -31,7 +30,3 @@ java {
     withJavadocJar()
 }
 
-configure<LicenseExtension> {
-    header(rootProject.file("HEADER.txt"))
-    include("**/*.java")
-}

@@ -1,0 +1,3 @@
+main: flintpathlib.Plugin
+name: flint-path-lib
+version: '${version}'

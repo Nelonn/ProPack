@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 
 package me.nelonn.propack.bukkit.adapter;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface MItemStack {
-    @NotNull Identifier getItemId();
+    @NotNull Key getItemId();
 
     @Nullable MCompoundTag getTag();
 }

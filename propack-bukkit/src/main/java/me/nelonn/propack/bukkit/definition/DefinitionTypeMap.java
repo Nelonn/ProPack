@@ -1,6 +1,6 @@
 /*
  * This file is part of ProPack, a Minecraft resource pack toolkit
- * Copyright (C) Nelonn <two.nelonn@gmail.com>
+ * Copyright (C) Michael Neonov <two.nelonn@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 package me.nelonn.propack.bukkit.definition;
 
-import me.nelonn.flint.path.Identifier;
+import me.nelonn.flint.path.Key;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,31 +26,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DefinitionTypeMap {
-    private final Map<Identifier, DefinitionType> knownDefTypes = new HashMap<>();
+    private final Map<Key, DefinitionType> knownDefTypes = new HashMap<>();
 
-    public boolean register(@NotNull Identifier id, @NotNull DefinitionType definitionType) {
+    public boolean register(@NotNull Key id, @NotNull DefinitionType definitionType) {
         if (knownDefTypes.containsKey(id)) return false;
         knownDefTypes.put(id, definitionType);
         return true;
     }
 
     public boolean register(@NotNull String id, @NotNull DefinitionType definitionType) {
-        return register(Identifier.ofWithFallback(id, "propack"), definitionType);
+        return register(Key.withFallback(id, "propack"), definitionType);
     }
 
-    public boolean unregister(@NotNull Identifier id) {
+    public boolean unregister(@NotNull Key id) {
         return knownDefTypes.remove(id) != null;
     }
 
     public boolean unregister(@NotNull String id) {
-        return unregister(Identifier.ofWithFallback(id, "propack"));
+        return unregister(Key.withFallback(id, "propack"));
     }
 
-    public @Nullable DefinitionType get(@NotNull Identifier id) {
+    public @Nullable DefinitionType get(@NotNull Key id) {
         return knownDefTypes.get(id);
     }
 
     public @Nullable DefinitionType get(@NotNull String id) {
-        return get(Identifier.ofWithFallback(id, "propack"));
+        return get(Key.withFallback(id, "propack"));
     }
 }
