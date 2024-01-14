@@ -8,7 +8,7 @@ plugins {
 group = rootProject.group
 version = "0.0.1"
 
-java.toolchain.languageVersion.set(JavaLanguageVersion.of(16))
+java.toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 
 repositories {
     mavenCentral()
