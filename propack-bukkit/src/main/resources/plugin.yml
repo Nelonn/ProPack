@@ -1,12 +1,12 @@
 main: me.nelonn.propack.bukkit.ProPackPlugin
 name: ProPack
-version: ${version}
-api-version: 1.17
+version: '${version}'
+api-version: '1.17'
 author: Nelonn
 load: STARTUP
 description: Modern solution for minecraft resource pack development
 website: 'https://github.com/Nelonn/ProPack'
-folia-supported: true
+folia-supported: true # maybe not
 softdepend:
   - PlaceholderAPI
   - flint-path-lib
