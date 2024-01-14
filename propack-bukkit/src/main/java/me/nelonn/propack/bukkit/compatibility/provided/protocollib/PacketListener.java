@@ -35,20 +35,21 @@ import me.nelonn.propack.bukkit.adapter.Adapter;
 import me.nelonn.propack.bukkit.adapter.AdapterLoader;
 import me.nelonn.propack.bukkit.adapter.MItemStack;
 import me.nelonn.propack.bukkit.packet.PacketPatcher;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @SuppressWarnings("deprecation")
 public class PacketListener extends PacketAdapter {
-    private final ProPackPlugin plugin;
-    private final Adapter adapter;
-    private final PacketPatcher packetPatcher;
+    public static final PacketType[] PACKET_TYPES;
 
-    public PacketListener(@NotNull ProPackPlugin plugin) {
-        super(plugin, ListenerPriority.HIGHEST, // priority is inverted
+    static {
+        List<PacketType> packetTypes = new ArrayList<>(List.of(new PacketType[]{
                 PacketType.Play.Client.SET_CREATIVE_SLOT,
 
                 PacketType.Play.Server.SET_SLOT,
@@ -56,8 +57,34 @@ public class PacketListener extends PacketAdapter {
                 PacketType.Play.Server.ENTITY_EQUIPMENT,
                 PacketType.Play.Server.ENTITY_METADATA,
 
-                PacketType.Play.Server.CUSTOM_SOUND_EFFECT, // Removed in 1.19.3
-                PacketType.Play.Server.NAMED_SOUND_EFFECT);
+                PacketType.Play.Server.ENTITY_SOUND,
+                PacketType.Play.Server.NAMED_SOUND_EFFECT,
+        }));
+        if (isLowerOr1_19_3()) {
+            packetTypes.add(PacketType.Play.Server.CUSTOM_SOUND_EFFECT);
+        }
+        PACKET_TYPES = packetTypes.toArray(PacketType[]::new);
+    }
+
+    private static boolean isLowerOr1_19_3() {
+        String[] minecraftVersion = Bukkit.getServer().getBukkitVersion().split("-")[0].split("\\.");
+        if (minecraftVersion.length == 3) {
+            int minor = Integer.parseInt(minecraftVersion[1]);
+            int patch = Integer.parseInt(minecraftVersion[2]);
+            if (minor > 19) return false;
+            return minor != 19 || patch <= 3;
+        }
+        return false;
+    }
+
+    private final ProPackPlugin plugin;
+    private final Adapter adapter;
+    private final PacketPatcher packetPatcher;
+
+    public PacketListener(@NotNull ProPackPlugin plugin) {
+        super(plugin,
+                ListenerPriority.HIGHEST, // priority is inverted
+                PACKET_TYPES);
         this.plugin = plugin;
         this.adapter = Objects.requireNonNull(AdapterLoader.ADAPTER, "Adapter not loaded");
         this.packetPatcher = plugin.getPacketPatcher();
@@ -72,7 +99,7 @@ public class PacketListener extends PacketAdapter {
         PacketType type = event.getPacketType();
         Object packet = event.getPacket().getHandle();
         if (type == PacketType.Play.Client.SET_CREATIVE_SLOT && plugin.config().get(Config.patchPacketItems)) {
-            packetPatcher.patchServerboundItems(adapter.wrap_ServerboundSetCreativeModeSlotPacket(packet).getItem());
+            adapter.patchServerboundSetCreativeModeSlotPacket(packet, packetPatcher::patchServerboundItem);
         }
     }
 
@@ -84,33 +111,35 @@ public class PacketListener extends PacketAdapter {
         if (resourcePack == null) return;
         final Resources resources = resourcePack.resources();
         if (plugin.config().get(Config.patchPacketItems)) {
-            BiConsumer<Object, Consumer<MItemStack>> method;
+            BiConsumer<Object, Consumer<MItemStack>> method = null;
             if (type == PacketType.Play.Server.SET_SLOT) {
-                method = (rawPacket, patcher) -> {
-                    patcher.accept(adapter.wrap_ClientboundContainerSetSlotPacket(rawPacket).getItem());
-                };
+                method = adapter::patchClientboundContainerSetSlotPacket;
             } else if (type == PacketType.Play.Server.WINDOW_ITEMS) {
-                method = adapter::patchSetContent;
+                method = adapter::patchClientboundContainerSetContentPacket;
             } else if (type == PacketType.Play.Server.ENTITY_EQUIPMENT) {
-                method = adapter::patchEntityEquipment;
+                method = adapter::patchClientboundSetEntityEquipmentPacket;
             } else if (type == PacketType.Play.Server.ENTITY_METADATA) {
-                method = adapter::patchSetEntityData;
-            } else {
+                method = adapter::patchClientboundSetEntityDataPacket;
+            }
+            if (method != null) {
+                method.accept(packet, stack -> packetPatcher.patchClientboundItem(stack, resources));
                 return;
             }
-            method.accept(packet, stack -> packetPatcher.patchClientboundItems(stack, resources));
         }
         if (plugin.config().get(Config.patchPacketSounds) &&
-                (type == PacketType.Play.Server.CUSTOM_SOUND_EFFECT ||
-                        type == PacketType.Play.Server.NAMED_SOUND_EFFECT)) {
+                (type == PacketType.Play.Server.ENTITY_SOUND ||
+                        type == PacketType.Play.Server.NAMED_SOUND_EFFECT ||
+                        type == PacketType.Play.Server.CUSTOM_SOUND_EFFECT)) {
+            // https://wiki.vg/Protocol#Sound_Effect
+            int soundId = event.getPacket().getIntegers().read(0);
+            if (soundId != 0) return;
             MinecraftKey minecraftKey = event.getPacket().getMinecraftKeys().read(0);
             Path path = Path.of(minecraftKey.getPrefix(), minecraftKey.getKey());
             SoundAsset sound = resources.sound(path);
-            if (sound != null) {
-                path = sound.realPath();
-                minecraftKey = new MinecraftKey(path.namespace(), path.value());
-                event.getPacket().getMinecraftKeys().write(0, minecraftKey);
-            }
+            if (sound == null) return;
+            path = sound.realPath();
+            minecraftKey = new MinecraftKey(path.namespace(), path.value());
+            event.getPacket().getMinecraftKeys().write(0, minecraftKey);
         }
     }
 }

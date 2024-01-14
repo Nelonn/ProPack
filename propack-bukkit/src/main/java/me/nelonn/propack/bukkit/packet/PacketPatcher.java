@@ -41,7 +41,7 @@ public class PacketPatcher {
     private static final int TAG_INT = 3;
     private static final int TAG_STRING = 8;
 
-    public void patchServerboundItems(MItemStack itemStack) {
+    public void patchServerboundItem(@NotNull MItemStack itemStack) {
         MCompoundTag tag = itemStack.getTag();
         if (tag == null ||
                 !tag.contains(CUSTOM_MODEL_DATA, TAG_INT) ||
@@ -49,7 +49,7 @@ public class PacketPatcher {
         tag.remove(CUSTOM_MODEL_DATA);
     }
 
-    public void patchClientboundItems(@NotNull MItemStack itemStack, @NotNull Resources resources) {
+    public void patchClientboundItem(@NotNull MItemStack itemStack, @NotNull Resources resources) {
         try {
             MCompoundTag rootTag = itemStack.getTag();
             if (rootTag == null || !rootTag.contains(ProPack.CUSTOM_MODEL, TAG_STRING)) return;
