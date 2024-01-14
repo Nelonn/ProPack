@@ -20,7 +20,6 @@ package me.nelonn.propack.bukkit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -78,7 +77,8 @@ public class DependencyManager {
                     }
                 }
             }
-            addToClasspath(file.toURI().toURL());
+            //addToClasspath(file.toURI().toURL());
+            Bukkit.getPluginManager().loadPlugin(file);
             Class.forName(library.getCheckClass());
         } catch (Throwable e) {
             throw new RuntimeException("Unable to load library '" + library.getName() + "'", e);
