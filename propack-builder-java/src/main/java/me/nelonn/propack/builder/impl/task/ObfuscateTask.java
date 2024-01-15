@@ -345,8 +345,10 @@ public class ObfuscateTask extends AbstractTask {
     private void obfuscateFonts(@NotNull TaskIO io, @NotNull ObfuscationNamer namer, @NotNull ObfuscationConfiguration conf) {
         String obfuscatedNamespace = conf.getNamespace();
         namer.reset();
+        Map<Path, Path> fontMapping = new HashMap<>();
         for (FontBuilder font : io.getAssets().getFonts()) {
-            String fontFilePath = "assets/" + font.getFontPath().namespace() + "/font/" + font.getFontPath().value() + ".json";
+            Path originalPath = font.getFontPath();
+            String fontFilePath = "assets/" + originalPath.namespace() + "/font/" + originalPath.value() + ".json";
             File fontFile = io.getFiles().removeFile(fontFilePath);
             if (!(fontFile instanceof JsonFile)) {
                 throw new IllegalStateException("font file not found for '" + font.getPath() + "'");
@@ -354,6 +356,38 @@ public class ObfuscateTask extends AbstractTask {
             Path obfuscatedPath = Path.of(obfuscatedNamespace, namer.next());
             font.setFontPath(obfuscatedPath);
             io.getFiles().addFile(fontFile.copyAs(PathUtil.assetsPath(obfuscatedPath, "font") + ".json"));
+            fontMapping.put(originalPath, obfuscatedPath);
+        }
+        for (FontBuilder font : io.getAssets().getFonts()) {
+            String fontFilePath = "assets/" + font.getFontPath().namespace() + "/font/" + font.getFontPath().value() + ".json";
+            File fontFile = io.getFiles().getFile(fontFilePath);
+            if (!(fontFile instanceof JsonFile)) {
+                // TODO: log error
+                continue;
+            }
+            JsonFile jsonFile = (JsonFile) fontFile;
+            JsonObject jsonObject = jsonFile.getContent();
+            JsonArray providersArray = jsonObject.getAsJsonArray("providers");
+            if (providersArray != null) {
+                for (JsonElement jsonElement : providersArray) {
+                    JsonObject providerJson = jsonElement.getAsJsonObject();
+                    if (GsonHelper.hasString(providerJson, "type")) {
+                        String type = GsonHelper.getString(providerJson, "type");
+                        if (type.equalsIgnoreCase("reference")) {
+                            if (GsonHelper.hasString(providerJson, "id")) {
+                                String pathStr = GsonHelper.getString(providerJson, "id");
+                                Path path = Path.tryOrNull(pathStr);
+                                if (path != null) {
+                                    Path obfPath = fontMapping.get(path);
+                                    if (obfPath != null) {
+                                        providerJson.addProperty("id", obfPath.toString());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
