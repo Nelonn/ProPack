@@ -58,7 +58,7 @@ dependencies {
     "compileOnly"("net.kyori:adventure-text-serializer-gson:$adventureVersion")
     "compileOnly"("net.kyori:adventure-platform-bukkit:4.3.2")
 
-    "implementation"("com.github.retrooper.packetevents:spigot:2.0.2") {
+    "implementation"("com.github.retrooper.packetevents:spigot:2.2.0") {
         exclude(group = "net.kyori")
         exclude(group = "org.jetbrains")
     }

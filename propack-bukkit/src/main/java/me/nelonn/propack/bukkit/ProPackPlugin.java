@@ -18,12 +18,15 @@
 
 package me.nelonn.propack.bukkit;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import me.nelonn.commandlib.bukkit.BukkitCommands;
 import me.nelonn.configlib.PluginConfig;
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
 import me.nelonn.propack.bukkit.dispatcher.ActivePackStore;
-import me.nelonn.propack.bukkit.packet.PacketPatcher;
+import me.nelonn.propack.bukkit.packet.PacketEventsListener;
+import me.nelonn.propack.bukkit.packet.ItemPatcher;
 import me.nelonn.propack.core.util.JarResources;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -45,7 +48,7 @@ public final class ProPackPlugin extends JavaPlugin {
 
     private BukkitAudiences adventure;
     private BukkitProPackCore core;
-    private PacketPatcher packetPatcher;
+    private ItemPatcher itemPatcher;
     private DevServer devServer;
     private PluginConfig config;
 
@@ -81,7 +84,7 @@ public final class ProPackPlugin extends JavaPlugin {
 
         core = new BukkitProPackCore(this);
         ProPack.setCore(core);
-        packetPatcher = new PacketPatcher();
+        itemPatcher = new ItemPatcher();
         config = new PluginConfig(this, "resources/config.yml", "config.yml");
         reloadModules();
         reloadConfig();
@@ -89,9 +92,14 @@ public final class ProPackPlugin extends JavaPlugin {
 
         BukkitCommands.register(this, new ProPackCommand(this));
 
-        LOGGER.info("Successfully enabled");
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        PacketEvents.getAPI().getSettings().bStats(false).checkForUpdates(false).debug(false);
+        PacketEvents.getAPI().init();
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketEventsListener(this));
 
         CompatibilitiesManager.enableNativeCompatibilities(this);
+
+        LOGGER.info("Successfully enabled");
     }
 
     @Override
@@ -159,8 +167,8 @@ public final class ProPackPlugin extends JavaPlugin {
         return config;
     }
 
-    public PacketPatcher getPacketPatcher() {
-        return packetPatcher;
+    public ItemPatcher getItemPatcher() {
+        return itemPatcher;
     }
 
     public BukkitProPackCore getCore() {

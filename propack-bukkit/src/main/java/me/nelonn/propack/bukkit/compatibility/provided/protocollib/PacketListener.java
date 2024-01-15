@@ -23,19 +23,15 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.wrappers.MinecraftKey;
-import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.Resources;
-import me.nelonn.propack.asset.SoundAsset;
 import me.nelonn.propack.bukkit.Config;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.adapter.Adapter;
 import me.nelonn.propack.bukkit.adapter.AdapterLoader;
 import me.nelonn.propack.bukkit.adapter.MItemStack;
-import me.nelonn.propack.bukkit.packet.PacketPatcher;
-import org.bukkit.Bukkit;
+import me.nelonn.propack.bukkit.packet.ItemPatcher;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -44,7 +40,6 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-@SuppressWarnings("deprecation")
 public class PacketListener extends PacketAdapter {
     public static final PacketType[] PACKET_TYPES;
 
@@ -56,30 +51,13 @@ public class PacketListener extends PacketAdapter {
                 PacketType.Play.Server.WINDOW_ITEMS,
                 PacketType.Play.Server.ENTITY_EQUIPMENT,
                 PacketType.Play.Server.ENTITY_METADATA,
-
-                PacketType.Play.Server.ENTITY_SOUND,
-                PacketType.Play.Server.NAMED_SOUND_EFFECT,
         }));
-        if (isLowerOr1_19_3()) {
-            packetTypes.add(PacketType.Play.Server.CUSTOM_SOUND_EFFECT);
-        }
         PACKET_TYPES = packetTypes.toArray(PacketType[]::new);
-    }
-
-    private static boolean isLowerOr1_19_3() {
-        String[] minecraftVersion = Bukkit.getServer().getBukkitVersion().split("-")[0].split("\\.");
-        if (minecraftVersion.length == 3) {
-            int minor = Integer.parseInt(minecraftVersion[1]);
-            int patch = Integer.parseInt(minecraftVersion[2]);
-            if (minor > 19) return false;
-            return minor != 19 || patch <= 3;
-        }
-        return false;
     }
 
     private final ProPackPlugin plugin;
     private final Adapter adapter;
-    private final PacketPatcher packetPatcher;
+    private final ItemPatcher packetPatcher;
 
     public PacketListener(@NotNull ProPackPlugin plugin) {
         super(plugin,
@@ -87,7 +65,7 @@ public class PacketListener extends PacketAdapter {
                 PACKET_TYPES);
         this.plugin = plugin;
         this.adapter = Objects.requireNonNull(AdapterLoader.ADAPTER, "Adapter not loaded");
-        this.packetPatcher = plugin.getPacketPatcher();
+        this.packetPatcher = plugin.getItemPatcher();
     }
 
     public static void register(@NotNull ProPackPlugin plugin) {
@@ -125,21 +103,6 @@ public class PacketListener extends PacketAdapter {
                 method.accept(packet, stack -> packetPatcher.patchClientboundItem(stack, resources));
                 return;
             }
-        }
-        if (plugin.config().get(Config.patchPacketSounds) &&
-                (type == PacketType.Play.Server.ENTITY_SOUND ||
-                        type == PacketType.Play.Server.NAMED_SOUND_EFFECT ||
-                        type == PacketType.Play.Server.CUSTOM_SOUND_EFFECT)) {
-            // https://wiki.vg/Protocol#Sound_Effect
-            int soundId = event.getPacket().getIntegers().read(0);
-            if (soundId != 0) return;
-            MinecraftKey minecraftKey = event.getPacket().getMinecraftKeys().read(0);
-            Path path = Path.of(minecraftKey.getPrefix(), minecraftKey.getKey());
-            SoundAsset sound = resources.sound(path);
-            if (sound == null) return;
-            path = sound.realPath();
-            minecraftKey = new MinecraftKey(path.namespace(), path.value());
-            event.getPacket().getMinecraftKeys().write(0, minecraftKey);
         }
     }
 }

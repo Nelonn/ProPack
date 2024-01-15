@@ -36,7 +36,7 @@ import java.nio.file.InvalidPathException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PacketPatcher {
+public class ItemPatcher {
     private static final String CUSTOM_MODEL_DATA = "CustomModelData";
     private static final int TAG_INT = 3;
     private static final int TAG_STRING = 8;
