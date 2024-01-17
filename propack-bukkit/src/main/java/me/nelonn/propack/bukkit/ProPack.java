@@ -26,6 +26,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
+
 public final class ProPack {
     public static final String CUSTOM_MODEL = "CustomModel";
 
@@ -47,6 +49,10 @@ public final class ProPack {
 
     public static @Nullable ResourcePack getAppliedResourcePack(@NotNull Player player) {
         return getCore().getDispatcher().getAppliedResourcePack(player);
+    }
+
+    public static @Nullable ResourcePack getAppliedResourcePack(@NotNull UUID playerID) {
+        return getCore().getDispatcher().getAppliedResourcePack(playerID);
     }
 
     private ProPack() {

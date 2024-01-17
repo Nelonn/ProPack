@@ -25,8 +25,8 @@ import java.util.UUID;
 
 public interface ActivePackStore {
 
-    @Nullable ActivePack getActiveResourcePack(@NotNull UUID uuid);
+    @Nullable ActivePack getActiveResourcePack(@NotNull UUID playerID);
 
-    void setActiveResourcePack(@NotNull UUID uuid, @Nullable ActivePack activePack);
+    void setActiveResourcePack(@NotNull UUID playerID, @Nullable ActivePack activePack);
 
 }

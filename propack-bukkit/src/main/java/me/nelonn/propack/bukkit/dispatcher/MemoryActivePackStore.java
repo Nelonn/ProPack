@@ -38,13 +38,13 @@ public class MemoryActivePackStore implements ActivePackStore, Listener {
     }
 
     @Override
-    public @Nullable ActivePack getActiveResourcePack(@NotNull UUID uuid) {
-        return map.get(uuid);
+    public @Nullable ActivePack getActiveResourcePack(@NotNull UUID playerID) {
+        return map.get(playerID);
     }
 
     @Override
-    public void setActiveResourcePack(@NotNull UUID uuid, @Nullable ActivePack activePack) {
-        map.put(uuid, activePack);
+    public void setActiveResourcePack(@NotNull UUID playerID, @Nullable ActivePack activePack) {
+        map.put(playerID, activePack);
     }
 
     @EventHandler

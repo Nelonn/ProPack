@@ -25,12 +25,11 @@ import me.nelonn.configlib.PluginConfig;
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
 import me.nelonn.propack.bukkit.dispatcher.ActivePackStore;
-import me.nelonn.propack.bukkit.packet.PacketEventsListener;
 import me.nelonn.propack.bukkit.packet.ItemPatcher;
+import me.nelonn.propack.bukkit.packet.PacketEventsListener;
 import me.nelonn.propack.core.util.JarResources;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +42,7 @@ public final class ProPackPlugin extends JavaPlugin {
     private static final DependencyManager.JarLibrary library = new DependencyManager.JarLibrary("flint-path-0.0.1.jar", "me.nelonn.flint.path.Path");
 
     public static ProPackPlugin getInstance() {
-        return (ProPackPlugin) Bukkit.getPluginManager().getPlugin("ProPack");
+        return JavaPlugin.getPlugin(ProPackPlugin.class);
     }
 
     private BukkitAudiences adventure;

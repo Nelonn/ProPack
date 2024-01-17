@@ -110,7 +110,8 @@ public class Dispatcher implements Listener {
             return;
         }
         if (!resourcePack.isUploaded()) {
-            throw new IllegalArgumentException("Resource pack '" + resourcePack.getName() + "' not uploaded");
+            LOGGER.error("Resource pack '" + resourcePack.getName() + "' not uploaded");
+            return;
         }
         UploadedPack uploadedPack = resourcePack.getUpload();
         Player player = event.getPlayer();
@@ -150,14 +151,14 @@ public class Dispatcher implements Listener {
     }
 
     public @Nullable ResourcePack getAppliedResourcePack(@NotNull Player player) {
-        ActivePack activePack = activePackStore.getActiveResourcePack(player.getUniqueId());
+        return getAppliedResourcePack(player.getUniqueId());
+    }
+
+    public @Nullable ResourcePack getAppliedResourcePack(@NotNull UUID playerID) {
+        ActivePack activePack = activePackStore.getActiveResourcePack(playerID);
         if (activePack == null) return null;
         PackDefinition definition = plugin.getCore().getPackManager().getDefinition(activePack.name);
         if (definition == null) return null;
         return definition.getResourcePack();
-    }
-
-    public @NotNull ResourcePack getAppliedResourcePack$(@NotNull Player player) {
-        return Objects.requireNonNull(this.getAppliedResourcePack(player));
     }
 }
