@@ -18,16 +18,15 @@
 
 package me.nelonn.propack.builder.impl.json.mesh;
 
-import me.nelonn.bestvecs.ImmVec3f;
 import me.nelonn.bestvecs.Vec3f;
 import me.nelonn.propack.core.util.Direction;
 import org.jetbrains.annotations.NotNull;
 
 public class ModelRotation {
-    public final ImmVec3f origin;
-    public final Direction.Axis axis;
-    public final float angle;
-    public final boolean rescale;
+    public Vec3f origin;
+    public Direction.Axis axis;
+    public float angle;
+    public boolean rescale;
 
     public ModelRotation(@NotNull Vec3f origin, @NotNull Direction.Axis axis, float angle, boolean rescale) {
         this.origin = origin.immutable();

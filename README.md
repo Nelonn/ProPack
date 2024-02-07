@@ -87,12 +87,22 @@ Models configuration file name should end with `.model.json`.
     },
     "element3": {
       "Mesh": "./mesh3",
-      "Offset": [0.1, 0.2, 0.3]
+      "Offset": [0.1, 0.2, 0.3],
+      "Scale": {
+        "Origin": [8.0, 0.0, 8.0],
+        "Size": 2.0
+      }
     }
   },
   "Target": "minecraft:paper"
 }
 ```
+
+`Offset` simply move whole mesh relative
+
+`Scale` is representation of BlockBench's _Transform -> Scale_ tool
+
+Rotation at the generation stage not supported, sorry
 
 <br>
 
@@ -124,6 +134,8 @@ Models configuration file name should end with `.model.json`.
   ]
 }
 ```
+
+Working with sub-meshes is the same as in CombinedItemModel
 
 ### Fields
 

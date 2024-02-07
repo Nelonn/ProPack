@@ -20,9 +20,11 @@ package me.nelonn.propack.builder.impl.json.mesh;
 
 import com.google.common.collect.Maps;
 import com.google.gson.*;
-import me.nelonn.bestvecs.ImmVec3f;
 import me.nelonn.bestvecs.Vec3f;
-import me.nelonn.propack.core.util.*;
+import me.nelonn.propack.core.util.Direction;
+import me.nelonn.propack.core.util.GsonHelper;
+import me.nelonn.propack.core.util.Util;
+import me.nelonn.propack.core.util.Vec4f;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,12 +34,11 @@ import java.util.Locale;
 import java.util.Map;
 
 public class ModelElement {
-    // TODO: fix
-    public /*final*/ Vec3f from;
-    public /*final*/ Vec3f to;
-    public final Map<Direction, ModelElementFace> faces;
-    public final ModelRotation rotation;
-    public final boolean shade;
+    public Vec3f from;
+    public Vec3f to;
+    public Map<Direction, ModelElementFace> faces;
+    public ModelRotation rotation;
+    public boolean shade;
 
     public ModelElement(@NotNull Vec3f from, @NotNull Vec3f to, @NotNull Map<Direction, ModelElementFace> faces,
                         @Nullable ModelRotation rotation, boolean shade) {

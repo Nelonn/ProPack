@@ -18,10 +18,7 @@
 
 package me.nelonn.propack.builder.impl.task;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import me.nelonn.bestvecs.ImmVec3f;
 import me.nelonn.bestvecs.Vec3f;
 import me.nelonn.flint.path.Key;
@@ -294,14 +291,20 @@ public class ProcessModelsTask extends AbstractTask {
 
     private JsonModel parseGeneratingMesh(JsonElement jsonElement, Path resourcePath, TaskIO io) {
         Path elementMeshPath;
-        Vec3f offset;
+        Vec3f offset = null;
+        Vec3f scaleOrigin = null;
+        float scaleSize = 0.0F;
         if (GsonHelper.isString(jsonElement)) {
             elementMeshPath = PathUtil.resolve(jsonElement.getAsString(), resourcePath);
-            offset = ImmVec3f.ZERO;
         } else {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
             elementMeshPath = PathUtil.resolve(GsonHelper.getString(jsonObject, "Mesh"), resourcePath);
             offset = Util.parseVec3f(jsonObject, "Offset", ImmVec3f.ZERO);
+            JsonObject scaleObject = GsonHelper.getObject(jsonObject, "Scale", null);
+            if (scaleObject != null) {
+                scaleOrigin = Util.parseVec3f(scaleObject, "Origin", ImmVec3f.ZERO);
+                scaleSize = GsonHelper.getFloat(scaleObject, "Size");
+            }
         }
         File elementMeshFile = io.getFiles().getFile(PathUtil.contentPath(elementMeshPath) + ".mesh.json");
         if (!(elementMeshFile instanceof JsonFile)) {
@@ -311,12 +314,34 @@ public class ProcessModelsTask extends AbstractTask {
         Map<String, String> textureMap = elementMesh.getTextureMap();
         processTextureMap(textureMap, elementMeshPath);
         List<ModelElement> modelElements = elementMesh.getElements();
-        for (ModelElement modelElement : modelElements) {
-            modelElement.from = modelElement.from.add(offset);
-            modelElement.to = modelElement.to.add(offset);
+        if (offset != null || scaleOrigin != null) {
+            for (ModelElement cube : modelElements) {
+                if (offset != null) {
+                    move(cube, offset);
+                }
+                if (scaleOrigin != null) {
+                    scale(cube, scaleOrigin, scaleSize);
+                }
+            }
         }
         return new JsonModel(elementMesh.getParent(), elementMesh.getTextureSize(),
                 textureMap, modelElements, elementMesh.useAmbientOcclusion(), elementMesh.getGuiLight(),
                 elementMesh.getTransformations(), elementMesh.getOverrides());
+    }
+
+    private static void move(ModelElement cube, Vec3f offset) {
+        cube.from = cube.from.add(offset);
+        cube.to = cube.to.add(offset);
+        if (cube.rotation != null) {
+            cube.rotation.origin = cube.rotation.origin.add(offset);
+        }
+    }
+
+    private static void scale(ModelElement cube, Vec3f origin, float size) {
+        cube.from = cube.from.subtract(origin).multiply(size).add(origin);
+        cube.to = cube.to.subtract(origin).multiply(size).add(origin);
+        if (cube.rotation != null) {
+            cube.rotation.origin = cube.rotation.origin.subtract(origin).multiply(size).add(origin);
+        }
     }
 }
