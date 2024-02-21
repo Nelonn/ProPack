@@ -17,11 +17,12 @@
   ],
   "Obfuscation": {
     "Enabled": true,
-    "Namespace": "obf",
+    "Namespace": "o",
     "ShuffleSequence": true,
     "Meshes": true,
     "Textures": true,
-    "TexturesAtlasesFolder": "t",
+    "TexturesBlocksAtlasFolder": "1",
+    "TexturesGuiAtlasFolder": "2",
     "Ogg": true,
     "Sounds": true,
     "Fonts": true

@@ -19,7 +19,6 @@
 package me.nelonn.propack.builder.impl;
 
 import me.nelonn.flint.path.Path;
-import me.nelonn.flint.path.PathImpl;
 import org.jetbrains.annotations.NotNull;
 
 public class ObfuscationConfiguration {
@@ -28,7 +27,8 @@ public class ObfuscationConfiguration {
     private final boolean shuffleSequence;
     private final boolean meshes;
     private final boolean textures;
-    private final String texturesAtlasesFolder;
+    private final String texturesBlocksAtlasFolder;
+    private final String texturesGuiAtlasFolder;
     private final boolean ogg;
     private final boolean sounds;
     private final boolean fonts;
@@ -38,7 +38,8 @@ public class ObfuscationConfiguration {
                                     boolean shuffleSequence,
                                     boolean meshes,
                                     boolean textures,
-                                    @NotNull String texturesAtlasesFolder,
+                                    @NotNull String texturesBlocksAtlasFolder,
+                                    @NotNull String texturesGuiAtlasFolder,
                                     boolean ogg,
                                     boolean sounds,
                                     boolean fonts) {
@@ -50,7 +51,8 @@ public class ObfuscationConfiguration {
         this.shuffleSequence = shuffleSequence;
         this.meshes = meshes;
         this.textures = textures;
-        this.texturesAtlasesFolder = texturesAtlasesFolder;
+        this.texturesBlocksAtlasFolder = texturesBlocksAtlasFolder;
+        this.texturesGuiAtlasFolder = texturesGuiAtlasFolder;
         this.ogg = ogg;
         this.sounds = sounds;
         this.fonts = fonts;
@@ -76,8 +78,12 @@ public class ObfuscationConfiguration {
         return textures;
     }
 
-    public String getTexturesAtlasesFolder() {
-        return texturesAtlasesFolder;
+    public String getTexturesBlocksAtlasFolder() {
+        return texturesBlocksAtlasFolder;
+    }
+
+    public String getTexturesGuiAtlasFolder() {
+        return texturesGuiAtlasFolder;
     }
 
     public boolean isOgg() {

@@ -175,7 +175,8 @@ public class ObfuscateTask extends AbstractTask {
 
     private void obfuscateTextures(@NotNull TaskIO io, @NotNull ObfuscationNamer namer, @NotNull ObfuscationConfiguration conf) {
         String obfuscatedNamespace = conf.getNamespace();
-        String obfuscatedTexturesAtlasesFolder = conf.getTexturesAtlasesFolder();
+        String obfuscatedTexturesBlocksAtlasFolder = conf.getTexturesBlocksAtlasFolder();
+        String obfuscatedTexturesGuiAtlasFolder = conf.getTexturesGuiAtlasFolder();
         namer.reset();
         Map<Path, Path> pngMapping = new HashMap<>();
         for (File file : files(io, conf)) {
@@ -183,15 +184,12 @@ public class ObfuscateTask extends AbstractTask {
                 String filePath = file.getPath();
                 if (!filePath.startsWith("content/") || !filePath.endsWith(".png")) continue;
                 Path resourcePath = PathUtil.resourcePath(filePath, ".png");
-                boolean trueResolution = false;
+                boolean validResolution;
                 try (InputStream inputStream = file.openInputStream()) {
                     BufferedImage image = ImageIO.read(inputStream);
-                    trueResolution = image.getHeight() >= 16 && image.getWidth() >= 16;
+                    validResolution = image.getHeight() % 16 == 0 && image.getWidth() % 16 == 0;
                 }
-                String obfuscatedName = namer.next();
-                if (trueResolution) {
-                    obfuscatedName = obfuscatedTexturesAtlasesFolder + '/' + obfuscatedName;
-                }
+                String obfuscatedName = (validResolution ? obfuscatedTexturesBlocksAtlasFolder : obfuscatedTexturesGuiAtlasFolder) + '/' + namer.next();
                 Path obfuscatedPath = Path.of(obfuscatedNamespace, obfuscatedName);
                 io.getFiles().addFile(file.copyAs(PathUtil.assetsPath(obfuscatedPath, "textures") + ".png"));
                 pngMapping.put(resourcePath, obfuscatedPath);
