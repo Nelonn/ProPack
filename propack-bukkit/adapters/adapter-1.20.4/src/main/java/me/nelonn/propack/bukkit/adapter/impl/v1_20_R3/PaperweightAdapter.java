@@ -20,60 +20,196 @@ package me.nelonn.propack.bukkit.adapter.impl.v1_20_R3;
 
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToMessageCodec;
 import me.nelonn.flint.path.Key;
 import me.nelonn.propack.bukkit.adapter.*;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Marker;
 import net.minecraft.world.item.ItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class PaperweightAdapter implements Adapter {
 
     @Override
-    public void patchServerboundSetCreativeModeSlotPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
+    public @NotNull Class<?> getServerboundSetCreativeModeSlotPacket() {
+        return ServerboundSetCreativeModeSlotPacket.class;
+    }
+
+    @Override
+    public @NotNull Class<?> getClientboundContainerSetSlotPacket() {
+        return ClientboundContainerSetSlotPacket.class;
+    }
+
+    @Override
+    public @NotNull Class<?> getClientboundContainerSetContentPacket() {
+        return ClientboundContainerSetContentPacket.class;
+    }
+
+    @Override
+    public @NotNull Class<?> getClientboundSetEntityEquipmentPacket() {
+        return ClientboundSetEquipmentPacket.class;
+    }
+
+    @Override
+    public @NotNull Class<?> getClientboundSetEntityDataPacket() {
+        return ClientboundSetEntityDataPacket.class;
+    }
+
+    @Override
+    public @NotNull Class<?> getClientboundSoundPacket() {
+        return ClientboundSoundPacket.class;
+    }
+
+    @Override
+    public @Nullable Class<?> getClientboundCustomSoundPacket() {
+        return null;
+    }
+
+    @Override
+    public @NotNull Class<?> getClientboundSoundEntityPacket() {
+        return ClientboundSoundEntityPacket.class;
+    }
+
+    static class PacketInjector extends MessageToMessageCodec<Packet<?>, Packet<?>> {
+        private final Player player;
+        private final IPacketListener listener;
+
+        public PacketInjector(@NotNull Player player, @NotNull IPacketListener listener) {
+            this.player = player;
+            this.listener = listener;
+        }
+
+        @Override
+        protected void encode(ChannelHandlerContext channelHandlerContext, Packet<?> packet, List<Object> list) {
+            if (listener.onPacketSend(player, packet) instanceof Packet<?> next) {
+                list.add(next);
+            }
+        }
+
+        @Override
+        protected void decode(ChannelHandlerContext channelHandlerContext, Packet<?> packet, List<Object> list) {
+            if (listener.onPacketReceive(player, packet) instanceof Packet<?> next) {
+                list.add(next);
+            }
+        }
+    }
+
+    @Override
+    public void inject(@NotNull Player player, @NotNull IPacketListener listener) {
+        ((CraftPlayer) player).getHandle().connection.connection.channel.pipeline().addBefore("packet_handler", "propack_injector", new PacketInjector(player, listener));
+    }
+
+    @Override
+    public @NotNull Object patchServerboundSetCreativeModeSlotPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
         patcher.accept(ItemStackWrapper.of(((ServerboundSetCreativeModeSlotPacket) packet).getItem()));
+        return packet;
     }
 
     @Override
-    public void patchClientboundContainerSetSlotPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
+    public @NotNull Object patchClientboundContainerSetSlotPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
         patcher.accept(ItemStackWrapper.of(((ClientboundContainerSetSlotPacket) packet).getItem()));
+        return packet;
     }
 
     @Override
-    public void patchClientboundContainerSetContentPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
+    public @NotNull Object patchClientboundContainerSetContentPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
         ClientboundContainerSetContentPacket nms = (ClientboundContainerSetContentPacket) packet;
         for (ItemStack itemStack : nms.getItems()) {
             patcher.accept(ItemStackWrapper.of(itemStack));
         }
         patcher.accept(ItemStackWrapper.of(nms.getCarriedItem()));
+        return packet;
     }
 
     @Override
-    public void patchClientboundSetEntityEquipmentPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
+    public @NotNull Object patchClientboundSetEntityEquipmentPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
         ClientboundSetEquipmentPacket nms = (ClientboundSetEquipmentPacket) packet;
         for (Pair<EquipmentSlot, ItemStack> slot : nms.getSlots()) {
             patcher.accept(ItemStackWrapper.of(slot.getSecond()));
         }
+        return packet;
     }
 
     @Override
-    public void patchClientboundSetEntityDataPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
+    public @NotNull Object patchClientboundSetEntityDataPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
         ClientboundSetEntityDataPacket nms = (ClientboundSetEntityDataPacket) packet;
         List<SynchedEntityData.DataValue<?>> dataValueList = nms.packedItems();
         for (SynchedEntityData.DataValue<?> dataValue : dataValueList) {
             if (!dataValue.serializer().equals(EntityDataSerializers.ITEM_STACK)) continue;
             patcher.accept(ItemStackWrapper.of((ItemStack) dataValue.value()));
         }
+        return packet;
+    }
+
+    private SoundEvent recreateSound(SoundEvent original, ResourceLocation name) {
+        float zeroRange = original.getRange(2.0F);
+        float twoRange = original.getRange(3.0F);
+        if (zeroRange != twoRange) {
+            return SoundEvent.createVariableRangeEvent(name);
+        } else {
+            return SoundEvent.createFixedRangeEvent(name, zeroRange);
+        }
+    }
+
+    @Override
+    public @NotNull Object patchClientboundSoundPacket(@NotNull Object packet, @NotNull Function<String, String> patcher) {
+        ClientboundSoundPacket nms = (ClientboundSoundPacket) packet;
+        if (nms.getSound().kind() != Holder.Kind.DIRECT) return packet;
+        SoundEvent soundEvent = nms.getSound().value();
+        String originalSound = soundEvent.getLocation().toString();
+        String patchedSound = patcher.apply(originalSound);
+        if (originalSound.equals(patchedSound)) return packet;
+        return new ClientboundSoundPacket(
+                Holder.direct(recreateSound(soundEvent, new ResourceLocation(patchedSound))),
+                nms.getSource(),
+                nms.getX(),
+                nms.getY(),
+                nms.getZ(),
+                nms.getVolume(),
+                nms.getPitch(),
+                nms.getSeed()
+        );
+    }
+
+    @Override
+    public @NotNull Object patchClientboundSoundEntityPacket(@NotNull Object packet, @NotNull Function<String, String> patcher) {
+        ClientboundSoundEntityPacket nms = (ClientboundSoundEntityPacket) packet;
+        if (nms.getSound().kind() != Holder.Kind.DIRECT) return packet;
+        SoundEvent soundEvent = nms.getSound().value();
+        String originalSound = soundEvent.getLocation().toString();
+        String patchedSound = patcher.apply(originalSound);
+        if (originalSound.equals(patchedSound)) return packet;
+        Entity entity = new Marker(EntityType.MARKER, null);
+        entity.setId(nms.getId());
+        return new ClientboundSoundEntityPacket(
+                Holder.direct(recreateSound(soundEvent, new ResourceLocation(patchedSound))),
+                nms.getSource(),
+                entity,
+                nms.getVolume(),
+                nms.getPitch(),
+                nms.getSeed()
+        );
     }
 
     private static class ItemStackWrapper implements MItemStack {

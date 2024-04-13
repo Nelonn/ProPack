@@ -28,8 +28,6 @@ repositories {
     mavenCentral()
     maven("https://repo.eclipse.org/content/groups/releases/") // JGit
     maven("https://repo.codemc.io/repository/maven-public/") // NBTAPI
-    maven("https://repo.codemc.io/repository/maven-releases/") // PacketEvents
-    maven("https://repo.dmulloy2.net/repository/public/") // ProtocolLib
 
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
     maven("https://jitpack.io") // Oraxen
@@ -58,11 +56,6 @@ dependencies {
     "compileOnly"("net.kyori:adventure-text-serializer-gson:$adventureVersion")
     "compileOnly"("net.kyori:adventure-platform-bukkit:4.3.2")
 
-    "implementation"("com.github.retrooper.packetevents:spigot:2.2.0") {
-        exclude(group = "net.kyori")
-        exclude(group = "org.jetbrains")
-    }
-    "compileOnly"("com.comphenix.protocol:ProtocolLib:5.1.0")
     "compileOnly"("me.clip:placeholderapi:2.11.2")
     //"compileOnly"("com.github.oraxen:oraxen:-SNAPSHOT")
 

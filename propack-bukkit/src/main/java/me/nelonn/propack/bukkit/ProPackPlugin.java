@@ -18,15 +18,13 @@
 
 package me.nelonn.propack.bukkit;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import me.nelonn.commandlib.bukkit.BukkitCommands;
 import me.nelonn.configlib.PluginConfig;
 import me.nelonn.propack.bukkit.command.ProPackCommand;
 import me.nelonn.propack.bukkit.compatibility.CompatibilitiesManager;
 import me.nelonn.propack.bukkit.dispatcher.ActivePackStore;
 import me.nelonn.propack.bukkit.packet.ItemPatcher;
-import me.nelonn.propack.bukkit.packet.PacketEventsListener;
+import me.nelonn.propack.bukkit.packet.PacketListener;
 import me.nelonn.propack.core.util.JarResources;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -89,12 +87,9 @@ public final class ProPackPlugin extends JavaPlugin {
         reloadConfig();
         reloadPacks();
 
-        BukkitCommands.register(this, new ProPackCommand(this));
+        PacketListener.register(this);
 
-        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
-        PacketEvents.getAPI().getSettings().bStats(false).checkForUpdates(false).debug(false);
-        PacketEvents.getAPI().init();
-        PacketEvents.getAPI().getEventManager().registerListener(new PacketEventsListener(this));
+        BukkitCommands.register(this, new ProPackCommand(this));
 
         CompatibilitiesManager.enableNativeCompatibilities(this);
 

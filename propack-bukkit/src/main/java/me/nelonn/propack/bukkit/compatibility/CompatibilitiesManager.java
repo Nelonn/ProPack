@@ -20,7 +20,6 @@ package me.nelonn.propack.bukkit.compatibility;
 
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.bukkit.compatibility.provided.placeholderapi.PlaceholderAPICompatibility;
-import me.nelonn.propack.bukkit.compatibility.provided.protocollib.ProtocolLibCompatibility;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +37,6 @@ public class CompatibilitiesManager {
 
     public static void enableNativeCompatibilities(@NotNull Plugin plugin) {
         new CompatibilityListener(plugin);
-        addCompatibility("ProtocolLib", ProtocolLibCompatibility.class, true);
         addCompatibility("PlaceholderAPI", PlaceholderAPICompatibility.class, true);
     }
 

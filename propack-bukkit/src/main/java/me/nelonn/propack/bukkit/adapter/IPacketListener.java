@@ -16,18 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.packet;
+package me.nelonn.propack.bukkit.adapter;
 
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface SoundPacket {
+public interface IPacketListener {
 
-    int getSoundId();
+    // if returns null packet will be cancelled
+    @Nullable Object onPacketSend(@NotNull Player player, @NotNull Object packet);
 
-    void setSoundId(int soundID);
-
-    @Nullable String getSoundName();
-
-    void setSoundName(@Nullable String soundName);
+    // if returns null packet will be cancelled
+    @Nullable Object onPacketReceive(@NotNull Player player, @NotNull Object packet);
 
 }

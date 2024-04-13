@@ -51,7 +51,7 @@ public class Dispatcher implements Listener {
 
     public Dispatcher(@NotNull ProPackPlugin plugin, @NotNull MemoryActivePackStore memoryStore) {
         this.plugin = plugin;
-        packSender = PaperPackSender.INSTANCE != null ? PaperPackSender.INSTANCE : new ProtocolPackSender();
+        packSender = Objects.requireNonNull(PaperPackSender.INSTANCE, "INSTALL PAPER PLEASE!!!");
         Bukkit.getPluginManager().registerEvents(this, plugin);
         fallbackActivePackStore = memoryStore;
         activePackStore = fallbackActivePackStore;

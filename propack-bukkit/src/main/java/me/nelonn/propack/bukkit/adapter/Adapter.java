@@ -18,18 +18,44 @@
 
 package me.nelonn.propack.bukkit.adapter;
 
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public interface Adapter {
-    void patchServerboundSetCreativeModeSlotPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 
-    void patchClientboundContainerSetSlotPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
+    @NotNull Class<?> getServerboundSetCreativeModeSlotPacket();
 
-    void patchClientboundContainerSetContentPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
+    @NotNull Class<?> getClientboundContainerSetSlotPacket();
 
-    void patchClientboundSetEntityEquipmentPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
+    @NotNull Class<?> getClientboundContainerSetContentPacket();
 
-    void patchClientboundSetEntityDataPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
+    @NotNull Class<?> getClientboundSetEntityEquipmentPacket();
+
+    @NotNull Class<?> getClientboundSetEntityDataPacket();
+
+    @NotNull Class<?> getClientboundSoundPacket();
+
+    @Nullable Class<?> getClientboundCustomSoundPacket(); // 1.17-1.18
+
+    @NotNull Class<?> getClientboundSoundEntityPacket();
+
+    void inject(@NotNull Player player, @NotNull IPacketListener packetListener);
+
+    @NotNull Object patchServerboundSetCreativeModeSlotPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
+
+    @NotNull Object patchClientboundContainerSetSlotPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
+
+    @NotNull Object patchClientboundContainerSetContentPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
+
+    @NotNull Object patchClientboundSetEntityEquipmentPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
+
+    @NotNull Object patchClientboundSetEntityDataPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
+
+    @NotNull Object patchClientboundSoundPacket(@NotNull Object packet, @NotNull Function<String, String> patcher);
+
+    @NotNull Object patchClientboundSoundEntityPacket(@NotNull Object packet, @NotNull Function<String, String> patcher);
 }
