@@ -214,8 +214,21 @@ public class PaperweightAdapter implements Adapter {
         }
 
         @Override
-        public @Nullable CompoundTagWrapper getTag() {
+        public @Nullable CompoundTagWrapper getCustomData() {
             return CompoundTagWrapper.of(handle.getTag());
+        }
+
+        @Override
+        public void setCustomModelData(int customModelData) {
+            handle.getOrCreateTag().putInt("CustomModelData", customModelData);
+        }
+
+        @Override
+        public void removeCustomModelData() {
+            CompoundTag tag = handle.getTag();
+            if (tag != null) {
+                tag.remove("CustomModelData");
+            }
         }
     }
 

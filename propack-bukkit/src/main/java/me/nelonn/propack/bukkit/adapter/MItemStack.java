@@ -25,5 +25,9 @@ import org.jetbrains.annotations.Nullable;
 public interface MItemStack {
     @NotNull Key getItemId();
 
-    @Nullable MCompoundTag getTag();
+    @Nullable MCompoundTag getCustomData();
+
+    void setCustomModelData(int customModelData);
+
+    void removeCustomModelData();
 }

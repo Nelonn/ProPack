@@ -27,8 +27,10 @@ import java.util.List;
 
 public final class LogManagerCompat {
 
+    public static String FORCE_LOGGER_NAME = null;
+
     public static @NotNull Logger getLogger() {
-        return LoggerFactory.getLogger(getCallerCallerClassName());
+        return LoggerFactory.getLogger(FORCE_LOGGER_NAME != null ? FORCE_LOGGER_NAME : getCallerCallerClassName());
     }
 
     @SuppressWarnings("deprecation")

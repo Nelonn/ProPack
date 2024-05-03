@@ -17,7 +17,7 @@ include("propack-cli")
 
 include("propack-bukkit")
 
-listOf("1.17.1", "1.18.2", "1.19.4", "1.20.4").forEach {
+listOf("1.17.1", "1.18.2", "1.19.4", "1.20.4", "1.20.6").forEach {
     include("propack-bukkit:adapters:adapter-$it")
 }
 

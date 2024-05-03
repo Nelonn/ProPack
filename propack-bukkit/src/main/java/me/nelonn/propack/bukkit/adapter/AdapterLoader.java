@@ -26,11 +26,15 @@ public class AdapterLoader {
     static {
         Adapter loaded;
         try {
-            String craftBukkit = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
             String minecraft = Bukkit.getServer().getBukkitVersion().split("-")[0];
-            String nmsVersion = craftBukkit;
-            if (minecraft.equalsIgnoreCase("1.17.1")) {
-                nmsVersion += "_2";
+            String nmsVersion;
+            if (minecraft.equals("1.20.5") || minecraft.equals("1.20.6")) {
+                nmsVersion = "v1_20_R4";
+            } else {
+                nmsVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+                if (minecraft.equalsIgnoreCase("1.17.1")) {
+                    nmsVersion += "_2";
+                }
             }
             Class<?> clazz = Class.forName("me.nelonn.propack.bukkit.adapter.impl." + nmsVersion + ".PaperweightAdapter");
             if (Adapter.class.isAssignableFrom(clazz)) {

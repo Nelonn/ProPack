@@ -51,6 +51,8 @@ public final class ProPackPlugin extends JavaPlugin {
 
     @Override
     public void onLoad() {
+        LogManagerCompat.FORCE_LOGGER_NAME = "ProPack";
+
         new DependencyManager(this).addLibrary(library);
 
         File modulesDir = new File(getDataFolder(), "modules");

@@ -1,0 +1,6 @@
+[versions]
+
+# Minimum versions we apply to make dependencies support newer Java
+minimumAsm = "9.7"
+minimumJdependency = "2.10"
+minimumTinyRemapper = "0.8.11"

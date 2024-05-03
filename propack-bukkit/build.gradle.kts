@@ -6,7 +6,7 @@ plugins {
     id("com.github.johnrengelman.shadow")
 }
 
-java.toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 
 val adapters = configurations.create("adapters") {
     description = "Adapters to include in the JAR"
@@ -29,6 +29,7 @@ repositories {
     maven("https://repo.eclipse.org/content/groups/releases/") // JGit
     maven("https://repo.codemc.io/repository/maven-public/") // NBTAPI
 
+    maven("https://repo.dmulloy2.net/repository/public/") // ProtocolLib
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
     maven("https://jitpack.io") // Oraxen
 
@@ -36,7 +37,7 @@ repositories {
     maven("https://papermc.io/repo/repository/maven-public/") // PaperAPI
 }
 
-var adventureVersion = "4.15.0"
+var adventureVersion = "4.16.0"
 
 dependencies {
     "implementation"(project(":propack-api"))
@@ -56,6 +57,7 @@ dependencies {
     "compileOnly"("net.kyori:adventure-text-serializer-gson:$adventureVersion")
     "compileOnly"("net.kyori:adventure-platform-bukkit:4.3.2")
 
+    "compileOnly"("com.comphenix.protocol:ProtocolLib:5.2.0-SNAPSHOT")
     "compileOnly"("me.clip:placeholderapi:2.11.2")
     //"compileOnly"("com.github.oraxen:oraxen:-SNAPSHOT")
 
@@ -64,7 +66,7 @@ dependencies {
     "implementation"("commons-io:commons-io:2.11.0")
     "implementation"("org.apache.commons:commons-lang3:3.12.0")
 
-    "compileOnly"("org.jetbrains:annotations:23.1.0")
+    "compileOnly"("org.jetbrains:annotations:24.1.0")
 
     project.project(":propack-bukkit:adapters").subprojects.forEach {
         "adapters"(project(it.path))
@@ -114,6 +116,17 @@ tasks.named<ShadowJar>("shadowJar") {
 
 tasks.named("assemble").configure {
     dependsOn("shadowJar")
+}
+
+tasks.withType<JavaCompile> {
+    options.release.set(21)
+    options.encoding = "UTF-8"
+}
+
+plugins.withId("java") {
+    the<JavaPluginExtension>().toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 
 tasks.withType<Javadoc> {

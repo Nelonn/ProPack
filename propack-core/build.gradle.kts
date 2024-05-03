@@ -12,7 +12,7 @@ repositories {
     maven("https://repo.eclipse.org/content/groups/releases/") // JGit
 }
 
-var adventureVersion = "4.15.0"
+var adventureVersion = "4.16.0"
 
 dependencies {
     "implementation"(project(":propack-api"))
@@ -32,12 +32,11 @@ dependencies {
     "compileOnly"("commons-io:commons-io:2.11.0")
     "compileOnly"("org.apache.commons:commons-lang3:3.12.0")
 
-    "compileOnly"("org.jetbrains:annotations:23.1.0")
+    "compileOnly"("org.jetbrains:annotations:24.1.0")
 }
 
-tasks.named<JavaCompile>("compileJava") {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    dependsOn(tasks.named("clean"))
 }
 
 tasks.named<Copy>("processResources") {

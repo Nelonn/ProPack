@@ -16,15 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.nelonn.propack.bukkit.adapter.impl.v1_19_R3;
+package me.nelonn.propack.bukkit.adapter.impl.v1_20_R4;
 
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
 import me.nelonn.flint.path.Key;
+import me.nelonn.propack.bukkit.Util;
 import me.nelonn.propack.bukkit.adapter.*;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -39,7 +41,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Marker;
 import net.minecraft.world.item.ItemStack;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import net.minecraft.world.item.component.CustomModelData;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -122,7 +125,7 @@ public class PaperweightAdapter implements Adapter {
 
     @Override
     public @NotNull Object patchServerboundSetCreativeModeSlotPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
-        patcher.accept(ItemStackWrapper.of(((ServerboundSetCreativeModeSlotPacket) packet).getItem()));
+        patcher.accept(ItemStackWrapper.of(((ServerboundSetCreativeModeSlotPacket) packet).itemStack()));
         return packet;
     }
 
@@ -228,22 +231,20 @@ public class PaperweightAdapter implements Adapter {
             return Key.of(handle.getItem().toString());
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public @Nullable CompoundTagWrapper getCustomData() {
-            return CompoundTagWrapper.of(handle.getTag());
+            return Util.map(handle.get(DataComponents.CUSTOM_DATA), customData -> CompoundTagWrapper.of(customData.getUnsafe()));
         }
 
         @Override
         public void setCustomModelData(int customModelData) {
-            handle.getOrCreateTag().putInt("CustomModelData", customModelData);
+            handle.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(customModelData));
         }
 
         @Override
         public void removeCustomModelData() {
-            CompoundTag tag = handle.getTag();
-            if (tag != null) {
-                tag.remove("CustomModelData");
-            }
+            handle.remove(DataComponents.CUSTOM_MODEL_DATA);
         }
     }
 
@@ -279,7 +280,7 @@ public class PaperweightAdapter implements Adapter {
         }
 
         @Override
-        public @NotNull ListTagWrapper getList(@NotNull String key, int type) {
+        public @NotNull PaperweightAdapter.ListTagWrapper getList(@NotNull String key, int type) {
             return ListTagWrapper.of(handle.getList(key, type));
         }
 

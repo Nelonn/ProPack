@@ -37,21 +37,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ItemPatcher {
-    private static final String CUSTOM_MODEL_DATA = "CustomModelData";
-    private static final int TAG_INT = 3;
     private static final int TAG_STRING = 8;
 
     public void patchServerboundItem(@NotNull MItemStack itemStack) {
-        MCompoundTag tag = itemStack.getTag();
-        if (tag == null ||
-                !tag.contains(CUSTOM_MODEL_DATA, TAG_INT) ||
-                !tag.contains(ProPack.CUSTOM_MODEL, TAG_STRING)) return;
-        tag.remove(CUSTOM_MODEL_DATA);
+        MCompoundTag tag = itemStack.getCustomData();
+        if (tag == null || !tag.contains(ProPack.CUSTOM_MODEL, TAG_STRING)) return;
+        itemStack.removeCustomModelData();
     }
 
     public void patchClientboundItem(@NotNull MItemStack itemStack, @NotNull Resources resources) {
         try {
-            MCompoundTag rootTag = itemStack.getTag();
+            MCompoundTag rootTag = itemStack.getCustomData();
             if (rootTag == null || !rootTag.contains(ProPack.CUSTOM_MODEL, TAG_STRING)) return;
             String customModel = rootTag.getString(ProPack.CUSTOM_MODEL);
             if (customModel.isEmpty()) return;
@@ -87,7 +83,7 @@ public class ItemPatcher {
             if (!itemModel.getTargetItems().contains(itemType)) return;
             Integer cmd = resources.getMeshes().getCustomModelData(mesh, itemType);
             if (cmd == null) return;
-            rootTag.putInt(CUSTOM_MODEL_DATA, cmd);
+            itemStack.setCustomModelData(cmd);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -39,16 +39,15 @@ dependencies {
     "implementation"("commons-io:commons-io:2.11.0")
     "implementation"("org.apache.commons:commons-lang3:3.12.0")
 
-    "implementation"("org.jetbrains:annotations:23.1.0")
+    "implementation"("org.jetbrains:annotations:24.1.0")
 
     "implementation"("info.picocli:picocli:4.7.0")
     "annotationProcessor"("info.picocli:picocli-codegen:4.7.0")
 }
 
-tasks.named<JavaCompile>("compileJava") {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.compilerArgs.add("-Aproject=${project.group}/${project.name}")
-    dependsOn(tasks.named("clean"))
 }
 
 tasks.named<Copy>("processResources") {

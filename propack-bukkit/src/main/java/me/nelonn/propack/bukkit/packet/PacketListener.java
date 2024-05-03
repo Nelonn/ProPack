@@ -18,6 +18,13 @@
 
 package me.nelonn.propack.bukkit.packet;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.ListeningWhitelist;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.injector.GamePhase;
+import com.comphenix.protocol.injector.packet.PacketRegistry;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.Resources;
@@ -31,11 +38,14 @@ import me.nelonn.propack.bukkit.adapter.IPacketListener;
 import me.nelonn.propack.bukkit.adapter.MItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -44,18 +54,81 @@ public class PacketListener implements IPacketListener, Listener {
     private final ProPackPlugin plugin;
     private final Adapter adapter;
     private final ItemPatcher packetPatcher;
+    private final boolean thirdPartyInjector;
 
     public PacketListener(@NotNull ProPackPlugin plugin) {
         this.plugin = plugin;
         this.adapter = Objects.requireNonNull(AdapterLoader.ADAPTER, "Adapter not loaded");
         this.packetPatcher = plugin.getItemPatcher();
+        if (plugin.getServer().getPluginManager().isPluginEnabled("ProtocolLib")) {
+            plugin.getLogger().info("Using third-party packet injector: ProtocolLib");
+            ProtocolLibrary.getProtocolManager().addPacketListener(new com.comphenix.protocol.events.PacketListener() {
+                private final ListeningWhitelist sending = buildWhitelist(PacketRegistry.getServerPacketTypes());
+                private final ListeningWhitelist receiving = buildWhitelist(PacketRegistry.getClientPacketTypes());
+
+                private static ListeningWhitelist buildWhitelist(Collection<PacketType> packetTypes) {
+                    return ListeningWhitelist.newBuilder()
+                            .normal()
+                            .gamePhase(GamePhase.PLAYING)
+                            .types(packetTypes
+                                    .stream()
+                                    .filter(packetType -> packetType.getProtocol() == PacketType.Protocol.PLAY)
+                                    .toList())
+                            .build();
+                }
+
+                @Override
+                public void onPacketSending(PacketEvent packetEvent) {
+                    if (packetEvent.isReadOnly()) return;
+                    Object patchedPacket = PacketListener.this.onPacketSend(packetEvent.getPlayer(), packetEvent.getPacket().getHandle());
+                    if (patchedPacket != null) {
+                        packetEvent.setPacket(PacketContainer.fromPacket(patchedPacket));
+                    } else {
+                        packetEvent.setCancelled(true);
+                    }
+                }
+
+                @Override
+                public void onPacketReceiving(PacketEvent packetEvent) {
+                    if (packetEvent.isReadOnly()) return;
+                    Object patchedPacket = PacketListener.this.onPacketReceive(packetEvent.getPlayer(), packetEvent.getPacket().getHandle());
+                    if (patchedPacket != null) {
+                        packetEvent.setPacket(PacketContainer.fromPacket(patchedPacket));
+                    } else {
+                        packetEvent.setCancelled(true);
+                    }
+                }
+
+                @Override
+                public ListeningWhitelist getSendingWhitelist() {
+                    return sending;
+                }
+
+                @Override
+                public ListeningWhitelist getReceivingWhitelist() {
+                    return receiving;
+                }
+
+                @Override
+                public Plugin getPlugin() {
+                    return plugin;
+                }
+            });
+            thirdPartyInjector = true;
+        } else {
+            plugin.getLogger().warning("Builtin packet injector is not recommended! Install ProtocolLib");
+            thirdPartyInjector = false;
+        }
     }
 
     public static void register(@NotNull ProPackPlugin plugin) {
-        plugin.getServer().getPluginManager().registerEvents(new PacketListener(plugin), plugin);
+        PacketListener packetListener = new PacketListener(plugin);
+        if (!packetListener.thirdPartyInjector) {
+            plugin.getServer().getPluginManager().registerEvents(packetListener, plugin);
+        }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     private void on(PlayerJoinEvent event) {
         adapter.inject(event.getPlayer(), this);
     }

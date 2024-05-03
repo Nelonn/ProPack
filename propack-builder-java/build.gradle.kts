@@ -30,5 +30,9 @@ dependencies {
     "compileOnly"("commons-io:commons-io:2.11.0")
     "compileOnly"("org.apache.commons:commons-lang3:3.12.0")
 
-    "compileOnly"("org.jetbrains:annotations:23.1.0")
+    "compileOnly"("org.jetbrains:annotations:24.1.0")
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
 }
