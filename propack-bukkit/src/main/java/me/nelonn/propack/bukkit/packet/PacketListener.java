@@ -20,11 +20,11 @@ package me.nelonn.propack.bukkit.packet;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.ListeningWhitelist;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.injector.GamePhase;
-import com.comphenix.protocol.injector.packet.PacketRegistry;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.Resources;
@@ -45,7 +45,6 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -56,6 +55,7 @@ public class PacketListener implements IPacketListener, Listener {
     private final ItemPatcher packetPatcher;
     private final boolean thirdPartyInjector;
 
+    @SuppressWarnings("deprecation")
     public PacketListener(@NotNull ProPackPlugin plugin) {
         this.plugin = plugin;
         this.adapter = Objects.requireNonNull(AdapterLoader.ADAPTER, "Adapter not loaded");
@@ -63,39 +63,50 @@ public class PacketListener implements IPacketListener, Listener {
         if (plugin.getServer().getPluginManager().isPluginEnabled("ProtocolLib")) {
             plugin.getLogger().info("Using third-party packet injector: ProtocolLib");
             ProtocolLibrary.getProtocolManager().addPacketListener(new com.comphenix.protocol.events.PacketListener() {
-                private final ListeningWhitelist sending = buildWhitelist(PacketRegistry.getServerPacketTypes());
-                private final ListeningWhitelist receiving = buildWhitelist(PacketRegistry.getClientPacketTypes());
-
-                private static ListeningWhitelist buildWhitelist(Collection<PacketType> packetTypes) {
+                private static ListeningWhitelist buildWhitelist(PacketType... packetTypes) {
                     return ListeningWhitelist.newBuilder()
-                            .normal()
+                            .priority(ListenerPriority.NORMAL)
                             .gamePhase(GamePhase.PLAYING)
-                            .types(packetTypes
-                                    .stream()
-                                    .filter(packetType -> packetType.getProtocol() == PacketType.Protocol.PLAY)
-                                    .toList())
+                            .types(packetTypes)
                             .build();
                 }
+
+                private final ListeningWhitelist sending = buildWhitelist(
+                        PacketType.Play.Server.SET_SLOT,
+                        PacketType.Play.Server.WINDOW_ITEMS,
+                        PacketType.Play.Server.ENTITY_EQUIPMENT,
+                        PacketType.Play.Server.ENTITY_METADATA,
+                        PacketType.Play.Server.NAMED_SOUND_EFFECT,
+                        PacketType.Play.Server.ENTITY_SOUND,
+                        PacketType.Play.Server.CUSTOM_SOUND_EFFECT
+                );
+                private final ListeningWhitelist receiving = buildWhitelist(PacketType.Play.Client.SET_CREATIVE_SLOT);
 
                 @Override
                 public void onPacketSending(PacketEvent packetEvent) {
                     if (packetEvent.isReadOnly()) return;
-                    Object patchedPacket = PacketListener.this.onPacketSend(packetEvent.getPlayer(), packetEvent.getPacket().getHandle());
-                    if (patchedPacket != null) {
-                        packetEvent.setPacket(PacketContainer.fromPacket(patchedPacket));
-                    } else {
+                    Object packet = packetEvent.getPacket().getHandle();
+                    Object patchedPacket = PacketListener.this.onPacketSend(packetEvent.getPlayer(), packet);
+                    if (patchedPacket == null) {
                         packetEvent.setCancelled(true);
+                        return;
+                    }
+                    if (patchedPacket != packet) {
+                        packetEvent.setPacket(PacketContainer.fromPacket(patchedPacket));
                     }
                 }
 
                 @Override
                 public void onPacketReceiving(PacketEvent packetEvent) {
                     if (packetEvent.isReadOnly()) return;
-                    Object patchedPacket = PacketListener.this.onPacketReceive(packetEvent.getPlayer(), packetEvent.getPacket().getHandle());
-                    if (patchedPacket != null) {
-                        packetEvent.setPacket(PacketContainer.fromPacket(patchedPacket));
-                    } else {
+                    Object packet = packetEvent.getPacket().getHandle();
+                    Object patchedPacket = PacketListener.this.onPacketReceive(packetEvent.getPlayer(), packet);
+                    if (patchedPacket == null) {
                         packetEvent.setCancelled(true);
+                        return;
+                    }
+                    if (patchedPacket != packet) {
+                        packetEvent.setPacket(PacketContainer.fromPacket(patchedPacket));
                     }
                 }
 
