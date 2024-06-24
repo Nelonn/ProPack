@@ -28,7 +28,9 @@ public class AdapterLoader {
         try {
             String minecraft = Bukkit.getServer().getBukkitVersion().split("-")[0];
             String nmsVersion;
-            if (minecraft.equals("1.20.5") || minecraft.equals("1.20.6")) {
+            if (minecraft.equals("1.21")) {
+                nmsVersion = "v1_21_R1";
+            } else if (minecraft.equals("1.20.5") || minecraft.equals("1.20.6")) {
                 nmsVersion = "v1_20_R4";
             } else {
                 nmsVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];

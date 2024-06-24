@@ -19,7 +19,7 @@ dependencies {
     implementation(gradleApi())
     implementation("gradle.plugin.org.cadixdev.gradle:licenser:0.6.1")
     implementation("com.github.johnrengelman:shadow:8.1.1")
-    implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.6.0")
+    implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.7.1")
     constraints {
         val asmVersion = "[${libs.versions.minimumAsm.get()},)"
         implementation("org.ow2.asm:asm:$asmVersion") {
