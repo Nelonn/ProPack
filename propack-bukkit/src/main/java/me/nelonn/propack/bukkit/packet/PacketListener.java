@@ -77,8 +77,8 @@ public class PacketListener implements IPacketListener, Listener {
                         PacketType.Play.Server.ENTITY_EQUIPMENT,
                         PacketType.Play.Server.ENTITY_METADATA,
                         PacketType.Play.Server.NAMED_SOUND_EFFECT,
-                        PacketType.Play.Server.ENTITY_SOUND,
-                        PacketType.Play.Server.CUSTOM_SOUND_EFFECT
+                        PacketType.Play.Server.ENTITY_SOUND
+                        //PacketType.Play.Server.CUSTOM_SOUND_EFFECT
                 );
                 private final ListeningWhitelist receiving = buildWhitelist(PacketType.Play.Client.SET_CREATIVE_SLOT);
 
