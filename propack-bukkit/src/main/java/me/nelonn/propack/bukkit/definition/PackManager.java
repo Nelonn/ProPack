@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,8 +67,9 @@ public class PackManager {
                 JsonObject jsonObject = GsonHelper.deserialize(content);
                 String type = GsonHelper.getString(jsonObject, "Type");
                 if (type.equalsIgnoreCase("Project")) {
-                    boolean buildAtStartup = GsonHelper.getBoolean(jsonObject, "BuildAtStartup", false);
-                    File projectFile = new File(directory, name + File.separatorChar + "project.json5");
+                    Path projectDirectory = Path.of(directory.getAbsolutePath()).resolve(GsonHelper.getString(jsonObject, "Directory", "./" + name));
+                    boolean buildAtStartup = GsonHelper.getBoolean(jsonObject, "BuildAtStartup", true);
+                    File projectFile = projectDirectory.resolve("project.json5").toFile();
                     ProjectPack projectPack = new ProjectPack(projectFile, projectLoader, !buildAtStartup);
                     definitions.put(name, projectPack);
                 } else if (type.equalsIgnoreCase("File")) {
@@ -81,8 +83,7 @@ public class PackManager {
                     definitions.put(name, definitionType.apply(jsonObject));
                 }
             } catch (Exception e) {
-                LOGGER.error("Unable to load '" + name + "': " + e.getMessage());
-                e.printStackTrace();
+                LOGGER.error("Unable to load '{}':", name, e);
             }
         }
     }
