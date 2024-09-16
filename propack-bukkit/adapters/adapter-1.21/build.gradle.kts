@@ -10,16 +10,11 @@ java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 
 dependencies {
     // https://papermc.io/repo/service/rest/repository/browse/maven-public/io/papermc/paper/dev-bundle/
-    paperweight.paperDevBundle("1.21-R0.1-20240624.021224-40")
-    "compileOnly"(files("../../../libs/flint-path-0.0.1.jar"))
-    "compileOnly"(project(":propack-api"))
-    "compileOnly"(project(":propack-core"))
-    "implementation"(project(":propack-bukkit"))
-    constraints {
-        "remapper"("net.fabricmc:tiny-remapper:[${stringyLibs.getVersion("minimumTinyRemapper")},)") {
-            because("Need remapper to support Java 21")
-        }
-    }
+    paperweight.paperDevBundle("1.21.1-R0.1-20240912.180724-74")
+    compileOnly(files("../../../libs/flint-path-0.0.1.jar"))
+    compileOnly(project(":propack-api"))
+    compileOnly(project(":propack-core"))
+    implementation(project(":propack-bukkit"))
 }
 
 tasks.withType<JavaCompile> {

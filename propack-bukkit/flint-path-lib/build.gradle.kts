@@ -16,9 +16,9 @@ repositories {
 }
 
 dependencies {
-    "implementation"(files("../libs/flint-path-0.0.1.jar"))
+    implementation(files("../libs/flint-path-0.0.1.jar"))
 
-    "compileOnly"("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
 }
 
 tasks.named<JavaCompile>("compileJava") {

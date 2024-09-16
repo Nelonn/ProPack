@@ -37,36 +37,36 @@ repositories {
     maven("https://papermc.io/repo/repository/maven-public/") // PaperAPI
 }
 
-var adventureVersion = "4.16.0"
+var adventureVersion = "4.17.0"
 
 dependencies {
-    "implementation"(project(":propack-api"))
-    "implementation"(project(":propack-core"))
-    "implementation"(project(":propack-builder-java"))
-    "implementation"(files("../libs/commandlib-0.0.1.jar"))
-    "implementation"(files("../libs/configlib-0.0.1.jar"))
-    "compileOnly"(files("../libs/flint-path-0.0.1.jar"))
+    implementation(project(":propack-api"))
+    implementation(project(":propack-core"))
+    implementation(project(":propack-builder-java"))
+    implementation(files("../libs/commandlib-0.0.1.jar"))
+    implementation(files("../libs/configlib-0.0.1.jar"))
+    compileOnly(files("../libs/flint-path-0.0.1.jar"))
 
-    "compileOnly"("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
-    //"compileOnly"("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
+    //compileOnly("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
 
-    "compileOnly"("net.kyori:adventure-api:$adventureVersion")
-    "compileOnly"("net.kyori:adventure-text-minimessage:$adventureVersion")
-    "compileOnly"("net.kyori:adventure-text-serializer-plain:$adventureVersion")
-    "compileOnly"("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
-    "compileOnly"("net.kyori:adventure-text-serializer-gson:$adventureVersion")
-    "compileOnly"("net.kyori:adventure-platform-bukkit:4.3.2")
+    compileOnly("net.kyori:adventure-api:$adventureVersion")
+    compileOnly("net.kyori:adventure-text-minimessage:$adventureVersion")
+    compileOnly("net.kyori:adventure-text-serializer-plain:$adventureVersion")
+    compileOnly("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
+    compileOnly("net.kyori:adventure-text-serializer-gson:$adventureVersion")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.3.3")
 
-    "compileOnly"("com.comphenix.protocol:ProtocolLib:5.3.0-SNAPSHOT")
-    "compileOnly"("me.clip:placeholderapi:2.11.2")
-    //"compileOnly"("com.github.oraxen:oraxen:-SNAPSHOT")
+    compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0-SNAPSHOT")
+    compileOnly("me.clip:placeholderapi:2.11.2")
+    //compileOnly("com.github.oraxen:oraxen:-SNAPSHOT")
 
-    "compileOnly"("org.slf4j:slf4j-api:2.0.7")
+    compileOnly("org.slf4j:slf4j-api:2.0.7")
 
-    "implementation"("commons-io:commons-io:2.11.0")
-    "implementation"("org.apache.commons:commons-lang3:3.12.0")
+    implementation("commons-io:commons-io:2.11.0")
+    implementation("org.apache.commons:commons-lang3:3.12.0")
 
-    "compileOnly"("org.jetbrains:annotations:24.1.0")
+    compileOnly("org.jetbrains:annotations:24.1.0")
 
     project.project(":propack-bukkit:adapters").subprojects.forEach {
         "adapters"(project(it.path))
