@@ -32,6 +32,8 @@ var shadedPackage = "me.nelonn.propack.shaded"
 
 tasks {
     shadowJar {
+        dependsOn(project.project(":propack-core").tasks.named("assemble"))
+        dependsOn(project.project(":propack-bukkit:adapters").subprojects.map { it.tasks.named("assemble") })
         exclude("GradleStart**")
         exclude(".cache")
         exclude("LICENSE*")
