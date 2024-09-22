@@ -16,9 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package flintpathlib;
+package me.nelonn.propack.bukkit;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
-public class Plugin extends JavaPlugin {
+import java.util.function.Function;
+
+public final class Util {
+    public static void send(@NotNull CommandSender r, @NotNull String s, @NotNull TagResolver... tags) {
+        ProPackPlugin.getInstance().adventure().sender(r).sendMessage(MiniMessage.miniMessage().deserialize(s, tags));
+    }
+
+    public static <I, O> O map(I value, @NotNull Function<I, O> fn) {
+        return value == null ? null : fn.apply(value);
+    }
+
+    private Util() {
+        throw new UnsupportedOperationException();
+    }
 }

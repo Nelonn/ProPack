@@ -36,8 +36,11 @@ import org.slf4j.Logger;
 import java.io.File;
 
 public final class ProPackPlugin extends JavaPlugin {
+    static {
+        LogManagerCompat.FORCE_LOGGER_NAME = "ProPack";
+    }
+
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static final DependencyManager.JarLibrary library = new DependencyManager.JarLibrary("flint-path-0.0.1.jar", "me.nelonn.flint.path.Path");
 
     public static ProPackPlugin getInstance() {
         return JavaPlugin.getPlugin(ProPackPlugin.class);
@@ -51,10 +54,6 @@ public final class ProPackPlugin extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        LogManagerCompat.FORCE_LOGGER_NAME = "ProPack";
-
-        new DependencyManager(this).addLibrary(library);
-
         File modulesDir = new File(getDataFolder(), "modules");
         if (!getDataFolder().exists()) {
             JarResources.extractDirectory(this, "resources/example/", new File(getDataFolder(), "example"));
@@ -73,12 +72,6 @@ public final class ProPackPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        try {
-            Class.forName(library.getCheckClass());
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("ProPack shared library not loaded");
-        }
-
         adventure = BukkitAudiences.create(this);
 
         core = new BukkitProPackCore(this);

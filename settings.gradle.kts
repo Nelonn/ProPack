@@ -17,8 +17,8 @@ include("propack-cli")
 
 include("propack-bukkit")
 
+include("propack-bukkit:base")
+
 listOf("1.20.4", "1.20.6", "1.21").forEach {
     include("propack-bukkit:adapters:adapter-$it")
 }
-
-include("propack-bukkit:flint-path-lib")

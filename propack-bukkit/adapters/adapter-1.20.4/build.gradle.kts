@@ -1,6 +1,3 @@
-import buildlogic.getVersion
-import buildlogic.stringyLibs
-
 plugins {
     `java-library`
     id("io.papermc.paperweight.userdev")
@@ -14,7 +11,7 @@ dependencies {
     compileOnly(files("../../../libs/flint-path-0.0.1.jar"))
     compileOnly(project(":propack-api"))
     compileOnly(project(":propack-core"))
-    implementation(project(":propack-bukkit"))
+    compileOnly(project(":propack-bukkit:base"))
 }
 
 tasks.withType<JavaCompile> {

@@ -1,0 +1,20 @@
+loader: me.nelonn.propack.bukkit.LibrariesLoader
+main: me.nelonn.propack.bukkit.ProPackPlugin
+name: ProPack
+version: '${version}'
+api-version: '1.20.4'
+authors: [Nelonn]
+load: STARTUP
+description: Modern solution for minecraft resource pack development
+website: 'https://github.com/Nelonn/ProPack'
+dependencies:
+  server:
+    PlaceholderAPI:
+      load: BEFORE
+      required: false
+    flint-path-lib:
+      load: BEFORE
+      required: false
+    ProtocolLib:
+      load: BEFORE
+      required: false
