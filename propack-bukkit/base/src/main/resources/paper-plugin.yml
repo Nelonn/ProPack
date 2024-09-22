@@ -2,7 +2,7 @@ loader: me.nelonn.propack.bukkit.LibrariesLoader
 main: me.nelonn.propack.bukkit.ProPackPlugin
 name: ProPack
 version: '${version}'
-api-version: '1.20.4'
+api-version: '1.20'
 authors: [Nelonn]
 load: STARTUP
 description: Modern solution for minecraft resource pack development
