@@ -20,11 +20,11 @@ package me.nelonn.propack.bukkit.definition;
 
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.Resources;
+import me.nelonn.propack.builder.ProPackBuilder;
 import me.nelonn.propack.builder.impl.BuiltResourcePack;
 import me.nelonn.propack.builder.impl.InternalProject;
 import me.nelonn.propack.builder.impl.ProjectLoader;
 import me.nelonn.propack.bukkit.SimpleResourcePack;
-import me.nelonn.propack.core.loader.LoadedResourcePack;
 import me.nelonn.propack.core.loader.ProPackFileLoader;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import org.jetbrains.annotations.NotNull;
@@ -39,11 +39,13 @@ public class ProjectPack implements PackDefinition {
     private String name;
     private InternalProject project;
     private ProjectLoader projectLoader;
+    private ProPackBuilder builder;
     private ResourcePack resourcePack;
 
-    public ProjectPack(@NotNull File file, @NotNull ProjectLoader projectLoader, boolean tryLoadBuilt) {
+    public ProjectPack(@NotNull File file, @NotNull ProPackBuilder builder, @NotNull ProjectLoader projectLoader, boolean tryLoadBuilt) {
         this.file = file;
         this.projectLoader = projectLoader;
+        this.builder = builder;
         if (tryLoadBuilt) {
             loadOrBuild();
         } else {
@@ -77,6 +79,14 @@ public class ProjectPack implements PackDefinition {
         this.projectLoader = projectLoader;
     }
 
+    public ProPackBuilder getBuilder() {
+        return builder;
+    }
+
+    public void setBuilder(ProPackBuilder builder) {
+        this.builder = builder;
+    }
+
     public void loadOrBuild() {
         project = projectLoader.load(file, true);
         name = project.name;
@@ -95,6 +105,7 @@ public class ProjectPack implements PackDefinition {
     }
 
     private void build0() {
+        builder.build();
         project.build();
         LOGGER.info("Trying to load output file...");
         File builtResourcePack = new File(project.getBuildDir(), project.name + ".propack");

@@ -18,6 +18,8 @@
 
 package me.nelonn.propack.bukkit;
 
+import me.nelonn.propack.builder.JarBinarySource;
+import me.nelonn.propack.builder.ProPackBuilder;
 import me.nelonn.propack.builder.impl.ProPackCore;
 import me.nelonn.propack.bukkit.definition.DefinitionTypeMap;
 import me.nelonn.propack.bukkit.definition.PackManager;
@@ -31,6 +33,7 @@ public class BukkitProPackCore extends ProPackCore {
     private final PackManager packManager;
     private final ActivePackStoreMap activePackStoreMap;
     private final Dispatcher dispatcher;
+    private final ProPackBuilder builder;
 
     public BukkitProPackCore(@NotNull ProPackPlugin plugin) {
         super(plugin.getDataFolder());
@@ -40,6 +43,12 @@ public class BukkitProPackCore extends ProPackCore {
         MemoryActivePackStore memoryStore = new MemoryActivePackStore(plugin);
         activePackStoreMap.register("memory_store", memoryStore);
         dispatcher = new Dispatcher(plugin, memoryStore);
+        try {
+            JarBinarySource jarBinarySource = new JarBinarySource(plugin.getFile().toPath());
+            builder = new ProPackBuilder(jarBinarySource.getBinaryPath());
+        } catch (Throwable e) {
+            throw new RuntimeException("Failed to initialize builder", e);
+        }
     }
 
     public DefinitionTypeMap getDefinitionTypeMap() {
@@ -56,5 +65,9 @@ public class BukkitProPackCore extends ProPackCore {
 
     public Dispatcher getDispatcher() {
         return dispatcher;
+    }
+
+    public ProPackBuilder getBuilder() {
+        return builder;
     }
 }

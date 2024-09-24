@@ -144,6 +144,10 @@ public final class ProPackPlugin extends JavaPlugin {
         core.getPackManager().loadAll();
     }
 
+    public @NotNull File getFile() {
+        return super.getFile();
+    }
+
     public @NotNull BukkitAudiences adventure() {
         if(this.adventure == null) {
             throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");

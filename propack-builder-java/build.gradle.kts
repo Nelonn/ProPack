@@ -33,6 +33,53 @@ dependencies {
     compileOnly("org.jetbrains:annotations:24.1.0")
 }
 
+tasks.register("buildGo") {
+    doLast {
+        val goPath = "/usr/local/bin/go"
+
+        val architectures = arrayOf(
+            "linux_386", "linux_amd64", "linux_arm64",
+            "darwin_amd64", "darwin_arm64",
+            "windows_amd64", "windows_arm64"
+        )
+
+        architectures.forEach { arch ->
+            val os = arch.split("_")[0]
+            val archName = arch.split("_")[1]
+            val outputExtension = if (os == "windows") ".exe" else ""
+            exec {
+                workingDir = rootProject.file("propack-builder")
+                environment("CGO_ENABLED", "0")
+                environment("GOOS", os)
+                environment("GOARCH", archName)
+                commandLine(goPath, "build", "-ldflags", "-s -w", "-o", "bin/$arch$outputExtension", "cmd/propack-builder/main.go")
+            }
+        }
+    }
+}
+
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+}
+
+tasks {
+    processResources {
+        filteringCharset = "UTF-8"
+    }
+
+    shadowJar {
+        dependsOn(project.project(":propack-core").tasks.named("assemble"))
+        dependsOn("buildGo")
+
+        archiveClassifier.set("")
+
+        from(rootProject.file("propack-builder/bin")) {
+            include("*")
+            into("propack-builder")
+        }
+    }
+
+    assemble {
+        dependsOn("shadowJar")
+    }
 }

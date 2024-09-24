@@ -70,7 +70,7 @@ public class PackManager {
                     Path projectDirectory = Path.of(directory.getAbsolutePath()).resolve(GsonHelper.getString(jsonObject, "Directory", "./" + name));
                     boolean buildAtStartup = GsonHelper.getBoolean(jsonObject, "BuildAtStartup", true);
                     File projectFile = projectDirectory.resolve("project.json5").toFile();
-                    ProjectPack projectPack = new ProjectPack(projectFile, projectLoader, !buildAtStartup);
+                    ProjectPack projectPack = new ProjectPack(projectFile, core.getBuilder(), projectLoader, !buildAtStartup);
                     definitions.put(name, projectPack);
                 } else if (type.equalsIgnoreCase("File")) {
                     throw new UnsupportedOperationException("Resource pack definition type 'File' currently not supported");

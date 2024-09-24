@@ -19,11 +19,9 @@ dependencies {
     implementation(project(":propack-builder-java"))
     implementation(files("../libs/flint-path-0.0.1.jar"))
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r")
-
     // Logging
     implementation("org.slf4j:slf4j-api:2.0.7")
-    implementation("ch.qos.logback:logback-classic:1.4.11")
+    implementation("ch.qos.logback:logback-classic:1.4.12")
     // Log4J Support
     implementation("org.apache.logging.log4j:log4j-api:2.19.0")
     implementation("org.apache.logging.log4j:log4j-to-slf4j:2.19.0")
@@ -50,19 +48,22 @@ tasks.withType<JavaCompile> {
     options.compilerArgs.add("-Aproject=${project.group}/${project.name}")
 }
 
-tasks.named<Copy>("processResources") {
-    filteringCharset = "UTF-8"
-}
-
-tasks.named<ShadowJar>("shadowJar") {
-    dependsOn(project.project(":propack-core").tasks.named("build"))
-    manifest {
-        attributes["Main-Class"] = "me.nelonn.propack.cli.CLI"
-        attributes["Multi-Release"] = "true"
+tasks {
+    processResources {
+        filteringCharset = "UTF-8"
     }
-    archiveClassifier.set("")
-}
 
-tasks.named("assemble").configure {
-    dependsOn("shadowJar")
+    shadowJar {
+        dependsOn(project.project(":propack-core").tasks.named("assemble"))
+        dependsOn(project.project(":propack-builder-java").tasks.named("assemble"))
+        manifest {
+            attributes["Main-Class"] = "me.nelonn.propack.cli.CLI"
+            attributes["Multi-Release"] = "true"
+        }
+        archiveClassifier.set("")
+    }
+
+    assemble {
+        dependsOn("shadowJar")
+    }
 }

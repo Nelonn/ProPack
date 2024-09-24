@@ -9,7 +9,6 @@ repositories {
     // All repos inherited from :propack-bukkit:base
 
     mavenCentral()
-    maven("https://repo.eclipse.org/content/groups/releases/") // JGit
     maven("https://repo.codemc.io/repository/maven-public/") // NBTAPI
 
     maven("https://repo.dmulloy2.net/repository/public/") // ProtocolLib
@@ -33,6 +32,7 @@ var shadedPackage = "me.nelonn.propack.shaded"
 tasks {
     shadowJar {
         dependsOn(project.project(":propack-core").tasks.named("assemble"))
+        dependsOn(project.project(":propack-builder-java").tasks.named("assemble"))
         dependsOn(project.project(":propack-bukkit:adapters").subprojects.map { it.tasks.named("assemble") })
         exclude("GradleStart**")
         exclude(".cache")
