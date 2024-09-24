@@ -45,7 +45,6 @@ public class JarBinarySource {
                 System.out.println("Not found");
                 throw new FileNotFoundException("The embedded resource '" + input + "' cannot be found in jar");
             }
-            System.out.println("Size: " + entry.getSize());
             try (InputStream is = zf.getInputStream(entry)) {
                 extractFile(is, output);
             }

@@ -142,7 +142,9 @@ public class Dispatcher implements Listener {
     private void onStatus(PlayerResourcePackStatusEvent event) {
         if (event.getStatus() == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) {
             Player player = event.getPlayer();
-            activePackStore.setActiveResourcePack(player.getUniqueId(), pending.remove(player.getUniqueId()));
+            ActivePack pack = pending.remove(player.getUniqueId());
+            if (pack == null) return;
+            activePackStore.setActiveResourcePack(player.getUniqueId(), pack);
             if (plugin.config().get(Config.patchPacketItems)) {
                 player.updateInventory();
                 // TODO: resend entities
