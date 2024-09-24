@@ -23,7 +23,11 @@ repositories {
 dependencies {
     implementation(project(":propack-bukkit:base"))
     project.project(":propack-bukkit:adapters").subprojects.forEach {
-        implementation(project(it.path))
+        if (it.path.contains("1.21")) {
+            implementation(project(it.path))
+        } else {
+            implementation(project(it.path, "reobf"))
+        }
     }
 }
 
