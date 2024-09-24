@@ -1,3 +1,5 @@
+import java.io.ByteArrayOutputStream
+
 plugins {
     `java-library`
     id("com.github.johnrengelman.shadow")
@@ -35,7 +37,21 @@ dependencies {
 
 tasks.register("buildGo") {
     doLast {
-        val goPath = "/usr/local/bin/go"
+        val goPath = ByteArrayOutputStream()
+        exec {
+            commandLine = if (System.getProperty("os.name").lowercase().contains("windows")) {
+                listOf("where", "go") // Windows
+            } else {
+                listOf("which", "go") // Linux/macOS
+            }
+            standardOutput = goPath
+        }
+
+        val goExecutablePath = goPath.toString().trim()
+
+        if (goExecutablePath.isEmpty()) {
+            throw GradleException("Go executable not found. Please ensure Go is installed and available in your PATH.")
+        }
 
         val architectures = arrayOf(
             "linux_386", "linux_amd64", "linux_arm64",
@@ -52,7 +68,7 @@ tasks.register("buildGo") {
                 environment("CGO_ENABLED", "0")
                 environment("GOOS", os)
                 environment("GOARCH", archName)
-                commandLine(goPath, "build", "-ldflags", "-s -w", "-o", "bin/$arch$outputExtension", "cmd/propack-builder/main.go")
+                commandLine(goExecutablePath, "build", "-ldflags", "-s -w", "-o", "bin/$arch$outputExtension", "cmd/propack-builder/main.go")
             }
         }
     }
