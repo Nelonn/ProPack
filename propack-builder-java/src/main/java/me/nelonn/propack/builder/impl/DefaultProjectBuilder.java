@@ -49,7 +49,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             Set<Task> tasksInstances = new LinkedHashSet<>();
 
             try {
-                for (TaskBootstrap bootstrap : project.getBuildConfiguration().getTasks()) {
+                for (TaskBootstrap bootstrap : project.getBuildConfiguration().getTasks().values()) {
                     tasksInstances.add(bootstrap.createTask(project));
                 }
             } catch (Exception e) {
@@ -59,12 +59,12 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             for (Task task : tasksInstances) {
                 try {
                     task.run(io);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     LOGGER.info("Task {} FAILED", task);
                     if (e instanceof IllegalArgumentException) {
                         LOGGER.error(e.getMessage());
                     } else {
-                        e.printStackTrace();
+                        LOGGER.error("Stacktrace:", e);
                     }
                     throw new TaskFailedException(task.toString());
                 }
@@ -80,8 +80,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             requireNonNull(io.getExtras().get(ProcessModelsTask.EXTRA_MESH_MAPPING_BUILDER)).build()
                     ),
                     requireNonNull(io.getExtras().get(SerializeTask.EXTRA_FILE)),
-                    requireNonNull(io.getExtras().get(PackageTask.EXTRA_ZIP)),
-                    requireNonNull(io.getExtras().get(PackageTask.EXTRA_SHA1)),
+                    io.getExtras().get(PackageTask.EXTRA_ZIP),
+                    io.getExtras().get(PackageTask.EXTRA_SHA1),
                     io.getExtras().get(UploadTask.EXTRA_UPLOADED_PACK));
 
             LOGGER.info("BUILD SUCCESSFUL in {}s", (int) (System.currentTimeMillis() - startTimestamp) / 1000);

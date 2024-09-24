@@ -12,6 +12,7 @@ Modern solution for minecraft resource pack development
 - [Auto sounds FFmpeg conversion](#sounds)
 - [Auto fancyPants (custom armor)](#armor-textures)
 - [Obfuscation](#obfuscation)
+- ItemsAdder integration
 
 
 ## Example Project
@@ -234,7 +235,6 @@ The settings for this function are in [`config/build.json5`](https://github.com/
 
 ## Planned in the future
 - [ ] **(W.I.P.)** Rewrite builder to **Golang** as binary executable for all platforms and architectures.
-- [ ] Integration into [ItemsAdder](https://www.spigotmc.org/resources/%E2%9C%A8itemsadder%E2%AD%90emotes-mobs-items-armors-hud-gui-emojis-blocks-wings-hats-liquids.73355/), [Oraxen](https://www.spigotmc.org/resources/%E2%98%84%EF%B8%8F-oraxen-add-items-blocks-armors-hats-food-furnitures-plants-and-gui.72448/), [Model Engine](https://www.spigotmc.org/resources/conxeptworks-model-engine—ultimate-custom-entity-model-manager-1-16-5-1-19-3.79477/), etc.
 - [ ] Fonts generating (auto symbol mapping, etc.)
 - [ ] **(ALMOST DONE)** Global player resource pack memory using [Redis](https://redis.io/) and CI/CD. (for multi server)
 - [ ] Improve the quality of the code and API.

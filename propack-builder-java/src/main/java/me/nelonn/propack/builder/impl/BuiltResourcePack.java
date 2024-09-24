@@ -23,7 +23,6 @@ import me.nelonn.propack.Resources;
 import me.nelonn.propack.Sha1;
 import me.nelonn.propack.UploadedPack;
 import me.nelonn.propack.builder.api.Project;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -32,15 +31,15 @@ public class BuiltResourcePack implements ResourcePack {
     private final Project project;
     private final Resources resources;
     private final File file;
-    private final File zip;
-    private final Sha1 sha1;
-    private final UploadedPack uploadedPack;
+    private final @Nullable File zip;
+    private final @Nullable Sha1 sha1;
+    private final @Nullable UploadedPack uploadedPack;
 
-    public BuiltResourcePack(@NotNull Project project,
-                             @NotNull Resources resources,
-                             @NotNull File file,
-                             @NotNull File zip,
-                             @NotNull Sha1 sha1,
+    public BuiltResourcePack(Project project,
+                             Resources resources,
+                             File file,
+                             @Nullable File zip,
+                             @Nullable Sha1 sha1,
                              @Nullable UploadedPack uploadedPack) {
         this.project = project;
         this.resources = resources;
@@ -51,12 +50,12 @@ public class BuiltResourcePack implements ResourcePack {
     }
 
     @Override
-    public @NotNull String getName() {
+    public String getName() {
         return project.getName();
     }
 
     @Override
-    public @NotNull Resources resources() {
+    public Resources resources() {
         return resources;
     }
 
@@ -65,19 +64,19 @@ public class BuiltResourcePack implements ResourcePack {
         return uploadedPack;
     }
 
-    public @NotNull Project getProject() {
+    public Project getProject() {
         return project;
     }
 
-    public @NotNull File getFile() {
+    public @Nullable File getFile() {
         return file;
     }
 
-    public @NotNull File getZip() {
+    public @Nullable File getZip() {
         return zip;
     }
 
-    public @NotNull Sha1 getSha1() {
+    public @Nullable Sha1 getSha1() {
         return sha1;
     }
 

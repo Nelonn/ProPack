@@ -24,6 +24,7 @@ import me.nelonn.configlib.MiniMessageText;
 public final class Config {
     public static final ConfigValue<String> dispatcherStore = new ConfigValue<>("dispatcher.store", "propack:memory_store");
     public static final ConfigValue<Boolean> dispatcherEnabled = new ConfigValue<>("dispatcher.enabled", true);
+    public static final ConfigValue<Boolean> itemsAdderCompat = new ConfigValue<>("dispatcher.items_adder_compat", true);
     public static final ConfigValue<Boolean> dispatcherReplace = new ConfigValue<>("dispatcher.replace", false);
     public static final ConfigValue<String> dispatcherPack = new ConfigValue<>("dispatcher.pack");
     public static final ConfigValue<Integer> dispatcherDelay = new ConfigValue<>("dispatcher.delay", 0);

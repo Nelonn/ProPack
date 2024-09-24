@@ -109,16 +109,20 @@ public class Dispatcher implements Listener {
             LOGGER.warn("Resource pack '" + packName + "' not built");
             return;
         }
+        Player player = event.getPlayer();
+        if (plugin.config().get(Config.itemsAdderCompat) && Bukkit.getServer().getPluginManager().isPluginEnabled("ItemsAdder")) {
+            activePackStore.setActiveResourcePack(player.getUniqueId(), new ActivePack(resourcePack.getName(), null));
+            return;
+        }
         if (!resourcePack.isUploaded()) {
             LOGGER.error("Resource pack '" + resourcePack.getName() + "' not uploaded");
             return;
         }
         UploadedPack uploadedPack = resourcePack.getUpload();
-        Player player = event.getPlayer();
         ActivePack active = activePackStore.getActiveResourcePack(player.getUniqueId());
         if (active != null) {
             if (plugin.config().get(Config.dispatcherReplace)) {
-                if (active.name.equals(resourcePack.getName()) && active.sha1.equals(uploadedPack.getSha1String())) return;
+                if (active.name.equals(resourcePack.getName()) && active.sha1 != null && active.sha1.equals(uploadedPack.getSha1String())) return;
             } else return;
         }
         int delay = plugin.config().get(Config.dispatcherDelay);

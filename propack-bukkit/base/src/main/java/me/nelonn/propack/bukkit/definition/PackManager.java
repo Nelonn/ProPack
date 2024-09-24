@@ -33,10 +33,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class PackManager {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -44,6 +41,7 @@ public class PackManager {
     private final BukkitProPackCore core;
     private final File directory;
     private final ProjectLoader projectLoader;
+    private @Nullable String usesIACompat = null;
 
     public PackManager(@NotNull BukkitProPackCore core, @NotNull File directory) {
         this.core = core;
@@ -52,7 +50,7 @@ public class PackManager {
     }
 
     public void loadAll() {
-        definitions.clear();
+        clear();
         File[] files = directory.listFiles();
         if (files == null) {
             return;
@@ -68,9 +66,16 @@ public class PackManager {
                 String type = GsonHelper.getString(jsonObject, "Type");
                 if (type.equalsIgnoreCase("Project")) {
                     Path projectDirectory = Path.of(directory.getAbsolutePath()).resolve(GsonHelper.getString(jsonObject, "Directory", "./" + name));
-                    boolean buildAtStartup = GsonHelper.getBoolean(jsonObject, "BuildAtStartup", true);
+                    ProjectPack.Config config = GsonHelper.getGson().fromJson(jsonObject, ProjectPack.Config.class);
+                    if (config.itemsAdderCompat) {
+                        if (usesIACompat != null) {
+                            throw new UnsupportedOperationException("Pack '" + name + "' already uses ItemsAdder compatibility, only one pack can use that");
+                        } else {
+                            usesIACompat = name;
+                        }
+                    }
                     File projectFile = projectDirectory.resolve("project.json5").toFile();
-                    ProjectPack projectPack = new ProjectPack(projectFile, core.getBuilder(), projectLoader, !buildAtStartup);
+                    ProjectPack projectPack = new ProjectPack(projectFile, core.getBuilder(), projectLoader, config);
                     definitions.put(name, projectPack);
                 } else if (type.equalsIgnoreCase("File")) {
                     throw new UnsupportedOperationException("Resource pack definition type 'File' currently not supported");
@@ -90,6 +95,7 @@ public class PackManager {
 
     public void clear() {
         definitions.clear();
+        usesIACompat = null;
     }
 
     public @Nullable PackDefinition getDefinition(@NotNull String name) {

@@ -25,10 +25,7 @@ import me.nelonn.propack.builder.impl.task.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class BuildConfiguration {
@@ -41,7 +38,7 @@ public class BuildConfiguration {
     private final PackageOptions packageOptions;
     private final Hosting hosting;
     private final Map<String, Object> uploadOptions;
-    private final LinkedHashSet<TaskBootstrap> tasks;
+    private final LinkedHashMap<String, TaskBootstrap> tasks;
 
     public BuildConfiguration(@NotNull StrictMode strictMode,
                               @Nullable Pattern dirIgnore,
@@ -61,21 +58,21 @@ public class BuildConfiguration {
         this.packageOptions = packageOptions;
         this.hosting = hosting;
         this.uploadOptions = uploadOptions == null ? null : new HashMap<>(uploadOptions);
-        tasks = new LinkedHashSet<>();
-        tasks.add(GatherSourcesTask.BOOTSTRAP);
-        tasks.add(ProcessModelsTask.BOOTSTRAP);
-        tasks.add(ProcessSoundsTask.BOOTSTRAP);
-        tasks.add(ProcessArmorTextures.BOOTSTRAP);
-        tasks.add(ProcessLanguagesTask.BOOTSTRAP);
-        tasks.add(ProcessFontsTask.BOOTSTRAP);
+        tasks = new LinkedHashMap<>();
+        tasks.put("gatherSources", GatherSourcesTask.BOOTSTRAP);
+        tasks.put("processModels", ProcessModelsTask.BOOTSTRAP);
+        tasks.put("processSounds", ProcessSoundsTask.BOOTSTRAP);
+        tasks.put("processArmorTextures", ProcessArmorTextures.BOOTSTRAP);
+        tasks.put("processLanguages", ProcessLanguagesTask.BOOTSTRAP);
+        tasks.put("processFonts", ProcessFontsTask.BOOTSTRAP);
         if (obfuscationConfiguration.isEnabled()) {
-            tasks.add(ObfuscateTask.BOOTSTRAP);
+            tasks.put("obfuscate", ObfuscateTask.BOOTSTRAP);
         }
-        tasks.add(SortAssetsTask.BOOTSTRAP);
-        tasks.add(PackageTask.BOOTSTRAP);
-        tasks.add(SerializeTask.BOOTSTRAP);
+        tasks.put("sortAssets", SortAssetsTask.BOOTSTRAP);
+        tasks.put("package", PackageTask.BOOTSTRAP);
+        tasks.put("serialize", SerializeTask.BOOTSTRAP);
         if (hosting != null) {
-            tasks.add(UploadTask.BOOTSTRAP);
+            tasks.put("upload", UploadTask.BOOTSTRAP);
         }
     }
 
@@ -115,7 +112,7 @@ public class BuildConfiguration {
         return uploadOptions == null ? null : new HashMap<>(uploadOptions);
     }
 
-    public @NotNull Set<TaskBootstrap> getTasks() {
+    public @NotNull LinkedHashMap<String, TaskBootstrap> getTasks() {
         return tasks;
     }
 }

@@ -19,12 +19,13 @@
 package me.nelonn.propack.bukkit.dispatcher;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ActivePack {
     public final String name;
-    public final String sha1;
+    public final @Nullable String sha1;
 
-    public ActivePack(@NotNull String name, @NotNull String sha1) {
+    public ActivePack(@NotNull String name, @Nullable String sha1) {
         this.name = name;
         this.sha1 = sha1;
     }

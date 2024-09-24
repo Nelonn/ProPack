@@ -4,15 +4,14 @@ dispatcher:
   store: 'propack:memory_store'
   # if disabled, you can access the store anyway.
   enabled: true
+  # works if ItemsAdder installed
+  items_adder_compat: true
   # send if player has active resource pack
   replace: false
   # pack to send
   pack: example
   # player joins -> delay seconds -> sending pack
   delay: 0
-
-  # options below requires ProtocolLib
-
   # kick player if he declined pack
   required: true
   # MiniMessage https://docs.advntr.dev/minimessage

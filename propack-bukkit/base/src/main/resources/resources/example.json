@@ -1,4 +1,5 @@
 {
   "Type": "Project",
-  "BuildAtStartup": false
+  "BuildAtStartup": true,
+  "ItemsAdderCompat": false
 }

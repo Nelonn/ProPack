@@ -18,14 +18,13 @@
 
 package me.nelonn.propack;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface ResourcePack {
 
-    @NotNull String getName();
+    String getName();
 
-    @NotNull Resources resources();
+    Resources resources();
 
     @Nullable UploadedPack getUpload();
 

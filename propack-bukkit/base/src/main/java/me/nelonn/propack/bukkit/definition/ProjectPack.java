@@ -18,22 +18,33 @@
 
 package me.nelonn.propack.bukkit.definition;
 
+import com.google.gson.annotations.SerializedName;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.Resources;
 import me.nelonn.propack.builder.ProPackBuilder;
 import me.nelonn.propack.builder.impl.BuiltResourcePack;
 import me.nelonn.propack.builder.impl.InternalProject;
 import me.nelonn.propack.builder.impl.ProjectLoader;
+import me.nelonn.propack.bukkit.SaveToFolderTask;
 import me.nelonn.propack.bukkit.SimpleResourcePack;
 import me.nelonn.propack.core.loader.ProPackFileLoader;
 import me.nelonn.propack.core.util.LogManagerCompat;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.nio.file.Path;
 
 public class ProjectPack implements PackDefinition {
+    public static class Config {
+        @SerializedName("BuildAtStartup")
+        public boolean buildAtStartup = true;
+        @SerializedName("ItemsAdderCompat")
+        public boolean itemsAdderCompat = true;
+    }
+
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final File file;
     private String name;
@@ -41,15 +52,17 @@ public class ProjectPack implements PackDefinition {
     private ProjectLoader projectLoader;
     private ProPackBuilder builder;
     private ResourcePack resourcePack;
+    private final boolean itemsAdderCompat;
 
-    public ProjectPack(@NotNull File file, @NotNull ProPackBuilder builder, @NotNull ProjectLoader projectLoader, boolean tryLoadBuilt) {
+    public ProjectPack(File file, ProPackBuilder builder, ProjectLoader projectLoader, Config config) {
         this.file = file;
         this.projectLoader = projectLoader;
         this.builder = builder;
-        if (tryLoadBuilt) {
-            loadOrBuild();
-        } else {
+        this.itemsAdderCompat = config.itemsAdderCompat;
+        if (config.buildAtStartup) {
             build();
+        } else {
+            loadOrBuild();
         }
     }
 
@@ -91,7 +104,7 @@ public class ProjectPack implements PackDefinition {
         project = projectLoader.load(file, true);
         name = project.name;
         if (project.getResourcePack() == null) {
-            build0();
+            buildInternal();
         } else {
             resourcePack = project.getResourcePack$();
         }
@@ -101,10 +114,22 @@ public class ProjectPack implements PackDefinition {
         LOGGER.info("Running builder...");
         project = projectLoader.load(file, false);
         name = project.name;
-        build0();
+        buildInternal();
     }
 
-    private void build0() {
+    private void buildInternal() {
+        if (itemsAdderCompat) {
+            Path iaDir = Bukkit.getServer().getPluginsFolder().toPath().resolve("ItemsAdder");
+            Path destDir = iaDir.resolve("contents").resolve("propack").resolve("resourcepack");
+            var tasks = project.getBuildConfiguration().getTasks();
+            tasks.remove("package");
+            tasks.remove("upload");
+            tasks.put("copyToIA", (project) -> {
+               var task = new SaveToFolderTask(project);
+               task.destDir = destDir;
+               return task;
+            });
+        }
         builder.build();
         project.build();
         LOGGER.info("Trying to load output file...");
