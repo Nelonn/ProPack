@@ -9,7 +9,6 @@ java.toolchain.languageVersion.set(JavaLanguageVersion.of(8))
 
 repositories {
     mavenCentral()
-    maven("https://repo.eclipse.org/content/groups/releases/") // JGit
 }
 
 var adventureVersion = "4.17.0"

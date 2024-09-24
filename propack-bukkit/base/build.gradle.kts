@@ -6,7 +6,6 @@ java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 
 repositories {
     mavenCentral()
-    maven("https://repo.eclipse.org/content/groups/releases/") // JGit
     maven("https://repo.codemc.io/repository/maven-public/") // NBTAPI
 
     maven("https://repo.dmulloy2.net/repository/public/") // ProtocolLib

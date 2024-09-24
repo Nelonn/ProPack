@@ -39,7 +39,6 @@ tasks {
         exclude("LICENSE*")
         exclude("META-INF/maven/**")
         exclude("about.html")
-        exclude("plugin.properties") // JGit
         relocate("me.nelonn.bestvecs", "$shadedPackage.bestvecs")
         relocate("me.nelonn.commandlib", "$shadedPackage.commandlib")
         relocate("me.nelonn.configlib", "$shadedPackage.configlib")
