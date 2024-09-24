@@ -71,7 +71,7 @@ public class SlotItemModel extends MultiItemModel {
         }
         if (empty) return getBaseMesh();
         String hex = Integer.toHexString(sb.toString().hashCode());
-        return Path.of(getBaseMesh().namespace(), getBaseMesh().value() + '-' + hex);
+        return Path.of(friendlyPath.namespace(), friendlyPath.value() + '-' + hex);
     }
 
     public @NotNull Collection<Slot> getSlots() {
