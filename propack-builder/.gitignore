@@ -1,0 +1,10 @@
+
+# For test
+/project.json
+
+/*.exe
+
+.DS_Store
+.idea
+.vscode
+.vs
