@@ -22,16 +22,19 @@ import me.nelonn.propack.builder.api.StrictMode;
 import me.nelonn.propack.builder.api.hosting.Hosting;
 import me.nelonn.propack.builder.api.task.TaskBootstrap;
 import me.nelonn.propack.builder.impl.task.*;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class BuildConfiguration {
     private final StrictMode strictMode;
     private final Pattern dirIgnore;
     private final Pattern fileIgnore;
+    private final int customModelDataStart;
     private final ObfuscationConfiguration obfuscationConfiguration;
     private final Map<String, String> allLangTranslations;
     private final Set<String> languages;
@@ -40,18 +43,20 @@ public class BuildConfiguration {
     private final Map<String, Object> uploadOptions;
     private final LinkedHashMap<String, TaskBootstrap> tasks;
 
-    public BuildConfiguration(@NotNull StrictMode strictMode,
+    public BuildConfiguration(StrictMode strictMode,
                               @Nullable Pattern dirIgnore,
                               @Nullable Pattern fileIgnore,
-                              @NotNull ObfuscationConfiguration obfuscationConfiguration,
-                              @NotNull Map<String, String> allLangTranslations,
-                              @NotNull Set<String> languages,
-                              @NotNull PackageOptions packageOptions,
+                              int customModelDataStart,
+                              ObfuscationConfiguration obfuscationConfiguration,
+                              Map<String, String> allLangTranslations,
+                              Set<String> languages,
+                              PackageOptions packageOptions,
                               @Nullable Hosting hosting,
                               @Nullable Map<String, Object> uploadOptions) {
         this.strictMode = strictMode;
         this.dirIgnore = dirIgnore;
         this.fileIgnore = fileIgnore;
+        this.customModelDataStart = customModelDataStart;
         this.obfuscationConfiguration = obfuscationConfiguration;
         this.allLangTranslations = allLangTranslations;
         this.languages = languages;
@@ -76,7 +81,7 @@ public class BuildConfiguration {
         }
     }
 
-    public @NotNull StrictMode getStrictMode() {
+    public StrictMode getStrictMode() {
         return strictMode;
     }
 
@@ -88,19 +93,23 @@ public class BuildConfiguration {
         return fileIgnore;
     }
 
-    public @NotNull ObfuscationConfiguration getObfuscationConfiguration() {
+    public int getCustomModelDataStart() {
+        return customModelDataStart;
+    }
+
+    public ObfuscationConfiguration getObfuscationConfiguration() {
         return obfuscationConfiguration;
     }
 
-    public @NotNull Map<String, String> getAllLangTranslations() {
+    public Map<String, String> getAllLangTranslations() {
         return allLangTranslations;
     }
 
-    public @NotNull Set<String> getLanguages() {
+    public Set<String> getLanguages() {
         return languages;
     }
 
-    public @NotNull PackageOptions getPackageOptions() {
+    public PackageOptions getPackageOptions() {
         return packageOptions;
     }
 
@@ -112,7 +121,7 @@ public class BuildConfiguration {
         return uploadOptions == null ? null : new HashMap<>(uploadOptions);
     }
 
-    public @NotNull LinkedHashMap<String, TaskBootstrap> getTasks() {
+    public LinkedHashMap<String, TaskBootstrap> getTasks() {
         return tasks;
     }
 }

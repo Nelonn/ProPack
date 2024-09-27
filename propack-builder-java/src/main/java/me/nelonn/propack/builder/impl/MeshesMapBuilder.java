@@ -23,7 +23,6 @@ import com.google.common.collect.HashBiMap;
 import me.nelonn.flint.path.Key;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.MeshesMap;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -32,17 +31,22 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MeshesMapBuilder {
+    private final int customModelDataStart;
     private final Map<Key, ItemEntry> mappers = new HashMap<>();
 
-    public @NotNull MeshesMapBuilder.ItemEntry getMapper(@NotNull Key itemId) {
-        return mappers.computeIfAbsent(itemId, ItemEntry::new);
+    public MeshesMapBuilder(int customModelDataStart) {
+        this.customModelDataStart = customModelDataStart;
     }
 
-    public @NotNull Collection<ItemEntry> getMappers() {
+    public MeshesMapBuilder.ItemEntry getMapper(Key itemId) {
+        return mappers.computeIfAbsent(itemId, (itemId2) -> new ItemEntry(itemId2, customModelDataStart));
+    }
+
+    public Collection<ItemEntry> getMappers() {
         return mappers.values();
     }
 
-    public @NotNull MeshesMap build() {
+    public MeshesMap build() {
         Map<Key, Map<Path, Integer>> map = new HashMap<>();
         for (ItemEntry itemEntry : getMappers()) {
             map.put(itemEntry.getItemId(), new HashMap<>(itemEntry.getMap().inverse()));
@@ -53,27 +57,26 @@ public class MeshesMapBuilder {
     public static class ItemEntry {
         private final Key itemId;
         private final BiMap<Integer, Path> map = HashBiMap.create();
-        private final AtomicInteger integer = new AtomicInteger(1);
+        private final AtomicInteger integer;
 
-        public ItemEntry(@NotNull Key itemId) {
+        public ItemEntry(Key itemId, int customModelDataStart) {
             this.itemId = itemId;
+            this.integer = new AtomicInteger(customModelDataStart);
         }
 
-        @NotNull
         public Key getItemId() {
             return itemId;
         }
 
-        @Nullable
-        public Integer get(@NotNull Path path) {
+        public @Nullable Integer get(Path path) {
             return map.inverse().get(path);
         }
 
-        public void add(@NotNull Path path) {
+        public void add(Path path) {
             map.put(integer.getAndIncrement(), path);
         }
 
-        public @NotNull BiMap<Integer, Path> getMap() {
+        public BiMap<Integer, Path> getMap() {
             return map;
         }
     }

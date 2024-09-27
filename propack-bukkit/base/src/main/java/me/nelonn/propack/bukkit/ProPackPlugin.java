@@ -76,8 +76,8 @@ public final class ProPackPlugin extends JavaPlugin {
 
         core = new BukkitProPackCore(this);
         ProPack.setCore(core);
-        itemPatcher = new ItemPatcher();
         config = new PluginConfig(this, "resources/config.yml", "config.yml");
+        itemPatcher = new ItemPatcher(config);
         reloadModules();
         reloadConfig();
         reloadPacks();

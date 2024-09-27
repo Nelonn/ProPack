@@ -143,6 +143,7 @@ public class ProjectLoader {
         StrictMode strictMode;
         Pattern fileIgnore = null;
         Pattern dirIgnore = null;
+        int customModelDataStart = 1;
         ObfuscationConfiguration obfuscationConfiguration;
         try {
             File buildConfigFile = new File(projectFile.getParentFile(), "config/build.json5");
@@ -191,6 +192,10 @@ public class ProjectLoader {
                     });
                     fileIgnore = Pattern.compile(sb.toString());
                 }
+            }
+
+            if (buildConfigObject.has("CustomModelDataStart")) {
+                customModelDataStart = GsonHelper.getInt(buildConfigObject, "CustomModelDataStart");
             }
 
             JsonObject obfuscationObject = GsonHelper.getObject(buildConfigObject, "Obfuscation");
@@ -306,8 +311,18 @@ public class ProjectLoader {
             throw new IllegalArgumentException("Something went wrong when loading 'config/upload.json5'", e);
         }
 
-        BuildConfiguration buildConfiguration = new BuildConfiguration(strictMode, dirIgnore, fileIgnore,
-                obfuscationConfiguration, allLangTranslations, languages, packageOptions, hosting, uploadOptions);
+        BuildConfiguration buildConfiguration = new BuildConfiguration(
+                strictMode,
+                dirIgnore,
+                fileIgnore,
+                customModelDataStart,
+                obfuscationConfiguration,
+                allLangTranslations,
+                languages,
+                packageOptions,
+                hosting,
+                uploadOptions
+        );
 
         ResourcePack resourcePack = null;
         File builtResourcePack = new File(projectFile.getParentFile(), "build/" + name + ".propack");

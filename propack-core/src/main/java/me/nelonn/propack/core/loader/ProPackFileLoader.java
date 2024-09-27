@@ -35,10 +35,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ProPackFileLoader {
     public @NotNull Resources load(@NotNull File file) {
@@ -87,13 +84,13 @@ public class ProPackFileLoader {
                     Set<Key> targetItems = parseTargetItems(targetArray);
                     JsonObject slotsObject = GsonHelper.getObject(modelObject, "Slots");
                     Map<String, SlotItemModel.Slot> slots = new HashMap<>();
-                    for (Map.Entry<String, JsonElement> slotEntry : slotsObject.entrySet()) {
+                    slotsObject.keySet().stream().sorted().forEach(key -> {
                         Set<String> slotEntries = new HashSet<>();
-                        JsonArray jsonArray = GsonHelper.asArray(slotEntry.getValue(), slotEntry.getKey());
-                        Util.forEachStringArray(jsonArray, slotEntry.getKey(), slotEntries::add);
-                        SlotItemModel.Slot slot = new SlotItemModel.Slot(slotEntry.getKey(), slotEntries);
+                        JsonArray jsonArray = GsonHelper.asArray(slotsObject.get(key), key);
+                        Util.forEachStringArray(jsonArray, key, slotEntries::add);
+                        SlotItemModel.Slot slot = new SlotItemModel.Slot(key, slotEntries);
                         slots.put(slot.getName(), slot);
-                    }
+                    });
                     itemModels.put(path, new SlotItemModelBuilder(path).setMesh(mesh).setSlots(slots).setTargetItems(targetItems));
                 }
             }

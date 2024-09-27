@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SlotItemModel extends MultiItemModel {
     private final Map<String, Slot> slots;
@@ -37,6 +36,10 @@ public class SlotItemModel extends MultiItemModel {
 
     public @NotNull Path getMesh() {
         return getBaseMesh();
+    }
+
+    public static String hash(String str) {
+        return Integer.toHexString(str.hashCode());
     }
 
     public @NotNull Path getMesh(Map<String, String> slots) {
@@ -56,26 +59,25 @@ public class SlotItemModel extends MultiItemModel {
             }
         }
         StringBuilder sb = new StringBuilder();
-        boolean empty = true;
-        for (Slot slot : getSlots()) {
+        boolean[] empty = {true};
+        slots.keySet().stream().sorted().forEach(slotName -> {
             if (sb.length() > 0) {
                 sb.append('&');
             }
-            sb.append(slot.getName()).append(':');
-            String element = slots.get(slot.getName());
+            sb.append(slotName).append(':');
+            String element = slots.get(slotName);
             if (element != null && !element.isEmpty()) {
                 sb.append(element);
-                empty = false;
-                break;
+                empty[0] = false;
             }
-        }
-        if (empty) return getBaseMesh();
-        String hex = Integer.toHexString(sb.toString().hashCode());
+        });
+        if (empty[0]) return getBaseMesh();
+        String hex = hash(sb.toString());
         return Path.of(friendlyPath.namespace(), friendlyPath.value() + '-' + hex);
     }
 
     public @NotNull Collection<Slot> getSlots() {
-        return slots.values().stream().sorted().collect(Collectors.toList());
+        return slots.values();
     }
 
     public @Nullable Slot getSlot(@NotNull String name) {
@@ -86,7 +88,7 @@ public class SlotItemModel extends MultiItemModel {
         return slots.containsKey(name);
     }
 
-    public static class Slot implements Iterable<String>, Comparable<Slot> {
+    public static class Slot implements Iterable<String> {
         private final String name;
         private final Set<String> entries;
 
@@ -111,11 +113,6 @@ public class SlotItemModel extends MultiItemModel {
         @Override
         public Iterator<String> iterator() {
             return entries.iterator();
-        }
-
-        @Override
-        public int compareTo(@NotNull SlotItemModel.Slot o) {
-            return o.getName().compareTo(getName());
         }
 
         @Override

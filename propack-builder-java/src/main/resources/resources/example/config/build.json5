@@ -15,6 +15,7 @@
     "\\.txt$",
     "\\.md$"
   ],
+  "CustomModelDataStart": 1,
   "Obfuscation": {
     "Enabled": true,
     "Namespace": "o",

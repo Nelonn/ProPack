@@ -18,6 +18,7 @@
 
 package me.nelonn.propack.bukkit.packet;
 
+import me.nelonn.configlib.PluginConfig;
 import me.nelonn.flint.path.Key;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.Resources;
@@ -25,19 +26,33 @@ import me.nelonn.propack.asset.CombinedItemModel;
 import me.nelonn.propack.asset.DefaultItemModel;
 import me.nelonn.propack.asset.ItemModel;
 import me.nelonn.propack.asset.SlotItemModel;
+import me.nelonn.propack.bukkit.Config;
 import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.adapter.MCompoundTag;
 import me.nelonn.propack.bukkit.adapter.MItemStack;
 import me.nelonn.propack.bukkit.adapter.MListTag;
+import me.nelonn.propack.core.util.LogManagerCompat;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.nio.file.InvalidPathException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ItemPatcher {
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static final int TAG_STRING = 8;
+
+    private final PluginConfig config;
+
+    public ItemPatcher(PluginConfig config) {
+        this.config = config;
+    }
+
+    public boolean isDebug() {
+        return config.get(Config.patchPacketDebugMode);
+    }
 
     public void patchServerboundItem(@NotNull MItemStack itemStack) {
         MCompoundTag tag = itemStack.getCustomData();
@@ -54,11 +69,19 @@ public class ItemPatcher {
             Path path;
             try {
                 path = Path.of(customModel);
-            } catch (InvalidPathException ignored) {
+            } catch (InvalidPathException e) {
+                if (isDebug()) {
+                    LOGGER.error("[ItemPatcherDebug] Invalid custom model path {}", customModel, e);
+                }
                 return;
             }
             ItemModel itemModel = resources.itemModel(path);
-            if (itemModel == null) return;
+            if (itemModel == null) {
+                if (isDebug()) {
+                    LOGGER.error("[ItemPatcherDebug] Model not found {}", path);
+                }
+                return;
+            }
             Path mesh;
             if (itemModel instanceof DefaultItemModel defaultItemModel) {
                 mesh = defaultItemModel.getMesh();
@@ -80,12 +103,22 @@ public class ItemPatcher {
             Material material = Material.matchMaterial(itemStack.getItemId().toString());
             assert material != null;
             Key itemType = ProPack.adapt(material);
-            if (!itemModel.getTargetItems().contains(itemType)) return;
+            if (!itemModel.getTargetItems().contains(itemType)) {
+                if (isDebug()) {
+                    LOGGER.error("[ItemPatcherDebug] Not target item {}", itemType);
+                }
+                return;
+            }
             Integer cmd = resources.getMeshes().getCustomModelData(mesh, itemType);
-            if (cmd == null) return;
+            if (cmd == null) {
+                if (isDebug()) {
+                    LOGGER.error("[ItemPatcherDebug] {} custom model data not found for {}", itemType, mesh);
+                }
+                return;
+            }
             itemStack.setCustomModelData(cmd);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to patch item", e);
         }
     }
 

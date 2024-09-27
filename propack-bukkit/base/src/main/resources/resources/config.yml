@@ -29,3 +29,4 @@ dev_server:
 patch_packets:
   items: true
   sounds: true
+  debug_mode: false

@@ -58,7 +58,7 @@ public class ProcessModelsTask extends AbstractTask {
 
     @Override
     public void run(@NotNull TaskIO io) {
-        MeshesMapBuilder meshesMapBuilder = new MeshesMapBuilder();
+        MeshesMapBuilder meshesMapBuilder = new MeshesMapBuilder(getProject().getBuildConfiguration().getCustomModelDataStart());
         io.getExtras().put(EXTRA_MESH_MAPPING_BUILDER, meshesMapBuilder);
         Map<Path, Set<Key>> meshesToOverride = new HashMap<>();
         for (File file : io.getFiles()) {
@@ -145,7 +145,7 @@ public class ProcessModelsTask extends AbstractTask {
                         }
                         slots.put(slotEntry.getKey(), slotElements);
                     }
-                    Map<String, List<String>> slotsMap = new HashMap<>();
+                    LinkedHashMap<String, List<String>> slotsMap = new LinkedHashMap<>();
                     for (Map.Entry<String, Map<String, JsonModel>> slot : slots.entrySet()) {
                         slotsMap.put(slot.getKey(), new ArrayList<>(slot.getValue().keySet()));
                     }
@@ -180,7 +180,7 @@ public class ProcessModelsTask extends AbstractTask {
                             }
                         });
                         if (empty.get()) continue;
-                        String hex = Integer.toHexString(sb.toString().hashCode());
+                        String hex = SlotItemModel.hash(sb.toString());
                         Path generatedPath = PathUtil.append(resourcePath, '-' + hex);
                         JsonModel generatedMesh = new JsonModel(baseMesh.getParent(), baseMesh.getTextureSize(),
                                 textureMap, modelElements, baseMesh.useAmbientOcclusion(), baseMesh.getGuiLight(),
