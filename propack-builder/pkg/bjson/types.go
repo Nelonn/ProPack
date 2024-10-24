@@ -2,6 +2,9 @@ package bjson
 
 type JsonObject map[string]interface{}
 type JsonArray []interface{}
+type JsonString struct {
+	Value string
+}
 
 type JsonElement interface {
 	Object() JsonObject
