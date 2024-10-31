@@ -3,12 +3,14 @@
   "Strict": true,
   // Ignore directory regexps
   "DirIgnore": [
+    "^\\.",
     "^\\.old$",
     "^\\.src$",
     "^\\.ignore$"
   ],
   // Ignore file regexps
   "FileIgnore": [
+    "^\\.",
     "^\\.ds_store$",
     "\\.old\\.png$",
     "\\.psd$",
