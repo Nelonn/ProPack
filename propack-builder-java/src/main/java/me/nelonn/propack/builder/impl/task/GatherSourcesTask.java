@@ -35,6 +35,7 @@ import me.nelonn.propack.core.util.IOUtil;
 import me.nelonn.propack.core.util.LogManagerCompat;
 import me.nelonn.propack.core.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -64,8 +65,8 @@ public class GatherSourcesTask extends AbstractTask {
         if (files == null) return;
         for (File file : files) {
             String fileName = file.getName().toLowerCase();
-            Pattern pattern = file.isFile() ? getProject().getBuildConfiguration().getFileIgnore() :
-                    getProject().getBuildConfiguration().getDirIgnore();
+            @Nullable Pattern pattern = file.isDirectory() ? getProject().getBuildConfiguration().getDirIgnore() :
+                    getProject().getBuildConfiguration().getFileIgnore();
             if (pattern != null && pattern.matcher(fileName).matches()) continue;
             if (Path.checkNamespace(fileName).isPresent()) {
                 String message = to + '/' + fileName + ": Non [a-z0-9._-] character in file name";

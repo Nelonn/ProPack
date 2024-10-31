@@ -35,7 +35,7 @@ dependencies {
     //compileOnly("net.kyori:adventure-text-serializer-gson:$adventureVersion")
     compileOnly("net.kyori:adventure-platform-bukkit:4.3.3")
 
-    compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0-SNAPSHOT")
+    compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0")
     compileOnly("me.clip:placeholderapi:2.11.6")
     //compileOnly("com.github.oraxen:oraxen:-SNAPSHOT")
 
