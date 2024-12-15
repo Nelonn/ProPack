@@ -19,6 +19,7 @@
 package me.nelonn.propack.bukkit.adapter;
 
 import me.nelonn.flint.path.Key;
+import me.nelonn.flint.path.Path;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +29,10 @@ public interface MItemStack {
     @Nullable MCompoundTag getCustomData();
 
     void setCustomModelData(int customModelData);
+
+    default boolean setNewItemModel(Path itemModel) {
+        return false;
+    }
 
     void removeCustomModelData();
 }

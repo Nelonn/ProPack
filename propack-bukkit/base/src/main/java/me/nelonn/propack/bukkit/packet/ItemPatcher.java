@@ -100,6 +100,9 @@ public class ItemPatcher {
             } else {
                 return;
             }
+            if (itemStack.setNewItemModel(mesh)) {
+                return;
+            }
             Material material = Material.matchMaterial(itemStack.getItemId().toString());
             assert material != null;
             Key itemType = ProPack.adapt(material);

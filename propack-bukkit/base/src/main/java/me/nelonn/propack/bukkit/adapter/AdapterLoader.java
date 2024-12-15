@@ -18,24 +18,31 @@
 
 package me.nelonn.propack.bukkit.adapter;
 
+import me.nelonn.propack.core.util.LogManagerCompat;
 import org.bukkit.Bukkit;
+import org.slf4j.Logger;
 
 public class AdapterLoader {
     public static final Adapter ADAPTER;
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     static {
         Adapter loaded;
         try {
             String minecraft = Bukkit.getServer().getBukkitVersion().split("-")[0];
             String nmsVersion;
-            if (minecraft.equals("1.21") || minecraft.equals("1.21.1")) {
-                nmsVersion = "v1_21_R1";
-            } else if (minecraft.equals("1.20.5") || minecraft.equals("1.20.6")) {
-                nmsVersion = "v1_20_R4";
-            } else {
-                nmsVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-                if (minecraft.equalsIgnoreCase("1.17.1")) {
-                    nmsVersion += "_2";
+            switch (minecraft) {
+                case "1.21.4" -> {
+                    nmsVersion = "v1_21_4";
+                    LOGGER.info("Obfuscation currently not supported in 1.21.4+, please disable that in `config/build.json5`");
+                }
+                case "1.21", "1.21.1" -> nmsVersion = "v1_21_R1";
+                case "1.20.5", "1.20.6" -> nmsVersion = "v1_20_R4";
+                default -> {
+                    nmsVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+                    if (minecraft.equalsIgnoreCase("1.17.1")) {
+                        nmsVersion += "_2";
+                    }
                 }
             }
             Class<?> clazz = Class.forName("me.nelonn.propack.bukkit.adapter.impl." + nmsVersion + ".PaperweightAdapter");
@@ -46,8 +53,7 @@ public class AdapterLoader {
             }
         } catch (Exception e) {
             loaded = null;
-            e.printStackTrace();
-            //throw new IllegalStateException("Unable to load bukkit adapter", e);
+            LOGGER.error("Failed to load adapter", e);
         }
         ADAPTER = loaded;
     }

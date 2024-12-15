@@ -41,7 +41,7 @@ dependencies {
 
     compileOnly("org.slf4j:slf4j-api:2.0.7")
 
-    implementation("commons-io:commons-io:2.11.0")
+    implementation("commons-io:commons-io:2.14.0")
     implementation("org.apache.commons:commons-lang3:3.12.0")
 
     compileOnly("org.jetbrains:annotations:24.1.0")
