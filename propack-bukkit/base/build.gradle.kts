@@ -13,7 +13,7 @@ repositories {
     maven("https://jitpack.io") // Oraxen
 
     maven("https://hub.spigotmc.org/nexus/content/groups/public") // SpigotAPI
-    maven("https://papermc.io/repo/repository/maven-public/") // PaperAPI
+    maven("https://repo.papermc.io/repository/maven-public/") // PaperAPI
 }
 
 var adventureVersion = "4.17.0"

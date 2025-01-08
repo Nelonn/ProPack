@@ -5,11 +5,11 @@ plugins {
 
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 
-paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.REOBF_PRODUCTION
+paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
 dependencies {
     // https://repo.papermc.io/service/rest/repository/browse/maven-public/io/papermc/paper/dev-bundle/
-    paperweight.paperDevBundle("1.20.6-R0.1-20240617.120221-121")
+    paperweight.paperDevBundle("1.21.3-R0.1-20241223.191244-86")
     compileOnly(files("../../../libs/flint-path-0.0.1.jar"))
     compileOnly(project(":propack-api"))
     compileOnly(project(":propack-core"))
@@ -19,8 +19,4 @@ dependencies {
 tasks.withType<JavaCompile> {
     options.release.set(21)
     options.encoding = "UTF-8"
-}
-
-tasks.named("assemble") {
-    dependsOn("reobfJar")
 }
