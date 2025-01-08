@@ -100,9 +100,6 @@ public class ItemPatcher {
             } else {
                 return;
             }
-            if (itemStack.setNewItemModel(mesh)) {
-                return;
-            }
             Material material = Material.matchMaterial(itemStack.getItemId().toString());
             assert material != null;
             Key itemType = ProPack.adapt(material);
@@ -117,6 +114,9 @@ public class ItemPatcher {
                 if (isDebug()) {
                     LOGGER.error("[ItemPatcherDebug] {} custom model data not found for {}", itemType, mesh);
                 }
+                return;
+            }
+            if (itemStack.setNewItemModel(Path.of("propack", itemType.value() + "." + Integer.toHexString(cmd)))) {
                 return;
             }
             itemStack.setCustomModelData(cmd);

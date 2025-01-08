@@ -32,14 +32,7 @@ public class AdapterLoader {
             String minecraft = Bukkit.getServer().getBukkitVersion().split("-")[0];
             String nmsVersion;
             switch (minecraft) {
-                case "1.21.4" -> {
-                    nmsVersion = "v1_21_4";
-                    LOGGER.info("Obfuscation currently not supported in 1.21.3+, please disable that in `config/build.json5`");
-                }
-                case "1.21.3" -> {
-                    nmsVersion = "v1_21_3";
-                    LOGGER.info("Obfuscation currently not supported in 1.21.3+, please disable that in `config/build.json5`");
-                }
+                case "1.21.4" -> nmsVersion = "v1_21_4";
                 case "1.21", "1.21.1" -> nmsVersion = "v1_21_R1";
                 case "1.20.5", "1.20.6" -> nmsVersion = "v1_20_R4";
                 default -> {

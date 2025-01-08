@@ -144,6 +144,7 @@ public class ProjectLoader {
         Pattern fileIgnore = null;
         Pattern dirIgnore = null;
         int customModelDataStart = 1;
+        boolean generateItemModels = false;
         ObfuscationConfiguration obfuscationConfiguration;
         try {
             File buildConfigFile = new File(projectFile.getParentFile(), "config/build.json5");
@@ -196,6 +197,10 @@ public class ProjectLoader {
 
             if (buildConfigObject.has("CustomModelDataStart")) {
                 customModelDataStart = GsonHelper.getInt(buildConfigObject, "CustomModelDataStart");
+            }
+
+            if (buildConfigObject.has("GenerateItemModels")) {
+                generateItemModels = GsonHelper.getBoolean(buildConfigObject, "GenerateItemModels");
             }
 
             JsonObject obfuscationObject = GsonHelper.getObject(buildConfigObject, "Obfuscation");
@@ -316,6 +321,7 @@ public class ProjectLoader {
                 dirIgnore,
                 fileIgnore,
                 customModelDataStart,
+                generateItemModels,
                 obfuscationConfiguration,
                 allLangTranslations,
                 languages,

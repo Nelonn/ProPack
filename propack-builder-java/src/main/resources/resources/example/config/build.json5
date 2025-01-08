@@ -18,6 +18,7 @@
     "\\.md$"
   ],
   "CustomModelDataStart": 1,
+  "GenerateItemModels": true,
   "Obfuscation": {
     "Enabled": true,
     "Namespace": "o",

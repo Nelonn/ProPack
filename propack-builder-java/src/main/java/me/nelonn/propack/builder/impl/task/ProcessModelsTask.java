@@ -240,6 +240,18 @@ public class ProcessModelsTask extends AbstractTask {
         }
         // overriding default models (custom_model_data)
         for (MeshesMapBuilder.ItemEntry itemEntry : meshesMapBuilder.getMappers()) {
+            if (getProject().getBuildConfiguration().isGenerateItemModels()) {
+                String pathBase = "include/assets/propack/items/" + itemEntry.getItemId().value() + ".";
+                for (Map.Entry<Integer, Path> mapping : itemEntry.getMap().entrySet()) {
+                    String finalPath = pathBase + Integer.toHexString(mapping.getKey()) + ".json";
+                    JsonObject rootJson = new JsonObject();
+                    JsonObject modelJson = new JsonObject();
+                    modelJson.addProperty("type", "minecraft:model");
+                    modelJson.addProperty("model", mapping.getValue().toString());
+                    rootJson.add("model", modelJson);
+                    io.getFiles().addFile(new JsonFile(finalPath, rootJson));
+                }
+            }
             String path = "include/assets/" + itemEntry.getItemId().namespace() + "/models/item/" + itemEntry.getItemId().value() + ".json";
             File file = io.getFiles().getFile(path);
             if (!(file instanceof JsonFile)) {

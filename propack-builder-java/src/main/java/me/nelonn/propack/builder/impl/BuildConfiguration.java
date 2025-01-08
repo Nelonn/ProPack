@@ -35,6 +35,7 @@ public class BuildConfiguration {
     private final Pattern dirIgnore;
     private final Pattern fileIgnore;
     private final int customModelDataStart;
+    private final boolean generateItemModels;
     private final ObfuscationConfiguration obfuscationConfiguration;
     private final Map<String, String> allLangTranslations;
     private final Set<String> languages;
@@ -47,6 +48,7 @@ public class BuildConfiguration {
                               @Nullable Pattern dirIgnore,
                               @Nullable Pattern fileIgnore,
                               int customModelDataStart,
+                              boolean generateItemModels,
                               ObfuscationConfiguration obfuscationConfiguration,
                               Map<String, String> allLangTranslations,
                               Set<String> languages,
@@ -57,6 +59,7 @@ public class BuildConfiguration {
         this.dirIgnore = dirIgnore;
         this.fileIgnore = fileIgnore;
         this.customModelDataStart = customModelDataStart;
+        this.generateItemModels = generateItemModels;
         this.obfuscationConfiguration = obfuscationConfiguration;
         this.allLangTranslations = allLangTranslations;
         this.languages = languages;
@@ -95,6 +98,10 @@ public class BuildConfiguration {
 
     public int getCustomModelDataStart() {
         return customModelDataStart;
+    }
+
+    public boolean isGenerateItemModels() {
+        return generateItemModels;
     }
 
     public ObfuscationConfiguration getObfuscationConfiguration() {
