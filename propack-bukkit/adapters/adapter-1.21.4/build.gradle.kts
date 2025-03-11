@@ -9,7 +9,7 @@ paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArt
 
 dependencies {
     // https://repo.papermc.io/service/rest/repository/browse/maven-public/io/papermc/paper/dev-bundle/
-    paperweight.paperDevBundle("1.21.4-R0.1-20241215.095037-18")
+    paperweight.paperDevBundle("1.21.4-R0.1-20250309.181911-203")
     compileOnly(files("../../../libs/flint-path-0.0.1.jar"))
     compileOnly(project(":propack-api"))
     compileOnly(project(":propack-core"))

@@ -19,6 +19,6 @@ include("propack-bukkit")
 
 include("propack-bukkit:base")
 
-listOf("1.20.4", "1.20.6", "1.21", "1.21.4").forEach {
+listOf("1.21.4").forEach {
     include("propack-bukkit:adapters:adapter-$it")
 }
