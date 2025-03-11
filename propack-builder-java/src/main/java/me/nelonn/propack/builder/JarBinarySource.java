@@ -120,6 +120,7 @@ public class JarBinarySource {
         String fileName = os + "_" + arch;
 
         if (os.equals("windows")) {
+            fileName = fileName + ".exe";
             binaryPath = Files.createTempFile(null, ".exe");
         } else {
             binaryPath = Files.createTempFile(null, null, PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-xr-x")));
