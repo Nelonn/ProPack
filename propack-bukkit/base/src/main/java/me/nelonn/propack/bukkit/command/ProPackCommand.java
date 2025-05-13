@@ -35,7 +35,7 @@ public class ProPackCommand extends Command<CommandSender> {
 
     public ProPackCommand(@NotNull ProPackPlugin plugin) {
         super("propack");
-        children(new HelpCommand(plugin), new ReloadCommand(plugin), new BuildCommand(plugin));
+        children(new HelpCommand(plugin), new ReloadCommand(plugin), new BuildCommand(plugin), new GetUrlCommand(plugin));
         this.plugin = plugin;
     }
 

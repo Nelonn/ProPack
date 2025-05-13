@@ -39,6 +39,7 @@ public class HelpCommand extends Command<CommandSender> {
         CommandSender sender = commandContext.getSource();
         Util.send(sender, "<white>" + plugin.getDescription().getName() + " <gray>v" + plugin.getDescription().getVersion());
         Util.send(sender, "<gray>/propack build <project>");
+        Util.send(sender, "<gray>/propack get-url <project>");
         Util.send(sender, "<gray>/propack reload [config|modules|packs]");
         return true;
     }
