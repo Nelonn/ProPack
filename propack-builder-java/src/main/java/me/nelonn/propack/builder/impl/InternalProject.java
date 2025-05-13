@@ -95,7 +95,7 @@ public class InternalProject implements Project {
         return resourcePack;
     }
 
-    public void build() {
-        resourcePack = createDefaultBuilder().build();
+    public boolean build() {
+        return (resourcePack = createDefaultBuilder().build()) != null;
     }
 }

@@ -131,7 +131,10 @@ public class ProjectPack implements PackDefinition {
             });
         }
         builder.build();
-        project.build();
+        if (!project.build()) {
+            resourcePack = null;
+            return;
+        }
         LOGGER.info("Trying to load output file...");
         File builtResourcePack = new File(project.getBuildDir(), project.name + ".propack");
         if (!builtResourcePack.exists()) {
