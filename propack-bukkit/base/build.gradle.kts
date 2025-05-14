@@ -37,7 +37,7 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
     //compileOnly("com.github.oraxen:oraxen:-SNAPSHOT")
 
-    implementation("io.netty:netty-transport:4.2.1.Final")
+    compileOnly("io.netty:netty-transport:4.2.1.Final")
 
     compileOnly("org.slf4j:slf4j-api:2.0.7")
 
