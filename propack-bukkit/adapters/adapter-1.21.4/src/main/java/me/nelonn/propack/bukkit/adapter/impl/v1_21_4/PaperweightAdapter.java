@@ -20,12 +20,14 @@ package me.nelonn.propack.bukkit.adapter.impl.v1_21_4;
 
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
 import me.nelonn.flint.path.Key;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.bukkit.Util;
 import me.nelonn.propack.bukkit.adapter.*;
+import me.nelonn.propack.bukkit.packet.IPacketListener;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -42,7 +44,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Marker;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomModelData;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -120,8 +121,10 @@ public class PaperweightAdapter implements Adapter {
     }
 
     @Override
-    public void inject(@NotNull Player player, @NotNull IPacketListener listener) {
-        ((CraftPlayer) player).getHandle().connection.connection.channel.pipeline().addBefore("packet_handler", "propack_injector", new PacketInjector(player, listener));
+    public @Nullable Channel getChannel(@NotNull Player player) {
+        var connection = ((CraftPlayer) player).getHandle().connection;
+        if (connection == null) return null;
+        return connection.connection.channel;
     }
 
     @Override

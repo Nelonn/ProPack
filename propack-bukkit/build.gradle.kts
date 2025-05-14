@@ -11,7 +11,6 @@ repositories {
     mavenCentral()
     maven("https://repo.codemc.io/repository/maven-public/") // NBTAPI
 
-    maven("https://repo.dmulloy2.net/repository/public/") // ProtocolLib
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
     maven("https://jitpack.io") // Oraxen
 

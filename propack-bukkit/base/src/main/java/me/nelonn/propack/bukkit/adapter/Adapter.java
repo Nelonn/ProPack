@@ -18,6 +18,7 @@
 
 package me.nelonn.propack.bukkit.adapter;
 
+import io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,7 +44,7 @@ public interface Adapter {
 
     @NotNull Class<?> getClientboundSoundEntityPacket();
 
-    void inject(@NotNull Player player, @NotNull IPacketListener packetListener);
+    @Nullable Channel getChannel(@NotNull Player player);
 
     @NotNull Object patchServerboundSetCreativeModeSlotPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher);
 

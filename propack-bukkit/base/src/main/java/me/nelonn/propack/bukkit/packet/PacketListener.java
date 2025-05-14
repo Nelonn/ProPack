@@ -18,13 +18,7 @@
 
 package me.nelonn.propack.bukkit.packet;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.ListeningWhitelist;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.injector.GamePhase;
+import io.netty.channel.Channel;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.ResourcePack;
 import me.nelonn.propack.Resources;
@@ -34,14 +28,12 @@ import me.nelonn.propack.bukkit.ProPack;
 import me.nelonn.propack.bukkit.ProPackPlugin;
 import me.nelonn.propack.bukkit.adapter.Adapter;
 import me.nelonn.propack.bukkit.adapter.AdapterLoader;
-import me.nelonn.propack.bukkit.adapter.IPacketListener;
 import me.nelonn.propack.bukkit.adapter.MItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,95 +45,35 @@ public class PacketListener implements IPacketListener, Listener {
     private final ProPackPlugin plugin;
     private final Adapter adapter;
     private final ItemPatcher packetPatcher;
-    private final boolean thirdPartyInjector;
 
-    @SuppressWarnings("deprecation")
     public PacketListener(@NotNull ProPackPlugin plugin) {
         this.plugin = plugin;
         this.adapter = Objects.requireNonNull(AdapterLoader.ADAPTER, "Adapter not loaded");
         this.packetPatcher = plugin.getItemPatcher();
-        if (plugin.getServer().getPluginManager().isPluginEnabled("ProtocolLib")) {
-            plugin.getLogger().info("Using third-party packet injector: ProtocolLib");
-            ProtocolLibrary.getProtocolManager().addPacketListener(new com.comphenix.protocol.events.PacketListener() {
-                private static ListeningWhitelist buildWhitelist(PacketType... packetTypes) {
-                    return ListeningWhitelist.newBuilder()
-                            .priority(ListenerPriority.NORMAL)
-                            .gamePhase(GamePhase.PLAYING)
-                            .types(packetTypes)
-                            .build();
-                }
-
-                private final ListeningWhitelist sending = buildWhitelist(
-                        PacketType.Play.Server.SET_SLOT,
-                        PacketType.Play.Server.WINDOW_ITEMS,
-                        PacketType.Play.Server.ENTITY_EQUIPMENT,
-                        PacketType.Play.Server.ENTITY_METADATA,
-                        PacketType.Play.Server.NAMED_SOUND_EFFECT,
-                        PacketType.Play.Server.ENTITY_SOUND
-                        //PacketType.Play.Server.CUSTOM_SOUND_EFFECT
-                );
-                private final ListeningWhitelist receiving = buildWhitelist(PacketType.Play.Client.SET_CREATIVE_SLOT);
-
-                @Override
-                public void onPacketSending(PacketEvent packetEvent) {
-                    if (packetEvent.isReadOnly()) return;
-                    Object packet = packetEvent.getPacket().getHandle();
-                    Object patchedPacket = PacketListener.this.onPacketSend(packetEvent.getPlayer(), packet);
-                    if (patchedPacket == null) {
-                        packetEvent.setCancelled(true);
-                        return;
-                    }
-                    if (patchedPacket != packet) {
-                        packetEvent.setPacket(PacketContainer.fromPacket(patchedPacket));
-                    }
-                }
-
-                @Override
-                public void onPacketReceiving(PacketEvent packetEvent) {
-                    if (packetEvent.isReadOnly()) return;
-                    Object packet = packetEvent.getPacket().getHandle();
-                    Object patchedPacket = PacketListener.this.onPacketReceive(packetEvent.getPlayer(), packet);
-                    if (patchedPacket == null) {
-                        packetEvent.setCancelled(true);
-                        return;
-                    }
-                    if (patchedPacket != packet) {
-                        packetEvent.setPacket(PacketContainer.fromPacket(patchedPacket));
-                    }
-                }
-
-                @Override
-                public ListeningWhitelist getSendingWhitelist() {
-                    return sending;
-                }
-
-                @Override
-                public ListeningWhitelist getReceivingWhitelist() {
-                    return receiving;
-                }
-
-                @Override
-                public Plugin getPlugin() {
-                    return plugin;
-                }
-            });
-            thirdPartyInjector = true;
-        } else {
-            plugin.getLogger().warning("Builtin packet injector is not recommended! Install ProtocolLib");
-            thirdPartyInjector = false;
-        }
     }
 
     public static void register(@NotNull ProPackPlugin plugin) {
         PacketListener packetListener = new PacketListener(plugin);
-        if (!packetListener.thirdPartyInjector) {
-            plugin.getServer().getPluginManager().registerEvents(packetListener, plugin);
-        }
+        plugin.getServer().getPluginManager().registerEvents(packetListener, plugin);
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    private static final String HANDLER_NAME = "propack-patcher";
+
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void on(PlayerJoinEvent event) {
-        adapter.inject(event.getPlayer(), this);
+        Channel channel = adapter.getChannel(event.getPlayer());
+        if (channel == null) {
+            ProPackPlugin.getInstance().getLogger().warning("Channel of " + event.getPlayer().getName() + " was null");
+            return;
+        }
+        if (channel.pipeline().get("unbundler") == null) {
+            ProPackPlugin.getInstance().getLogger().warning("Channel of " + event.getPlayer().getName() + " does not contain unbundler");
+            return;
+        }
+        channel.pipeline().addBefore("unbundler", HANDLER_NAME, new DuplexPacketHandler(event.getPlayer(), this));
+        for (String name : channel.pipeline().names()) {
+            System.out.println(name);
+        }
     }
 
     private @NotNull String patchSound(@NotNull Resources resources, @NotNull String original) {
@@ -170,6 +102,7 @@ public class PacketListener implements IPacketListener, Listener {
                 method = adapter::patchClientboundSetEntityDataPacket;
             }
             if (method != null) {
+                System.out.println("PATCHED");
                 return method.apply(packet, stack -> packetPatcher.patchClientboundItem(stack, resources));
             }
         }

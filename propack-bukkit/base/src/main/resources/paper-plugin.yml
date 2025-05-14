@@ -18,6 +18,3 @@ dependencies:
     flint-path-lib:
       load: BEFORE
       required: false
-    ProtocolLib:
-      load: BEFORE
-      required: false

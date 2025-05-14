@@ -8,7 +8,6 @@ repositories {
     mavenCentral()
     maven("https://repo.codemc.io/repository/maven-public/") // NBTAPI
 
-    maven("https://repo.dmulloy2.net/repository/public/") // ProtocolLib
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
     maven("https://jitpack.io") // Oraxen
 
@@ -35,9 +34,10 @@ dependencies {
     //compileOnly("net.kyori:adventure-text-serializer-gson:$adventureVersion")
     compileOnly("net.kyori:adventure-platform-bukkit:4.3.3")
 
-    compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0")
     compileOnly("me.clip:placeholderapi:2.11.6")
     //compileOnly("com.github.oraxen:oraxen:-SNAPSHOT")
+
+    implementation("io.netty:netty-transport:4.2.1.Final")
 
     compileOnly("org.slf4j:slf4j-api:2.0.7")
 
