@@ -62,7 +62,8 @@ public class GetUrlCommand extends Command<CommandSender> {
             Util.send(sender, "<red>Resource pack '" + context.getArguments()[0] + "' not uploaded");
             return false;
         }
-        Util.send(sender, "URL: <green>" + resourcePack.getUpload().getUrl());
+        String url = resourcePack.getUpload().getUrl();
+        Util.send(sender, "URL: <green><hover:show_text:'Click to copy'><click:copy_to_clipboard:'" + url + "'>" + url);
         return true;
     }
 
