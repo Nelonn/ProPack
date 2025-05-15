@@ -31,10 +31,10 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.*;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
+import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -88,6 +88,13 @@ public class PackageTask extends AbstractTask {
         }
     }
 
+    private final static FileTime ZERO_TIME = FileTime.fromMillis(0L);
+    private final static Random RANDOM = new Random();
+
+    private static int random(int min, int max) {
+        return RANDOM.nextInt((max - min) + 1) + min;
+    }
+
     private void packageFiles(@NotNull File output, @NotNull FileCollection input, @NotNull PackageOptions options) {
         try (FileOutputStream fileOutputStream = new FileOutputStream(output);
              ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream, StandardCharsets.UTF_8)) {
@@ -95,7 +102,17 @@ public class PackageTask extends AbstractTask {
             zipOutputStream.setComment(options.comment);
             for (me.nelonn.propack.builder.api.file.File file : input) {
                 final ZipEntry zipEntry = new ZipEntry(file.getPath());
-                zipEntry.setLastModifiedTime(FileTime.fromMillis(0L));
+                if (options.protection) {
+                    zipEntry.setCrc(0L);
+                    zipEntry.setLastAccessTime(ZERO_TIME);
+                    zipEntry.setCreationTime(ZERO_TIME);
+                    zipEntry.setLastModifiedTime(ZERO_TIME);
+                    if (file.getPath().endsWith(".ogg")) {
+                        zipEntry.setSize(random(9000, 15000));
+                    } else {
+                        zipEntry.setSize(1111L);
+                    }
+                }
                 zipOutputStream.putNextEntry(zipEntry);
                 try (InputStream inputStream = file.openInputStream()) {
                     final byte[] buffer = new byte[1024];
@@ -104,10 +121,6 @@ public class PackageTask extends AbstractTask {
                         zipOutputStream.write(buffer, 0, read);
                     }
                     zipOutputStream.closeEntry();
-                    if (options.protection) {
-                        zipEntry.setCrc(buffer.length);
-                        zipEntry.setSize(new BigInteger(buffer).mod(BigInteger.valueOf(Long.MAX_VALUE)).longValue());
-                    }
                 }
             }
         } catch (IOException e) {
