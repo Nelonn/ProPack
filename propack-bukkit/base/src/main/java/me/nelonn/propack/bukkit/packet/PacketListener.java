@@ -102,7 +102,6 @@ public class PacketListener implements IPacketListener, Listener {
                 method = adapter::patchClientboundSetEntityDataPacket;
             }
             if (method != null) {
-                System.out.println("PATCHED");
                 return method.apply(packet, stack -> packetPatcher.patchClientboundItem(stack, resources));
             }
         }
