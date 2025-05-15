@@ -35,7 +35,6 @@ public class DuplexPacketHandler extends ChannelDuplexHandler {
     // On Server: Serverbound
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
-        System.out.println("Read packet: " + packet.getClass().getSimpleName());
         packet = packetListener.onPacketReceive(player, packet);
         if (packet == null) return;
         super.channelRead(ctx, packet);
@@ -44,7 +43,6 @@ public class DuplexPacketHandler extends ChannelDuplexHandler {
     // On Server: Clientbound
     @Override
     public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
-        System.out.println("Send packet: " + packet.getClass().getSimpleName());
         packet = packetListener.onPacketSend(player, packet);
         if (packet == null) return;
         super.write(ctx, packet, promise);
