@@ -42,7 +42,6 @@ public class JarBinarySource {
         try (ZipFile zf = new ZipFile(source.toFile())) {
             ZipEntry entry = zf.getEntry(input);
             if (entry == null) {
-                System.out.println("Not found");
                 throw new FileNotFoundException("The embedded resource '" + input + "' cannot be found in jar");
             }
             try (InputStream is = zf.getInputStream(entry)) {

@@ -22,7 +22,7 @@ import me.nelonn.flint.path.Key;
 import me.nelonn.propack.Sha1;
 import me.nelonn.propack.UploadedPack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public abstract class Hosting {
     private HostingMap hostingMap;
     private Key id;
 
-    public abstract @NotNull UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1, @NotNull String name, @Nullable Map<String, Object> options) throws IOException;
+    public abstract @Nullable UploadedPack upload(@NotNull File file, @NotNull Sha1 sha1, @NotNull String name, @Nullable Map<String, Object> options) throws IOException;
 
     public final boolean register(@NotNull HostingMap hostingMap, @NotNull Key id) {
         if (allowChangesFrom(hostingMap)) {

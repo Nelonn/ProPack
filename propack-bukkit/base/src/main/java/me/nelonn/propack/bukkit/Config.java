@@ -35,6 +35,9 @@ public final class Config {
     public static final ConfigValue<String> devServerHostIp = new ConfigValue<>("dev_server.host_ip", "127.0.0.1");
     public static final ConfigValue<Integer> devServerPort = new ConfigValue<>("dev_server.port", 3000);
 
+    public static final ConfigValue<Boolean> staticHostEnabled = new ConfigValue<>("static_host.enabled", false);
+    public static final ConfigValue<String> staticHostUrl = new ConfigValue<>("static_host.url", "https://example.com/pack.zip");
+
     public static final ConfigValue<Boolean> patchPacketItems = new ConfigValue<>("patch_packets.items", true);
     public static final ConfigValue<Boolean> patchPacketSounds = new ConfigValue<>("patch_packets.sounds", true);
     public static final ConfigValue<Boolean> patchPacketDebugMode = new ConfigValue<>("patch_packets.debug_mode", true);

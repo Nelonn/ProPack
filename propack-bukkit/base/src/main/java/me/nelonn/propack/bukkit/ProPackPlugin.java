@@ -50,6 +50,7 @@ public final class ProPackPlugin extends JavaPlugin {
     private BukkitProPackCore core;
     private ItemPatcher itemPatcher;
     private DevServer devServer;
+    private StaticHosting staticHost;
     private PluginConfig config;
 
     @Override
@@ -120,9 +121,18 @@ public final class ProPackPlugin extends JavaPlugin {
             }
             devServer = null;
         }
+        if (staticHost != null) {
+            core.getHostingMap().unregister(staticHost);
+            staticHost = null;
+        }
         if (config.get(Config.devServerEnabled)) {
             devServer = new DevServer(config.get(Config.devServerHostIp), config.get(Config.devServerPort));
             core.getHostingMap().register("dev_server", devServer);
+        }
+        if (config.get(Config.staticHostEnabled)) {
+            staticHost = new StaticHosting();
+            staticHost.setPackUrl(config.get(Config.staticHostUrl));
+            core.getHostingMap().register("static_host", staticHost);
         }
         String dispatcherStore = config.get(Config.dispatcherStore);
         ActivePackStore activePackStore = core.getActivePackStoreMap().get(dispatcherStore);

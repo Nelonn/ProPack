@@ -71,9 +71,9 @@ public class PacketListener implements IPacketListener, Listener {
             return;
         }
         channel.pipeline().addBefore("unbundler", HANDLER_NAME, new DuplexPacketHandler(event.getPlayer(), this));
-        for (String name : channel.pipeline().names()) {
-            System.out.println(name);
-        }
+        //for (String name : channel.pipeline().names()) {
+        //    System.out.println(name);
+        //}
     }
 
     private @NotNull String patchSound(@NotNull Resources resources, @NotNull String original) {

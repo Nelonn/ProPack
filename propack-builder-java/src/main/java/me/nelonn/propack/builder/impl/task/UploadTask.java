@@ -55,11 +55,15 @@ public class UploadTask extends AbstractTask {
         if (sha1 == null) {
             throw new NullPointerException("EXTRA_SHA1");
         }
+        UploadedPack uploadedPack;
         try {
-            UploadedPack uploadedPack = hosting.upload(zip, sha1, getProject().getName(), getProject().getBuildConfiguration().getUploadOptions());
-            io.getExtras().put(EXTRA_UPLOADED_PACK, uploadedPack);
+            uploadedPack = hosting.upload(zip, sha1, getProject().getName(), getProject().getBuildConfiguration().getUploadOptions());
         } catch (Exception e) {
-            LOGGER.error("Unable to upload '" + getProject().getName() + "'", e);
+            LOGGER.error("Unable to upload '{}'", getProject().getName(), e);
+            return;
+        }
+        if (uploadedPack != null) {
+            io.getExtras().put(EXTRA_UPLOADED_PACK, uploadedPack);
         }
     }
 }
