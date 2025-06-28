@@ -21,6 +21,7 @@ package me.nelonn.propack.bukkit.packet;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import me.nelonn.propack.bukkit.ProPackPlugin;
 import org.bukkit.entity.Player;
 
 public class DuplexPacketHandler extends ChannelDuplexHandler {
@@ -37,7 +38,11 @@ public class DuplexPacketHandler extends ChannelDuplexHandler {
     public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
         packet = packetListener.onPacketReceive(player, packet);
         if (packet == null) return;
-        super.channelRead(ctx, packet);
+        try {
+            super.channelRead(ctx, packet);
+        } catch (Throwable e) {
+            ProPackPlugin.getInstance().getSLF4JLogger().error("DuplexPacketHandler: {}", e.getMessage());
+        }
     }
 
     // On Server: Clientbound
@@ -45,7 +50,11 @@ public class DuplexPacketHandler extends ChannelDuplexHandler {
     public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
         packet = packetListener.onPacketSend(player, packet);
         if (packet == null) return;
-        super.write(ctx, packet, promise);
+        try {
+            super.write(ctx, packet, promise);
+        } catch (Throwable e) {
+            ProPackPlugin.getInstance().getSLF4JLogger().error("DuplexPacketHandler: {}", e.getMessage());
+        }
     }
 
 }

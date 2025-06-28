@@ -26,9 +26,13 @@ import io.netty.handler.codec.MessageToMessageCodec;
 import me.nelonn.flint.path.Key;
 import me.nelonn.flint.path.Path;
 import me.nelonn.propack.bukkit.Util;
-import me.nelonn.propack.bukkit.adapter.*;
+import me.nelonn.propack.bukkit.adapter.Adapter;
+import me.nelonn.propack.bukkit.adapter.MCompoundTag;
+import me.nelonn.propack.bukkit.adapter.MItemStack;
+import me.nelonn.propack.bukkit.adapter.MListTag;
 import me.nelonn.propack.bukkit.packet.IPacketListener;
 import net.minecraft.core.Holder;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -49,6 +53,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -135,38 +140,79 @@ public class PaperweightAdapter implements Adapter {
 
     @Override
     public @NotNull Object patchClientboundContainerSetSlotPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
-        patcher.accept(ItemStackWrapper.of(((ClientboundContainerSetSlotPacket) packet).getItem()));
-        return packet;
+        ClientboundContainerSetSlotPacket nms = (ClientboundContainerSetSlotPacket) packet;
+        if (nms.getItem().isEmpty()) return packet;
+        ItemStack itemStack = nms.getItem().copy();
+        patcher.accept(ItemStackWrapper.of(itemStack));
+        return new ClientboundContainerSetSlotPacket(nms.getContainerId(), nms.getStateId(), nms.getSlot(), itemStack);
     }
 
     @Override
     public @NotNull Object patchClientboundContainerSetContentPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
         ClientboundContainerSetContentPacket nms = (ClientboundContainerSetContentPacket) packet;
+        NonNullList<ItemStack> modified = NonNullList.createWithCapacity(nms.getItems().size());
+        boolean modifiedFlag = false;
         for (ItemStack itemStack : nms.getItems()) {
+            if (itemStack.isEmpty()) {
+                modified.add(itemStack);
+                continue;
+            }
+            itemStack = itemStack.copy();
             patcher.accept(ItemStackWrapper.of(itemStack));
+            modified.add(itemStack);
+            modifiedFlag = true;
         }
-        patcher.accept(ItemStackWrapper.of(nms.getCarriedItem()));
-        return packet;
+        ItemStack carriedItem = nms.getCarriedItem();
+        if (!carriedItem.isEmpty()) {
+            carriedItem = carriedItem.copy();
+            patcher.accept(ItemStackWrapper.of(carriedItem));
+            modifiedFlag = true;
+        }
+        return modifiedFlag ? new ClientboundContainerSetContentPacket(nms.getContainerId(), nms.getStateId(), modified, carriedItem) : packet;
     }
 
     @Override
     public @NotNull Object patchClientboundSetEntityEquipmentPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
         ClientboundSetEquipmentPacket nms = (ClientboundSetEquipmentPacket) packet;
+        List<Pair<EquipmentSlot, ItemStack>> modified = new ArrayList<>(nms.getSlots().size());
+        boolean modifiedFlag = false;
         for (Pair<EquipmentSlot, ItemStack> slot : nms.getSlots()) {
-            patcher.accept(ItemStackWrapper.of(slot.getSecond()));
+            ItemStack itemStack = slot.getSecond();
+            if (itemStack.isEmpty()) {
+                modified.add(slot);
+                continue;
+            }
+            itemStack = itemStack.copy();
+            patcher.accept(ItemStackWrapper.of(itemStack));
+            modified.add(Pair.of(slot.getFirst(), itemStack));
+            modifiedFlag = true;
         }
-        return packet;
+        return modifiedFlag ? new ClientboundSetEquipmentPacket(nms.getEntity(), modified) : packet;
     }
 
     @Override
     public @NotNull Object patchClientboundSetEntityDataPacket(@NotNull Object packet, @NotNull Consumer<MItemStack> patcher) {
         ClientboundSetEntityDataPacket nms = (ClientboundSetEntityDataPacket) packet;
         List<SynchedEntityData.DataValue<?>> dataValueList = nms.packedItems();
+        if (dataValueList.isEmpty()) return packet;
+        List<SynchedEntityData.DataValue<?>> modified = new ArrayList<>(dataValueList.size());
+        boolean modifiedFlag = false;
         for (SynchedEntityData.DataValue<?> dataValue : dataValueList) {
-            if (!dataValue.serializer().equals(EntityDataSerializers.ITEM_STACK)) continue;
-            patcher.accept(ItemStackWrapper.of((ItemStack) dataValue.value()));
+            if (!dataValue.serializer().equals(EntityDataSerializers.ITEM_STACK)) {
+                modified.add(dataValue);
+                continue;
+            }
+            ItemStack itemStack = (ItemStack) dataValue.value();
+            if (itemStack.isEmpty()) {
+                modified.add(dataValue);
+                continue;
+            }
+            itemStack = itemStack.copy();
+            patcher.accept(ItemStackWrapper.of(itemStack));
+            modified.add(new SynchedEntityData.DataValue(dataValue.id(), dataValue.serializer(), itemStack));
+            modifiedFlag = true;
         }
-        return packet;
+        return modifiedFlag ? new ClientboundSetEntityDataPacket(nms.id(), modified) : nms;
     }
 
     private SoundEvent recreateSound(SoundEvent original, ResourceLocation name) {
