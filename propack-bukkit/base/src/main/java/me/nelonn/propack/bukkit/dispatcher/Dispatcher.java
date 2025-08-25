@@ -110,7 +110,7 @@ public class Dispatcher implements Listener {
             return;
         }
         Player player = event.getPlayer();
-        if (plugin.config().get(Config.itemsAdderCompat) && Bukkit.getServer().getPluginManager().isPluginEnabled("ItemsAdder")) {
+        if (plugin.config().get(Config.fakeApply)) {
             activePackStore.setActiveResourcePack(player.getUniqueId(), new ActivePack(resourcePack.getName(), null));
             return;
         }
